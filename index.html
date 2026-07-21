@@ -619,7 +619,17 @@ fetch('plugins.json')
         filterData();
         updateDailyFeatured();
     });
-
+    
+// 2. Filmleri Çek (movies.json)
+fetch('movies.json')
+    .then(r => r.json())
+    .then(data => {
+        moviesDb = data;
+    })
+    .catch(error => {
+        console.error("Filmler yüklenemedi:", error);
+        moviesDb = []; // Dosya okunamazsa boş döner, hata vermez
+    });
 
 </script>
 </body>
