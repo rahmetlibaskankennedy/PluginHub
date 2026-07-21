@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
+    
     <script>
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
     </script>
@@ -68,7 +68,7 @@
         }
         .play-btn-circle:hover { transform: scale(1.1); }
 
-        /* Mobil Alt Navigasyon Barı (Görseldeki Yuvarlak Sarı/Pembe Aksiyonlu) */
+        /* Mobil Alt Navigasyon Barı */
         .stream-dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: #141230;
@@ -83,6 +83,7 @@
             width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: var(--text-muted); font-size: 18px; transition: all 0.2s;
+            cursor: pointer;
         }
         .dock-btn.active {
             background: var(--accent-yellow);
@@ -149,7 +150,7 @@
 
 <main class="max-w-7xl mx-auto px-6 py-4">
 
-    <!-- HERO FEATURED MEDIA (Görseldeki Sağ Medya Oynatıcı Bölümü) -->
+    <!-- HERO FEATURED MEDIA -->
     <div class="hero-media-box p-6 md:p-8 mb-8">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="max-w-xl">
@@ -190,7 +191,7 @@
             <option value="tv">📺 TV</option>
             <option value="mobile">📱 Mobil</option>
         </select>
-        <input type="text" id="searchInput" oninput="filterData()" placeholder="🔍 Eklenti veya içerik ara..." class="bg-indigo-950/80 border border-slate-800 text-xs text-white p-3 rounded-xl outline-none">
+        <input type="text" id="searchInput" oninput="filterData()" placeholder="🔍 Eklenti veya içerik ara..." class="bg-indigo-950/80 border border-slate-800 text-xs text-white p-3 rounded-xl outline-none hidden md:block">
     </div>
 
     <!-- EKLENTİ KARTLARI AKIŞI -->
@@ -201,11 +202,26 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- MOBİL DOCK NAVIGATION (Görseldeki Gibi) -->
+<!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
     <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})">🏠</button>
-    <button class="dock-btn" onclick="document.getElementById('searchInput').focus()">🔍</button>
+    <button class="dock-btn" onclick="toggleSearchModal()">🔍</button>
     <button class="dock-btn" onclick="toggleFavFilter()">♡</button>
+</div>
+
+<!-- GENİŞLETİLMİŞ ARAMA MODALI -->
+<div id="search-modal" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex flex-col opacity-0 pointer-events-none transition-all duration-300">
+    <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
+            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
+        </div>
+        <div class="relative">
+            <input type="text" id="expandedSearchInput" placeholder="Eklenti, içerik veya platform ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none focus:border-pink-500 transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
+            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-3xl opacity-50">🔍</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">Arama sonuçları arka planda anlık olarak listelenir. Kapatmak için çarpıya veya dışarı tıklayın.</p>
+    </div>
 </div>
 
 <!-- DETAY MODAL -->
@@ -233,6 +249,9 @@ let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
 let showFavsOnly = false;
 let currentModalItem = null;
 
+const HERO_MANIFEST = "https://torrentio.strem.fun/manifest.json";
+const HERO_INSTALL_URL = "stremio://torrentio.strem.fun/manifest.json";
+
 function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -240,10 +259,51 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 2000);
 }
 
+// Hero Butonları Aksiyonları
+function openHeroModal() {
+    window.location.href = HERO_INSTALL_URL;
+    showToast("🚀 Stremio'da Hızlı Kurulum başlatılıyor...");
+}
+
+function copyHeroLink() {
+    navigator.clipboard.writeText(HERO_MANIFEST);
+    showToast("📋 Torrentio Manifest linki kopyalandı!");
+}
+
+// Genişletilmiş Arama Modalı Aksiyonları
+function toggleSearchModal() {
+    const modal = document.getElementById('search-modal');
+    const input = document.getElementById('expandedSearchInput');
+    
+    if(modal.classList.contains('opacity-0')) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => input.focus(), 100); 
+    } else {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+}
+
+function handleExpandedSearch(val) {
+    document.getElementById('searchInput').value = val;
+    filterData();
+}
+
+// Esc tuşu ile geniş arama kapatma
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') {
+        const searchModal = document.getElementById('search-modal');
+        if(!searchModal.classList.contains('opacity-0')) {
+            toggleSearchModal();
+        }
+    }
+});
+
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
+    document.getElementById('favBtn').style.background = showFavsOnly ? 'var(--accent-pink)' : '';
+    document.getElementById('favBtn').style.color = showFavsOnly ? '#fff' : '';
     filterData();
 }
 
@@ -306,8 +366,11 @@ function openModalItem(item) {
     document.getElementById('modal-title').textContent = item.name;
     document.getElementById('modal-app-tag').textContent = item.app;
     document.getElementById('modal-desc').textContent = item.desc || '';
+    
+    // Manifest URL Tespiti
     const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
     const url = match ? match[0] : 'URL Mevcut Değil';
+    
     document.getElementById('modal-url-box').textContent = url;
     document.getElementById('modal-copy-btn').onclick = () => {
         navigator.clipboard.writeText(url);
@@ -332,6 +395,13 @@ function filterTab(type, el) {
     filterData();
 }
 
+// Örnek Dummy Veri Yükleme (Local Test için)
+const dummyData = [
+    { name: "Torrentio", app: "Stremio", debrid: "optional", desc: "https://torrentio.strem.fun/manifest.json - En iyi kaynak." },
+    { name: "SuperFlix", app: "Nuvio", debrid: "free", desc: "https://superflix.com/manifest.json - Ücretsiz filmler." }
+];
+
+// Fetch işlemi başarısız olursa dummy veriyi kullan
 fetch('plugins.json')
     .then(r => r.json())
     .then(data => {
@@ -339,7 +409,12 @@ fetch('plugins.json')
         buildTabs();
         filterData();
     })
-    .catch(() => console.error('plugins.json okunamadı'));
+    .catch(() => {
+        console.error('plugins.json okunamadı, yerel veri kullanılıyor.');
+        plugins = dummyData;
+        buildTabs();
+        filterData();
+    });
 </script>
 </body>
 </html>
