@@ -65,6 +65,7 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
             transition: transform 0.2s;
+            cursor: pointer;
         }
         .play-btn-circle:hover { transform: scale(1.1); }
 
@@ -140,10 +141,10 @@
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
         
-        /* Özel Scrollbar Modal için */
-        #modal-box::-webkit-scrollbar { width: 6px; }
-        #modal-box::-webkit-scrollbar-track { background: transparent; }
-        #modal-box::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
+        /* Özel Scrollbar Modallar için */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -156,31 +157,32 @@
         <div class="w-10 h-10 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center font-black text-indigo-400">P</div>
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
-    <div class="flex gap-4 items-center text-xs font-semibold text-slate-400">
-        <a href="https://tcl-iffalcon.github.io/wiki/" class="hover:text-white transition">Ana Sayfa</a>
-        <a href="https://tcl-iffalcon.github.io/wiki/uygulamalar.html" class="hover:text-white transition hidden md:block">TV APK</a>
-        <a href="https://t.me/tcltvturk1" class="hover:text-white transition hidden md:block">Telegram</a>
+    <div class="flex gap-3 items-center text-xs font-semibold text-slate-400">
+        <!-- Film Öneri Butonu -->
+        <button onclick="suggestRandomMovie()" class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition flex items-center gap-2 font-bold">
+            <span class="text-sm leading-none">🎲</span> Film Öner
+        </button>
         <button onclick="toggleFavFilter()" id="favBtn" class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ Favoriler</button>
     </div>
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-4">
 
-    <!-- HERO FEATURED MEDIA -->
-    <div class="hero-media-box p-6 md:p-8 mb-8">
+    <!-- HERO FEATURED MEDIA (Dinamik) -->
+    <div class="hero-media-box p-6 md:p-8 mb-8" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="max-w-xl">
-                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Öne Çıkan Eklenti</span>
-                <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Torrentio + RealDebrid</h1>
-                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Stremio için en hızlı 4K, RealDebrid ve yüksek kaliteli medya kaynak eklentisi entegrasyonu.</p>
+                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Günün Öne Çıkanı</span>
+                <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Yükleniyor...</h1>
+                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
                 <div class="flex gap-3">
-                    <button onclick="window.location.href='stremio://torrentio.strem.fun/manifest.json'" class="bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
+                    <button id="hero-install-btn" class="bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
                         <span>🚀</span> Hızlı Kurulum
                     </button>
-                    <button onclick="navigator.clipboard.writeText('https://torrentio.strem.fun/manifest.json'); showToast('📋 Manifest Kopyalandı!')" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 transition">📋 Manifest Kopyala</button>
+                    <button id="hero-copy-btn" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 transition">📋 Manifest Kopyala</button>
                 </div>
             </div>
-            <div class="play-btn-circle cursor-pointer" onclick="window.location.href='stremio://torrentio.strem.fun/manifest.json'">
+            <div class="play-btn-circle" id="hero-play-btn">
                 <span class="text-white text-xl">▶</span>
             </div>
         </div>
@@ -228,15 +230,13 @@
     </div>
 </div>
 
-<!-- DETAY MODAL (Tasarımınıza tam uygun) -->
+<!-- DETAY MODAL -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
         
         <!-- Üst Etiketler ve Aksiyonlar -->
         <div class="flex justify-between items-start mb-5">
-            <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags">
-                <!-- JS ile Doldurulacak -->
-            </div>
+            <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
                 <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
@@ -245,7 +245,6 @@
             </div>
         </div>
 
-        <!-- Başlık -->
         <h2 id="modal-title" class="text-3xl font-bold text-white mb-6"></h2>
 
         <!-- Puanlama (Yıldızlar) -->
@@ -285,12 +284,45 @@
                 <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">6</span><span><b>Save Changes</b>'e basın ve TV'ye gelen bildirimi onaylayın.</span></li>
             </ul>
         </div>
+    </div>
+</div>
 
+<!-- FİLM ÖNERİ MODALI -->
+<div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+        
+        <!-- Sol: Film Posteri -->
+        <div class="md:w-5/12 relative">
+            <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-64 md:h-full object-cover">
+            <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                <span class="text-lg leading-none">★</span>
+                <span id="movie-imdb"></span>
+            </div>
+        </div>
+
+        <!-- Sağ: Film Detayları -->
+        <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
+            <button onclick="closeMovieModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition">✕</button>
+            
+            <div class="mb-2 flex items-center gap-2">
+                <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
+                <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
+            </div>
+            
+            <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
+            
+            <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
+            
+            <button onclick="suggestRandomMovie()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
+                <span class="text-xl">🎲</span> Başka Bir Film Öner
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
 let plugins = [];
+let moviesDb = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
 let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
 let showFavsOnly = false;
@@ -306,7 +338,79 @@ function showToast(msg) {
 
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
-// Geniş Arama
+// ---------------------------
+// GÜNLÜK ÖNE ÇIKAN EKLENTİ
+// ---------------------------
+function updateDailyFeatured() {
+    if(!plugins || plugins.length === 0) return;
+    
+    // Epoch zamanını gün sayısına bölerek her 24 saatte bir indeks değiştir
+    const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    const featured = plugins[daysSinceEpoch % plugins.length];
+
+    document.getElementById('heroTitle').textContent = featured.name;
+    const addonType = featured.type || (featured.desc?.toLowerCase().includes('altyazı') ? 'Altyazı Eklentisi' : 'Film & Dizi Eklentisi');
+    document.getElementById('heroDesc').textContent = `${featured.app} platformu için günün seçilen ${addonType}.`;
+
+    const match = featured.desc?.match(/(https?:\/\/[^\s]+)/g);
+    const url = match ? match[0] : '';
+    
+    const heroInstallBtn = document.getElementById('hero-install-btn');
+    const heroCopyBtn = document.getElementById('hero-copy-btn');
+    const heroPlayBtn = document.getElementById('hero-play-btn');
+
+    heroInstallBtn.onclick = () => {
+        if(url) {
+            let installUrl = url;
+            // Eğer Stremio ise direkt açması için URL'yi stremio:// protokolüne çevir
+            if(featured.app === 'Stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
+            window.location.href = installUrl;
+            showToast(`🚀 ${featured.name} kurulumu başlatılıyor...`);
+        } else {
+            showToast('Kurulum linki bulunamadı.');
+        }
+    };
+
+    heroCopyBtn.onclick = () => {
+        if(url) {
+            navigator.clipboard.writeText(url);
+            showToast('📋 Manifest kopyalandı!');
+        }
+    };
+    
+    heroPlayBtn.onclick = heroInstallBtn.onclick;
+}
+
+// ---------------------------
+// FİLM ÖNERİ MODALI
+// ---------------------------
+function suggestRandomMovie() {
+    if(moviesDb.length === 0) {
+        showToast("Filmler yükleniyor, lütfen bekleyin...");
+        return;
+    }
+    const randomIndex = Math.floor(Math.random() * moviesDb.length);
+    const movie = moviesDb[randomIndex];
+
+    document.getElementById('movie-title').textContent = movie.title;
+    document.getElementById('movie-year').textContent = movie.year;
+    document.getElementById('movie-genre').textContent = movie.genre;
+    document.getElementById('movie-imdb').textContent = movie.imdb;
+    document.getElementById('movie-plot').textContent = movie.plot;
+    document.getElementById('movie-poster').src = movie.poster;
+
+    document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+}
+
+function closeMovieModal(e) {
+    if (!e || e.target.id === 'movie-modal-overlay') {
+        document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    }
+}
+
+// ---------------------------
+// GENEL FONKSİYONLAR
+// ---------------------------
 function toggleSearchModal() {
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('expandedSearchInput');
@@ -327,6 +431,7 @@ document.addEventListener('keydown', (e) => {
         const searchModal = document.getElementById('search-modal');
         if(!searchModal.classList.contains('opacity-0')) toggleSearchModal();
         if(document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+        closeMovieModal();
     }
 });
 
@@ -347,13 +452,11 @@ function renderCards(data) {
         const isFav = favorites.includes(pluginKey(item));
         const userRating = userRatings[pluginKey(item)] || 0;
         
-        // Kartlarda Sol Altta Bulunan Puanlama ("Yeni" metni yerine)
         let starsHTML = '';
         for(let i = 1; i <= 5; i++) {
             starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
         }
 
-        // Açıklamaya göre dinamik "Türü" belirleme ("Bağlantı Linki:" yerine)
         const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
 
         const card = document.createElement('div');
@@ -408,7 +511,6 @@ function openModalItem(item) {
     
     document.getElementById('modal-title').textContent = item.name;
     
-    // Modal Etiketleri (Görsele uygun)
     const tagsContainer = document.getElementById('modal-tags');
     let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${item.app}</span>`;
     tagsHTML += `<span class="tag-free px-3 py-1.5 rounded-md flex items-center gap-1">☑ ÜCRETSİZ</span>`;
@@ -416,7 +518,6 @@ function openModalItem(item) {
     tagsHTML += `<span class="tag-device px-3 py-1.5 rounded-md">📱 MOBİL</span>`;
     tagsContainer.innerHTML = tagsHTML;
 
-    // Bağlantı
     const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
     const url = match ? match[0] : 'Bağlantı bulunamadı';
     document.getElementById('modal-url-box').textContent = url;
@@ -434,7 +535,6 @@ function openModalItem(item) {
         }
     };
 
-    // Nuvio Rehberi
     const guide = document.getElementById('modal-nuvio-guide');
     if(item.app.toLowerCase() === 'nuvio') {
         guide.classList.remove('hidden');
@@ -442,7 +542,6 @@ function openModalItem(item) {
         guide.classList.add('hidden');
     }
 
-    // Modal Puanları Göster
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
@@ -459,11 +558,9 @@ function copyCurrentLink() {
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 
-// Modal Yıldız Hover 
 function hoverStars(index) { updateStarsUI(index, true); }
 function resetStarHover() { updateStarsUI(currentRatingDisplay); }
 
-// Oy Ver
 function ratePlugin(index) {
     if(!currentModalItem) return;
     currentRatingDisplay = index;
@@ -471,7 +568,7 @@ function ratePlugin(index) {
     localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
     updateStarsUI(index);
     showToast(`⭐ Puanınız kaydedildi (${index}/5)`);
-    filterData(); // Anasayfadaki kartların yıldızlarını hemen güncelle
+    filterData(); 
 }
 
 function updateStarsUI(count) {
@@ -498,8 +595,12 @@ function filterTab(type, el) {
     filterData();
 }
 
-// Test Verisi 
-const dummyData = [
+// ---------------------------
+// VERİ ÇEKME (FETCH) İŞLEMLERİ
+// ---------------------------
+
+// 1. Eklentileri Çek (plugins.json)
+const dummyPlugins = [
     { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
     { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı" }
 ];
@@ -510,12 +611,44 @@ fetch('plugins.json')
         plugins = data;
         buildTabs();
         filterData();
+        updateDailyFeatured(); // Veri gelince günün eklentisini seç
     })
     .catch(() => {
-        plugins = dummyData;
+        plugins = dummyPlugins;
         buildTabs();
         filterData();
+        updateDailyFeatured();
     });
+
+// 2. Filmleri Çek (movies.json)
+const dummyMovies = [
+    {
+        title: "Interstellar", year: "2014", genre: "Bilim Kurgu", imdb: "8.6",
+        plot: "İnsanlığın hayatta kalabilmesi için bir grup kaşifin, yeni keşfedilmiş bir solucan deliğinden geçerek yaşanabilir yeni gezegenler arayışını konu alıyor.",
+        poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+    },
+    {
+        title: "Dune: Çöl Gezegeni", year: "2021", genre: "Aksiyon / Bilim Kurgu", imdb: "8.0",
+        plot: "Soylu bir ailenin, evrendeki en değerli kaynağın tek üreticisi olan tehlikeli çöl gezegeni Arrakis'in kontrolünü sağlama mücadelesi.",
+        poster: "https://image.tmdb.org/t/p/w500/jL8mO8L7vEEDg7b5G7p9N58Vj96.jpg"
+    },
+    {
+        title: "Esaretin Bedeli", year: "1994", genre: "Dram", imdb: "9.3",
+        plot: "Masumiyetini iddia etmesine rağmen cinayetten ömür boyu hapse mahkum edilen bir bankacının hapishanedeki sıra dışı yaşam mücadelesi.",
+        poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg"
+    }
+];
+
+fetch('movies.json')
+    .then(r => r.json())
+    .then(data => {
+        moviesDb = data;
+    })
+    .catch(() => {
+        console.warn("movies.json bulunamadı, yedek film listesi kullanılıyor.");
+        moviesDb = dummyMovies;
+    });
+
 </script>
 </body>
 </html>
