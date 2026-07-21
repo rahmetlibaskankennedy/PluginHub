@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PluginHub — Media OS Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        // ─── TELEGRAM REPORT ENDPOINT ────────────
+        const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
+    </script>
+
+    <style>
+        :root {
+            --bg: #060911;
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-hover: rgba(255, 255, 255, 0.07);
+            --surface2: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(59, 130, 246, 0.4);
+            --text: #f0f4ff;
+            --muted: #94a3b8;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.35);
+            --accent2: #10b981;
+            --glow: rgba(59, 130, 246, 0.15);
+        }
+
+        body.light {
+            --bg: #f0f4fc;
+            --surface: rgba(255, 255, 255, 0.7);
+            --surface-hover: rgba(255, 255, 255, 0.9);
+            --surface2: rgba(0, 0, 0, 0.04);
+            --border: rgba(0, 0, 0, 0.08);
+            --border-glow: rgba(37, 99, 235, 0.4);
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.2);
+            --accent2: #059669;
+            --glow: rgba(59, 130, 246, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+            padding-bottom: 70px;
+        }
+
+        /* Cam Efekti Sınıfı */
+        .glass-panel {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navigasyon Cam Efekti */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(6, 9, 17, 0.75);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 0 24px;
+        }
+        body.light nav { background: rgba(240, 244, 252, 0.85); }
+
+        .nav-inner { max-width: 1200px; margin: 0 auto; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+        .brand {
+            font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .nav-btn {
+            display: flex; align-items: center; padding: 7px 13px; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+            font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; gap: 6px;
+        }
+        .nav-btn:hover { color: var(--text); border-color: var(--accent); }
+        .nav-btn.active { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); }
+
+        /* Yatay Carousel (Kategori & Uygulama Filtreleri) */
+        .carousel { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+        .carousel::-webkit-scrollbar { display: none; }
+        .pill {
+            background: var(--surface2); border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem;
+            white-space: nowrap; cursor: pointer; color: var(--muted); font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .pill:hover { border-color: var(--border-glow); color: var(--text); }
+        .pill.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; box-shadow: 0 4px 14px var(--accent-glow); }
+
+        /* Glass Media Card Design */
+        .plugin-card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex; flex-direction: column;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+        }
+        .plugin-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: var(--border-glow);
+            box-shadow: 0 12px 40px var(--accent-glow);
+            background: var(--surface-hover);
+        }
+        .plugin-card.compare-selected { border-color: rgba(59, 130, 246, 0.8); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
+        .plugin-card.reported-selected { border-color: rgba(239, 68, 68, 0.5); }
+
+        /* Metrics Box */
+        .metrics-row {
+            display: flex; justify-content: space-between;
+            background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px 12px; margin: 12px 0; text-align: center;
+        }
+        body.light .metrics-row { background: rgba(0, 0, 0, 0.03); }
+        .metric-item small { display: block; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+        .metric-item strong { font-size: 0.8rem; color: var(--text); }
+
+        /* Badges */
+        .badge { display: inline-block; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 9px; border-radius: 8px; }
+        .badge-app { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-type { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-new { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-debrid-free { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
+        .badge-debrid-optional { background: rgba(245, 158, 11, 0.12); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
+        .badge-debrid-required { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.25); }
+        .badge-platform { background: rgba(167, 139, 250, 0.12); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.25); }
+
+        /* Mobil Bottom Dock Bar */
+        .mobile-bottom-dock {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(6, 9, 17, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding: 10px 0; z-index: 100;
+        }
+        body.light .mobile-bottom-dock { background: rgba(240, 244, 252, 0.9); }
+        .dock-btn { background: none; border: none; color: var(--muted); font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 2px; font-weight: 600; cursor: pointer; }
+        .dock-btn.active { color: #60a5fa; font-weight: bold; }
+
+        /* Buttons */
+        .btn { padding: 9px 0; border-radius: 12px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--border-glow); }
+        .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* Yıldızlar, Toast ve Modal */
+        .stars { display: flex; gap: 2px; }
+        .star { font-size: 13px; cursor: pointer; color: var(--surface2); transition: color 0.15s; }
+        .star.filled { color: #f59e0b; }
+
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); padding: 10px 24px; border-radius: 30px; font-size: 13px; font-weight: 700; z-index: 9999; transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.3s; opacity: 0; pointer-events: none; white-space: nowrap; background: #10b981; color: #000; box-shadow: 0 8px 32px rgba(16,185,129,0.3); }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        #modal-overlay, #compare-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 16px; backdrop-filter: blur(8px); }
+        #modal-overlay.open, #compare-overlay.open { opacity: 1; pointer-events: all; }
+        #modal-box, #compare-box { background: rgba(13, 20, 33, 0.95); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 580px; max-height: 88vh; overflow-y: auto; backdrop-filter: blur(20px); transform: scale(0.93); transition: transform 0.3s cubic-bezier(.34,1.4,.64,1); }
+        #modal-overlay.open #modal-box, #compare-overlay.open #compare-box { transform: scale(1); }
+
+        #compare-bar { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(120px); background: rgba(13, 20, 33, 0.9); border: 1px solid var(--border-glow); border-radius: 18px; padding: 12px 20px; display: flex; align-items: center; gap: 16px; z-index: 500; transition: transform 0.4s cubic-bezier(.34,1.4,.64,1); backdrop-filter: blur(16px); }
+        #compare-bar.visible { transform: translateX(-50%) translateY(0); }
+
+        mark { background: rgba(245,158,11,0.25); color: inherit; border-radius: 3px; padding: 0 2px; }
+        .url-mono { font-size: 11px; font-family: monospace; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 8px; }
+        #progress-bar { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, #3b82f6, #34d399); z-index: 9999; transition: width 0.3s ease; }
+    </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="toast"></div>
+
+<!-- Yeni Eklenti Bildirimi -->
+<div class="bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border-b border-amber-500/30 p-2 text-center text-xs font-semibold hidden cursor-pointer" id="newBanner">
+    <span>🆕 <span id="newBannerText"></span> — görmek için tıkla</span>
+    <span class="float-right mr-4 opacity-60" onclick="event.stopPropagation(); dismissBanner()">✕</span>
+</div>
+
+<!-- Navigasyon -->
+<nav>
+    <div class="nav-inner">
+        <div class="brand">PluginHub</div>
+        <div class="hidden md:flex gap-4 items-center text-xs font-medium text-slate-400">
+            <a href="https://tcl-iffalcon.github.io/wiki/" class="hover:text-white transition">Ana Sayfa</a>
+            <a href="https://tcl-iffalcon.github.io/wiki/uygulamalar.html" class="hover:text-white transition">TV APK</a>
+            <a href="https://tcl-iffalcon.github.io/wiki/mobil.html" class="hover:text-white transition">Telefon APK</a>
+            <a href="https://tcl-iffalcon.github.io/wiki/spor.html" class="hover:text-white transition">Spor APK</a>
+            <a href="https://tcl-iffalcon.github.io/wiki/dolbyatmos.html" class="hover:text-white transition">Dolby Atmos Film Listesi</a>
+            <a href="https://tcl-iffalcon.github.io/wiki/wc2026.html" class="hover:text-white transition">⚽ Dünya Kupası</a>
+            <a href="https://t.me/tcltvturk1" class="hover:text-white transition">Telegram</a>
+        </div>
+        <div class="flex gap-2 items-center">
+            <button onclick="toggleFavFilter()" id="favFilterBtn" class="nav-btn hidden md:flex">
+                <span>♡</span> Favoriler
+            </button>
+            <button onclick="toggleTheme()" class="nav-btn" id="themeBtn">🌙</button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Hero Bölümü -->
+    <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="inline-block text-[10px] font-extrabold uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 mb-3">
+            🔌 Eklenti Portal
+        </span>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-3">
+            Tüm <span class="bg-gradient-to-r from-blue-400 via-emerald-400 to-purple-400 bg-clip-text text-transparent">Eklentiler</span> Tek Yerde
+        </h1>
+        <p class="text-slate-400 text-sm leading-relaxed">Stremio, Nuvio, CloudStream ve daha fazlası için eklentiler ve repolar.</p>
+        
+        <!-- İstatistikler -->
+        <div class="flex justify-center gap-8 mt-6" id="statsBar">
+            <div><div class="text-xl font-bold" id="statTotal">—</div><div class="text-[10px] text-slate-500 uppercase tracking-wider">Eklenti</div></div>
+            <div><div class="text-xl font-bold" id="statNew">—</div><div class="text-[10px] text-slate-500 uppercase tracking-wider">Bu Hafta Yeni</div></div>
+            <div><div class="text-xl font-bold" id="statApps">—</div><div class="text-[10px] text-slate-500 uppercase tracking-wider">Uygulama</div></div>
+        </div>
+    </div>
+
+    <!-- Son Görüntülenenler -->
+    <div class="mb-6 hidden" id="lastSeenSection">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">🕐 Son Görüntülenenler</div>
+        <div class="flex gap-2 flex-wrap" id="lastSeenChips"></div>
+    </div>
+
+    <!-- Filtreler Cam Alanı -->
+    <div class="glass-panel p-5 rounded-2xl mb-6 grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Uygulama</label>
+            <select id="appSelect" onchange="filterData()" class="w-full bg-slate-800/50 border border-slate-700/50 text-xs p-2.5 rounded-xl outline-none text-white">
+                <option value="all">Tüm Uygulamalar</option>
+                <option value="Stremio">Stremio</option>
+                <option value="Nuvio">Nuvio</option>
+                <option value="Diğer">Diğer</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Kategori</label>
+            <select id="typeSelect" onchange="filterData()" class="w-full bg-slate-800/50 border border-slate-700/50 text-xs p-2.5 rounded-xl outline-none text-white">
+                <option value="all">Tüm Kategoriler</option>
+                <option value="4K">4K</option>
+                <option value="Film">Film & Dizi</option>
+                <option value="Dublaj">Dublaj</option>
+                <option value="Altyazı">Altyazı</option>
+                <option value="Spor">Spor</option>
+                <option value="Çizgi Film">Çizgi Film</option>
+                <option value="Katalog">Katalog</option>
+                <option value="Repo">Plugins</option>
+                <option value="Canlı">Canlı TV</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Debrid</label>
+            <select id="debridSelect" onchange="filterData()" class="w-full bg-slate-800/50 border border-slate-700/50 text-xs p-2.5 rounded-xl outline-none text-white">
+                <option value="all">Tümü</option>
+                <option value="free">✅ Ücretsiz</option>
+                <option value="optional">⚡ İsteğe Bağlı</option>
+                <option value="required">💳 Ücretli (Debrid)</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cihaz</label>
+            <select id="platformSelect" onchange="filterData()" class="w-full bg-slate-800/50 border border-slate-700/50 text-xs p-2.5 rounded-xl outline-none text-white">
+                <option value="all">Tüm Cihazlar</option>
+                <option value="tv">📺 TV</option>
+                <option value="mobile">📱 Mobil</option>
+                <option value="web">🌐 Web</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Arama</label>
+            <input type="text" id="searchInput" oninput="filterData()" placeholder="🔍 Eklenti veya içerik ara..." class="w-full bg-slate-800/50 border border-slate-700/50 text-xs p-2.5 rounded-xl outline-none text-white">
+        </div>
+    </div>
+
+    <!-- Yatay Kategori Bandı -->
+    <div class="carousel mb-4" id="categoryTabs"></div>
+
+    <!-- Sonuç ve Sıralama Barı -->
+    <div class="flex justify-between items-center text-xs text-slate-400 mb-4">
+        <span id="resultCount"></span>
+        <div class="flex items-center gap-2">
+            <label for="sortSelect" class="text-[10px] uppercase font-bold">Sırala</label>
+            <select id="sortSelect" onchange="filterData()" class="bg-slate-800/50 border border-slate-700/50 text-white p-1.5 rounded-lg text-xs outline-none">
+                <option value="default">Varsayılan</option>
+                <option value="newest">🆕 En Yeni Eklenenler</option>
+                <option value="oldest">🕰️ En Eski Eklenenler</option>
+                <option value="rating">⭐ En Çok Beğenilen</option>
+                <option value="name_asc">İsim (A-Z)</option>
+                <option value="name_desc">İsim (Z-A)</option>
+                <option value="app_group">📦 Uygulamaya Göre Grupla</option>
+            </select>
+            <button onclick="shareCurrentFilter()" class="nav-btn text-[11px] py-1.5 px-3">🔗 Paylaş</button>
+        </div>
+    </div>
+
+    <!-- Eklenti Kartları Grid Yapısı -->
+    <div id="skeletonGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    
+    <div id="emptyState" class="hidden text-center py-20 text-slate-500">
+        <div class="text-4xl mb-3">🔍</div>
+        <p class="font-bold text-base text-slate-300">Sonuç bulunamadı</p>
+        <p class="text-xs mt-1">Filtrelerinizi değiştirmeyi deneyin.</p>
+    </div>
+</main>
+
+<!-- Mobil Bottom Navigation Dock -->
+<div class="mobile-bottom-dock md:hidden">
+    <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})"><span>🔌</span>Eklentiler</button>
+    <button class="dock-btn" onclick="toggleFavFilter()" id="favFilterBtnMobile"><span>♡</span>Favoriler</button>
+    <button class="dock-btn" onclick="document.getElementById('searchInput').focus()"><span>🔍</span>Arama</button>
+    <button class="dock-btn" onclick="openCompareModal()"><span>⚖️</span>Karşılaştır</button>
+</div>
+
+<!-- Karşılaştırma Barı -->
+<div id="compare-bar">
+    <div id="compare-bar-label" class="text-xs font-bold text-white">Karşılaştır</div>
+    <div id="compare-bar-items" class="flex gap-2"></div>
+    <button id="compare-btn" onclick="openCompareModal()" class="btn btn-primary text-xs px-3 py-1">Karşılaştır →</button>
+    <button id="compare-clear" onclick="clearCompare()" class="btn btn-secondary text-xs px-2 py-1">✕</button>
+</div>
+
+<!-- Detay Modalı -->
+<div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
+    <div id="modal-box" class="p-6">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <div class="flex gap-1.5 mb-2 flex-wrap" id="modal-badges"></div>
+                <h2 id="modal-title" class="text-xl font-bold"></h2>
+                <div id="modal-date" class="text-xs text-slate-400 mt-1"></div>
+            </div>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
+        </div>
+
+        <div id="modal-rating-section" class="mb-4">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Puanınız</p>
+            <div class="stars" id="modal-stars"></div>
+        </div>
+
+        <div id="modal-url-section" class="hidden mb-4">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Bağlantı</p>
+            <div id="modal-url" class="url-mono mb-2"></div>
+            <div class="grid grid-cols-2 gap-2">
+                <button id="modal-copy-btn" class="btn btn-secondary">Kopyala</button>
+                <a id="modal-goto-btn" href="#" target="_blank" class="btn btn-primary">Siteye Git ↗</a>
+            </div>
+        </div>
+
+        <div id="modal-code-section" class="hidden mb-4">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Downloader Kodu</p>
+            <div class="flex items-center gap-3">
+                <div id="modal-code" class="text-2xl font-bold text-blue-400 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50"></div>
+                <button id="modal-code-copy-btn" class="btn btn-secondary flex-none px-4">Kopyala</button>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Kişisel Notum</p>
+            <textarea id="modal-note" class="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl p-3 text-xs text-white outline-none resize-none h-20" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
+            <div class="flex gap-2 mt-2">
+                <button onclick="saveNote()" class="btn btn-secondary text-xs px-3 py-1.5">Notu Kaydet</button>
+                <button id="modal-report-btn" onclick="toggleReportBroken()" class="text-xs text-red-400 border border-red-500/30 rounded-xl px-3 py-1.5 hover:bg-red-500/10">🚩 Çalışmıyor Bildir</button>
+            </div>
+        </div>
+
+        <div id="modal-guide"></div>
+    </div>
+</div>
+
+<!-- Karşılaştırma Modalı -->
+<div id="compare-overlay" onclick="closeCompareOnBackdrop(event)">
+    <div id="compare-box" class="p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold">Eklenti Karşılaştırması</h2>
+            <button onclick="closeCompareModal()" class="text-slate-400 text-xl">✕</button>
+        </div>
+        <div id="compare-table"></div>
+    </div>
+</div>
+
+<script>
+// ─── STATE MANAGEMENT ───────────────────
+let plugins = [];
+let fuse;
+let favorites  = JSON.parse(localStorage.getItem('ph_favorites') || '[]');
+let ratings    = JSON.parse(localStorage.getItem('ph_ratings')   || '{}');
+let lastSeen   = JSON.parse(localStorage.getItem('ph_lastseen')  || '[]');
+let notes      = JSON.parse(localStorage.getItem('ph_notes')     || '{}');
+let reports    = JSON.parse(localStorage.getItem('ph_reports')   || '{}');
+let showFavsOnly = false;
+let compareList  = [];
+let currentModalItem = null;
+const pluginRegistry = {};
+
+// Theme Override Logic
+const manualTheme = localStorage.getItem('ph_theme');
+let isLight = manualTheme ? manualTheme === 'light' : window.matchMedia('(prefers-color-scheme: light)').matches;
+if (isLight) { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+
+function pluginKey(p) { return `${p.app}|${p.name}|${p.type}`; }
+function isFav(p) { return favorites.includes(pluginKey(p)); }
+function isComparing(p) { return compareList.some(c => pluginKey(c) === pluginKey(p)); }
+function isReported(p) { return !!reports[pluginKey(p)]; }
+
+function showToast(msg, color='#10b981') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = color;
+    t.classList.add('show');
+    clearTimeout(window._tt);
+    window._tt = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast('✓ Kopyalandı!')); }
+
+function toggleTheme() {
+    isLight = !isLight;
+    document.body.classList.toggle('light', isLight);
+    localStorage.setItem('ph_theme', isLight ? 'light' : 'dark');
+    document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+}
+
+function toggleFav(key, btn) {
+    const idx = favorites.indexOf(key);
+    if (idx === -1) { favorites.push(key); showToast('❤ Favorilere eklendi'); }
+    else { favorites.splice(idx, 1); showToast('♡ Favorilerden çıkarıldı'); }
+    localStorage.setItem('ph_favorites', JSON.stringify(favorites));
+    btn.classList.toggle('active', favorites.includes(key));
+    btn.textContent = favorites.includes(key) ? '❤' : '♡';
+    if (showFavsOnly) filterData();
+}
+
+function toggleFavFilter() {
+    showFavsOnly = !showFavsOnly;
+    ['favFilterBtn','favFilterBtnMobile'].map(id => document.getElementById(id)).filter(Boolean).forEach(b => {
+        b.classList.toggle('active', showFavsOnly);
+        b.innerHTML = showFavsOnly ? '<span>❤</span> Favoriler' : '<span>♡</span> Favoriler';
+    });
+    filterData();
+}
+
+// ─── BROKEN REPORT ────────────────────────
+function toggleReportBroken() {
+    if (!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const btn = document.getElementById('modal-report-btn');
+    const wasReported = !!reports[key];
+    const action = wasReported ? 'unreport' : 'report';
+
+    if (wasReported) {
+        delete reports[key];
+        btn.textContent = '🚩 Çalışmıyor Bildir';
+        showToast('Bildirim geri alındı');
+    } else {
+        reports[key] = { at: Date.now() };
+        btn.textContent = '✓ Bildirildi';
+        showToast('🚩 Bildirdiğin için teşekkürler', '#ef4444');
+    }
+    localStorage.setItem('ph_reports', JSON.stringify(reports));
+
+    fetch(REPORT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pluginName: currentModalItem.name, app: currentModalItem.app, type: currentModalItem.type, action })
+    }).catch(err => console.warn(err));
+}
+
+// ─── COMPARE ──────────────────────────────
+function toggleCompare(p, btn) {
+    const key = pluginKey(p);
+    const idx = compareList.findIndex(c => pluginKey(c) === key);
+    if (idx === -1) {
+        if (compareList.length >= 3) { showToast('En fazla 3 eklenti karşılaştırılabilir', '#ef4444'); return; }
+        compareList.push(p);
+    } else {
+        compareList.splice(idx, 1);
+    }
+    updateCompareBar();
+    filterData();
+}
+
+function updateCompareBar() {
+    const bar = document.getElementById('compare-bar');
+    const items = document.getElementById('compare-bar-items');
+    if (compareList.length < 1) { bar.classList.remove('visible'); return; }
+    bar.classList.add('visible');
+    items.innerHTML = compareList.map(p => `<span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-lg font-bold">${p.name}</span>`).join('');
+}
+
+function clearCompare() {
+    compareList = [];
+    updateCompareBar();
+    filterData();
+}
+
+function openCompareModal() {
+    if (compareList.length < 2) { showToast('En az 2 eklenti seçmelisin', '#ef4444'); return; }
+    let html = `<div class="overflow-x-auto"><table class="w-full text-xs text-left border-collapse">`;
+    html += `<tr class="border-b border-slate-700/50"><th class="p-2 text-slate-400">Özellik</th>${compareList.map(p => `<th class="p-2 font-bold text-white">${p.name}</th>`).join('')}</tr>`;
+    html += `<tr class="border-b border-slate-700/50"><td class="p-2 text-slate-400">Uygulama</td>${compareList.map(p => `<td class="p-2">${p.app}</td>`).join('')}</tr>`;
+    html += `<tr class="border-b border-slate-700/50"><td class="p-2 text-slate-400">Kategori</td>${compareList.map(p => `<td class="p-2">${p.type}</td>`).join('')}</tr>`;
+    html += `<tr class="border-b border-slate-700/50"><td class="p-2 text-slate-400">Debrid</td>${compareList.map(p => `<td class="p-2">${p.debrid}</td>`).join('')}</tr>`;
+    html += `</table></div>`;
+    document.getElementById('compare-table').innerHTML = html;
+    document.getElementById('compare-overlay').classList.add('open');
+}
+function closeCompareModal() { document.getElementById('compare-overlay').classList.remove('open'); }
+function closeCompareOnBackdrop(e) { if (e.target === document.getElementById('compare-overlay')) closeCompareModal(); }
+
+// ─── RENDER CARDS (Glassmorphism & Media OS) ───
+function debridBadge(debrid) {
+    const map = { free:['badge-debrid-free','✅ Ücretsiz'], optional:['badge-debrid-optional','⚡ Opsiyonel'], required:['badge-debrid-required','💳 Debrid'] };
+    const [cls, label] = map[debrid] || [];
+    return cls ? `<span class="badge ${cls}">${label}</span>` : '';
+}
+
+function platformBadges(platform) {
+    if (!platform || !platform.length) return '';
+    const map = { tv:'📺 TV', mobile:'📱 Mobil', web:'🌐 Web' };
+    return platform.map(p => map[p] ? `<span class="badge badge-platform">${map[p]}</span>` : '').join('');
+}
+
+function renderCards(data, q, sortMode) {
+    const grid = document.getElementById('resultsGrid');
+    const empty = document.getElementById('emptyState');
+    const count = document.getElementById('resultCount');
+    grid.innerHTML = '';
+    count.textContent = data.length > 0 ? `${data.length} eklenti bulundu` : '';
+    if (!data.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    data.forEach((item, i) => {
+        const key = pluginKey(item);
+        pluginRegistry[key] = item;
+        const favActive = isFav(item);
+        const cmpActive = isComparing(item);
+        const repActive = isReported(item);
+
+        const card = document.createElement('div');
+        card.className = `plugin-card ${cmpActive ? 'compare-selected' : ''} ${repActive ? 'reported-selected' : ''}`;
+        card.dataset.key = key;
+
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+                <div class="flex gap-1 flex-wrap">
+                    <span class="badge badge-app">${item.app}</span>
+                    <span class="badge badge-type">${item.type}</span>
+                    ${item.isNew ? '<span class="badge badge-new">Yeni</span>' : ''}
+                </div>
+                <button class="text-base text-slate-400 hover:text-red-400" onclick="event.stopPropagation();toggleFav('${key.replace(/"/g,'&quot;')}',this)">${favActive?'❤':'♡'}</button>
+            </div>
+            
+            <h3 class="font-bold text-sm text-white mb-1">${item.name}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-2">${item.desc || ''}</p>
+
+            <!-- Media OS Metrics Row -->
+            <div class="metrics-row">
+                <div class="metric-item"><small>Erişim</small><strong>${item.app}</strong></div>
+                <div class="metric-item"><small>Debrid</small><strong>${item.debrid || 'Ücretsiz'}</strong></div>
+                <div class="metric-item"><small>Puan</small><strong>⭐ ${ratings[key] || '4.9'}</strong></div>
+            </div>
+
+            <div class="flex gap-1 mb-2">${debridBadge(item.debrid)} ${platformBadges(item.platform)}</div>
+
+            <div class="flex gap-2 mt-auto pt-2" onclick="event.stopPropagation()">
+                <button onclick="openModalByKey('${key.replace(/"/g,'&quot;')}')" class="btn btn-primary flex-1 text-xs">Yükle (Manifest)</button>
+                <button onclick="toggleCompareByKey('${key.replace(/"/g,'&quot;')}',this)" class="btn btn-secondary text-xs px-3">${cmpActive?'✓':'Compare'}</button>
+            </div>
+        `;
+        card.addEventListener('click', () => openModal(item));
+        grid.appendChild(card);
+    });
+}
+
+function openModalByKey(key) { if (pluginRegistry[key]) openModal(pluginRegistry[key]); }
+function toggleCompareByKey(key, btn) { if (pluginRegistry[key]) toggleCompare(pluginRegistry[key], btn); }
+
+// ─── FILTER & INIT ────────────────────────
+function buildCategoryTabs() {
+    const types = ['all', ...new Set(plugins.map(p => p.type))];
+    const container = document.getElementById('categoryTabs');
+    container.innerHTML = types.map(t => `<button class="pill ${t==='all'?'active':''}" onclick="setTypeTab('${t}')" data-type="${t}">${t === 'all' ? 'Tümü' : t}</button>`).join('');
+}
+
+function setTypeTab(type) {
+    document.getElementById('typeSelect').value = type;
+    document.querySelectorAll('.pill').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+    filterData();
+}
+
+function filterData() {
+    const app = document.getElementById('appSelect').value;
+    const type = document.getElementById('typeSelect').value;
+    const debrid = document.getElementById('debridSelect').value;
+    const platform = document.getElementById('platformSelect').value;
+    const q = document.getElementById('searchInput').value.trim();
+
+    let pool = plugins;
+    if (app !== 'all') pool = pool.filter(p => p.app === app);
+    if (type !== 'all') pool = pool.filter(p => p.type === type);
+    if (debrid !== 'all') pool = pool.filter(p => p.debrid === debrid);
+    if (platform !== 'all') pool = pool.filter(p => (p.platform||[]).includes(platform));
+    if (showFavsOnly) pool = pool.filter(p => isFav(p));
+
+    if (q) {
+        const localFuse = new Fuse(pool, { keys: ['name','desc','type','app'], threshold: 0.4 });
+        pool = localFuse.search(q).map(r => r.item);
+    }
+
+    renderCards(pool, q);
+}
+
+// ─── MODAL ────────────────────────────────
+function openModal(item) {
+    currentModalItem = item;
+    const key = pluginKey(item);
+    document.getElementById('modal-title').textContent = item.name;
+    document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+// Fetch Plugins
+fetch('plugins.json')
+    .then(r => r.json())
+    .then(data => {
+        plugins = data;
+        buildCategoryTabs();
+        filterData();
+        document.getElementById('statTotal').textContent = plugins.length;
+        document.getElementById('statNew').textContent = plugins.filter(p => p.isNew).length;
+        document.getElementById('statApps').textContent = new Set(plugins.map(p => p.app)).size;
+    })
+    .catch(err => console.error(err));
+</script>
+</body>
+</html>
