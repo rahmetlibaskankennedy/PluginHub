@@ -49,6 +49,25 @@
             box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2);
         }
 
+        /* Featured Medya Hero Kartı */
+        .hero-media-box {
+            background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 42, 95, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-btn-circle {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--accent-pink);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
+            transition: transform 0.2s;
+        }
+        .play-btn-circle:hover { transform: scale(1.1); }
+
         /* Mobil Alt Navigasyon Barı */
         .stream-dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -107,7 +126,7 @@
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; }
         .star:hover { color: #ffb800; }
         
-        /* Tag Colors (Görsele uygun) */
+        /* Tag Colors (Görsele uygun rozetler) */
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-device { background: rgba(243, 232, 255, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
@@ -138,11 +157,35 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-4 items-center text-xs font-semibold text-slate-400">
+        <a href="https://tcl-iffalcon.github.io/wiki/" class="hover:text-white transition">Ana Sayfa</a>
+        <a href="https://tcl-iffalcon.github.io/wiki/uygulamalar.html" class="hover:text-white transition hidden md:block">TV APK</a>
+        <a href="https://t.me/tcltvturk1" class="hover:text-white transition hidden md:block">Telegram</a>
         <button onclick="toggleFavFilter()" id="favBtn" class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ Favoriler</button>
     </div>
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-4">
+
+    <!-- HERO FEATURED MEDIA -->
+    <div class="hero-media-box p-6 md:p-8 mb-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="max-w-xl">
+                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Öne Çıkan Eklenti</span>
+                <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Torrentio + RealDebrid</h1>
+                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Stremio için en hızlı 4K, RealDebrid ve yüksek kaliteli medya kaynak eklentisi entegrasyonu.</p>
+                <div class="flex gap-3">
+                    <button onclick="window.location.href='stremio://torrentio.strem.fun/manifest.json'" class="bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
+                        <span>🚀</span> Hızlı Kurulum
+                    </button>
+                    <button onclick="navigator.clipboard.writeText('https://torrentio.strem.fun/manifest.json'); showToast('📋 Manifest Kopyalandı!')" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 transition">📋 Manifest Kopyala</button>
+                </div>
+            </div>
+            <div class="play-btn-circle cursor-pointer" onclick="window.location.href='stremio://torrentio.strem.fun/manifest.json'">
+                <span class="text-white text-xl">▶</span>
+            </div>
+        </div>
+    </div>
+
     <!-- KATEGORİ & FİLTRELEME ALANI -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-6" id="categoryTabs"></div>
 
@@ -166,11 +209,26 @@
 <!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
     <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})">🏠</button>
-    <button class="dock-btn" onclick="document.getElementById('searchInput').focus()">🔍</button>
+    <button class="dock-btn" onclick="toggleSearchModal()">🔍</button>
     <button class="dock-btn" onclick="toggleFavFilter()">♡</button>
 </div>
 
-<!-- DETAY MODAL (Görseldeki Tasarıma Uygun) -->
+<!-- GENİŞLETİLMİŞ ARAMA MODALI -->
+<div id="search-modal" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex flex-col opacity-0 pointer-events-none transition-all duration-300">
+    <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
+            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
+        </div>
+        <div class="relative">
+            <input type="text" id="expandedSearchInput" placeholder="Eklenti, içerik veya platform ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none focus:border-pink-500 transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
+            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-3xl opacity-50">🔍</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">Arama sonuçları arka planda anlık olarak listelenir. Kapatmak için çarpıya veya dışarı tıklayın.</p>
+    </div>
+</div>
+
+<!-- DETAY MODAL (Tasarımınıza tam uygun) -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
         
@@ -248,6 +306,30 @@ function showToast(msg) {
 
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
+// Geniş Arama
+function toggleSearchModal() {
+    const modal = document.getElementById('search-modal');
+    const input = document.getElementById('expandedSearchInput');
+    if(modal.classList.contains('opacity-0')) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => input.focus(), 100); 
+    } else {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+}
+function handleExpandedSearch(val) {
+    document.getElementById('searchInput').value = val;
+    filterData();
+}
+
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') {
+        const searchModal = document.getElementById('search-modal');
+        if(!searchModal.classList.contains('opacity-0')) toggleSearchModal();
+        if(document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+    }
+});
+
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
     document.getElementById('favBtn').style.background = showFavsOnly ? 'var(--accent-pink)' : '';
@@ -265,13 +347,14 @@ function renderCards(data) {
         const isFav = favorites.includes(pluginKey(item));
         const userRating = userRatings[pluginKey(item)] || 0;
         
-        // Puan Gösterimi Tasarımı (image_ffdf20.png referans alındı)
-        const ratingHTML = userRating > 0 
-            ? `<span class="text-amber-400 text-sm font-bold flex items-center gap-1"><span class="text-lg">★</span> ${userRating}.0</span>` 
-            : `<span class="text-amber-400 text-sm font-bold flex items-center gap-1"><span class="text-lg">★</span> Yeni</span>`;
+        // Kartlarda Sol Altta Bulunan Puanlama ("Yeni" metni yerine)
+        let starsHTML = '';
+        for(let i = 1; i <= 5; i++) {
+            starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
+        }
 
-        // Tür Belirleme (Açıklamaya veya rastgele veriye göre eklenti türü)
-        const addonType = item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi';
+        // Açıklamaya göre dinamik "Türü" belirleme ("Bağlantı Linki:" yerine)
+        const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
 
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
@@ -285,7 +368,9 @@ function renderCards(data) {
                 <p class="text-[13px] text-slate-300 leading-relaxed mb-6 border-b border-white/5 pb-6">Türü: ${addonType}</p>
             </div>
             <div class="flex items-center justify-between">
-                ${ratingHTML}
+                <div class="flex gap-1 text-lg">
+                    ${starsHTML}
+                </div>
                 <button class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition">İncele</button>
             </div>
         `;
@@ -323,7 +408,7 @@ function openModalItem(item) {
     
     document.getElementById('modal-title').textContent = item.name;
     
-    // Etiketler 
+    // Modal Etiketleri (Görsele uygun)
     const tagsContainer = document.getElementById('modal-tags');
     let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${item.app}</span>`;
     tagsHTML += `<span class="tag-free px-3 py-1.5 rounded-md flex items-center gap-1">☑ ÜCRETSİZ</span>`;
@@ -349,7 +434,7 @@ function openModalItem(item) {
         }
     };
 
-    // Nuvio Rehberini Göster/Gizle
+    // Nuvio Rehberi
     const guide = document.getElementById('modal-nuvio-guide');
     if(item.app.toLowerCase() === 'nuvio') {
         guide.classList.remove('hidden');
@@ -357,7 +442,7 @@ function openModalItem(item) {
         guide.classList.add('hidden');
     }
 
-    // Yıldızlar
+    // Modal Puanları Göster
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
@@ -374,10 +459,11 @@ function copyCurrentLink() {
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 
-// Oylama (Yıldız) Sistemi
+// Modal Yıldız Hover 
 function hoverStars(index) { updateStarsUI(index, true); }
 function resetStarHover() { updateStarsUI(currentRatingDisplay); }
 
+// Oy Ver
 function ratePlugin(index) {
     if(!currentModalItem) return;
     currentRatingDisplay = index;
@@ -385,16 +471,16 @@ function ratePlugin(index) {
     localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
     updateStarsUI(index);
     showToast(`⭐ Puanınız kaydedildi (${index}/5)`);
-    filterData(); // Anasayfadaki yıldızı güncelle
+    filterData(); // Anasayfadaki kartların yıldızlarını hemen güncelle
 }
 
 function updateStarsUI(count) {
     const stars = document.getElementById('modal-rating').children;
     for(let i = 0; i < 5; i++) {
         if(i < count) {
-            stars[i].style.color = '#ffb800'; // Aktif Sarı
+            stars[i].style.color = '#ffb800'; 
         } else {
-            stars[i].style.color = '#2d2a54'; // Pasif Koyu Mavi
+            stars[i].style.color = '#2d2a54'; 
         }
     }
 }
