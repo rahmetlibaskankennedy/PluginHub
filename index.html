@@ -119,7 +119,19 @@
         #modal-box {
             background: #151333; border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 28px; width: 90%; max-width: 560px; padding: 28px;
+            max-height: 90vh; overflow-y: auto;
         }
+        
+        /* Star Rating Hover Effects */
+        .star { color: #3f3c64; transition: color 0.2s; }
+        .star.active, .star:hover, .star:hover ~ .star { /* Note: CSS hover for stars usually needs JS or specific sibling selectors */ }
+        
+        /* Tag Colors (Görsele uygun) */
+        .tag-nuvio { background: #e0e7ff; color: #4f46e5; }
+        .tag-4k { background: #dcfce7; color: #16a34a; }
+        .tag-free { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        .tag-device { background: #f3e8ff; color: #9333ea; }
+
         #toast {
             position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px);
             background: var(--accent-pink); color: #fff; padding: 10px 24px;
@@ -128,6 +140,11 @@
             box-shadow: 0 10px 25px rgba(255, 42, 95, 0.4);
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
+        
+        /* Özel Scrollbar Modal için */
+        #modal-box::-webkit-scrollbar { width: 6px; }
+        #modal-box::-webkit-scrollbar-track { background: transparent; }
+        #modal-box::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -149,27 +166,6 @@
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-4">
-
-    <!-- HERO FEATURED MEDIA -->
-    <div class="hero-media-box p-6 md:p-8 mb-8">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="max-w-xl">
-                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Öne Çıkan Eklenti</span>
-                <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Torrentio + RealDebrid</h1>
-                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Stremio için en hızlı 4K, RealDebrid ve yüksek kaliteli medya kaynak eklentisi entegrasyonu.</p>
-                <div class="flex gap-3">
-                    <button onclick="openHeroModal()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
-                        <span>🚀</span> Hızlı Kurulum
-                    </button>
-                    <button onclick="copyHeroLink()" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 transition">📋 Manifest Kopyala</button>
-                </div>
-            </div>
-            <div class="play-btn-circle cursor-pointer" onclick="openHeroModal()">
-                <span class="text-white text-xl">▶</span>
-            </div>
-        </div>
-    </div>
-
     <!-- KATEGORİ & FİLTRELEME ALANI -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-6" id="categoryTabs"></div>
 
@@ -224,57 +220,101 @@
     </div>
 </div>
 
-<!-- DETAY MODAL -->
+<!-- YENİ DETAY MODAL (Görseldeki Tasarıma Uygun) -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
-    <div id="modal-box">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <h2 id="modal-title" class="text-xl font-black text-white"></h2>
-                <span id="modal-app-tag" class="text-[10px] bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-md font-bold mt-1 inline-block"></span>
+    <div id="modal-box" onclick="event.stopPropagation()">
+        
+        <!-- Üst Etiketler ve Aksiyonlar -->
+        <div class="flex justify-between items-start mb-5">
+            <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags">
+                <!-- JS ile Doldurulacak -->
             </div>
-            <button onclick="closeModal()" class="text-slate-400 text-xl">✕</button>
+            <div class="flex gap-4 items-center text-slate-400">
+                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                </button>
+                <button onclick="closeModal()" class="hover:text-white text-2xl leading-none transition">✕</button>
+            </div>
         </div>
-        <p id="modal-desc" class="text-xs text-slate-400 leading-relaxed mb-4"></p>
-        <div id="modal-url-box" class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs font-mono text-indigo-300 break-all mb-4"></div>
-        <div class="flex gap-2">
-            <button id="modal-copy-btn" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-3 rounded-xl shadow-lg transition">Manifest Kopyala</button>
-            <button id="modal-report-btn" onclick="toggleReportBroken()" class="border border-red-500/30 text-red-400 text-xs px-4 rounded-xl">🚩 Bildir</button>
+
+        <!-- Başlık -->
+        <h2 id="modal-title" class="text-2xl md:text-3xl font-black text-white mb-6"></h2>
+
+        <!-- Puanlama (Yıldızlar) -->
+        <div class="mb-6">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">PUANINIZ</label>
+            <div class="flex gap-1 text-2xl" id="modal-rating" onmouseleave="resetStarHover()">
+                <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)">★</button>
+                <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)">★</button>
+                <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)">★</button>
+                <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)">★</button>
+                <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)">★</button>
+            </div>
         </div>
+
+        <!-- Bağlantı / Link Alanı -->
+        <div class="mb-8">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
+            <div id="modal-url-box" class="bg-indigo-950/40 border border-indigo-500/20 rounded-xl p-3 text-xs md:text-sm font-mono text-indigo-300 break-all mb-3 select-all"></div>
+            
+            <div class="flex gap-3">
+                <button id="modal-copy-btn" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm py-3 rounded-xl transition">Kopyala</button>
+                <button id="modal-go-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-blue-600/20 transition flex justify-center items-center gap-1">
+                    Siteye Git ↗
+                </button>
+            </div>
+        </div>
+
+        <!-- Nuvio'ya Nasıl Kurulur? (Dinamik Gösterim) -->
+        <div id="modal-nuvio-guide" class="mb-8 bg-slate-800/30 rounded-2xl p-5 border border-slate-700/50 hidden">
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</h3>
+            <ul class="text-xs text-slate-300 space-y-3 leading-relaxed">
+                <li class="flex gap-3 items-start"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                <li class="flex gap-3 items-start"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
+                <li class="flex gap-3 items-start"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
+                <li class="flex gap-3 items-start"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
+                <li class="flex gap-3 items-start"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
+                <li class="flex gap-3 items-start"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 mt-0.5">6</span><span><b>Save Changes</b>'e basın ve TV'ye gelen bildirimi onaylayın.</span></li>
+            </ul>
+        </div>
+
+        <!-- Kişisel Not Alanı -->
+        <div>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
+            <textarea id="modal-note-input" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition resize-none placeholder:text-slate-600" rows="3" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
+            
+            <div class="flex justify-between items-center mt-3">
+                <button onclick="savePersonalNote()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs px-5 py-2.5 rounded-lg transition">Notu Kaydet</button>
+                <button onclick="reportBroken()" class="text-red-400/80 hover:text-red-400 text-xs font-bold flex items-center gap-1.5 transition">
+                    <span class="text-sm">🚩</span> Çalışmıyor Bildir
+                </button>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
 let plugins = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
+let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
+let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}');
 let showFavsOnly = false;
 let currentModalItem = null;
-
-const HERO_MANIFEST = "https://torrentio.strem.fun/manifest.json";
-const HERO_INSTALL_URL = "stremio://torrentio.strem.fun/manifest.json";
+let currentRatingDisplay = 0;
 
 function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// Hero Butonları Aksiyonları
-function openHeroModal() {
-    window.location.href = HERO_INSTALL_URL;
-    showToast("🚀 Stremio'da Hızlı Kurulum başlatılıyor...");
-}
+function pluginKey(p) { return `${p.app}|${p.name}`; }
 
-function copyHeroLink() {
-    navigator.clipboard.writeText(HERO_MANIFEST);
-    showToast("📋 Torrentio Manifest linki kopyalandı!");
-}
-
-// Genişletilmiş Arama Modalı Aksiyonları
 function toggleSearchModal() {
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('expandedSearchInput');
-    
     if(modal.classList.contains('opacity-0')) {
         modal.classList.remove('opacity-0', 'pointer-events-none');
         setTimeout(() => input.focus(), 100); 
@@ -282,23 +322,18 @@ function toggleSearchModal() {
         modal.classList.add('opacity-0', 'pointer-events-none');
     }
 }
-
 function handleExpandedSearch(val) {
     document.getElementById('searchInput').value = val;
     filterData();
 }
 
-// Esc tuşu ile geniş arama kapatma
 document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape') {
         const searchModal = document.getElementById('search-modal');
-        if(!searchModal.classList.contains('opacity-0')) {
-            toggleSearchModal();
-        }
+        if(!searchModal.classList.contains('opacity-0')) toggleSearchModal();
+        if(document.getElementById('modal-overlay').classList.contains('open')) closeModal();
     }
 });
-
-function pluginKey(p) { return `${p.app}|${p.name}`; }
 
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
@@ -315,6 +350,9 @@ function renderCards(data) {
 
     data.forEach(item => {
         const isFav = favorites.includes(pluginKey(item));
+        const userRating = userRatings[pluginKey(item)] || 0;
+        const ratingText = userRating > 0 ? `⭐ ${userRating}.0` : `⭐ Yeni`;
+
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
         card.innerHTML = `
@@ -327,8 +365,8 @@ function renderCards(data) {
                 <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">${item.desc || ''}</p>
             </div>
             <div class="flex items-center justify-between border-t border-white/5 pt-3 mt-2">
-                <span class="text-[11px] text-amber-400 font-bold">⭐ 4.9</span>
-                <button onclick="openModal('${pluginKey(item)}')" class="bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition">Detaylar</button>
+                <span class="text-[11px] text-amber-400 font-bold">${ratingText}</span>
+                <button class="bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition">İncele</button>
             </div>
         `;
         card.onclick = () => openModalItem(item);
@@ -361,26 +399,118 @@ function filterData() {
     renderCards(pool);
 }
 
+// ---- YENİ MODAL İŞLEMLERİ ----
+
 function openModalItem(item) {
     currentModalItem = item;
+    const pKey = pluginKey(item);
+    
+    // Temel Bilgiler
     document.getElementById('modal-title').textContent = item.name;
-    document.getElementById('modal-app-tag').textContent = item.app;
-    document.getElementById('modal-desc').textContent = item.desc || '';
     
-    // Manifest URL Tespiti
+    // Etiketler (Görseldeki gibi uyarlama)
+    const tagsContainer = document.getElementById('modal-tags');
+    let tagsHTML = `<span class="tag-nuvio px-2.5 py-1 rounded-md uppercase">${item.app}</span>`;
+    if(item.name.toLowerCase().includes('4k')) {
+        tagsHTML += `<span class="tag-4k px-2.5 py-1 rounded-md">4K</span>`;
+    }
+    if(item.debrid === 'free' || !item.debrid) {
+        tagsHTML += `<span class="tag-free px-2.5 py-1 rounded-md flex items-center gap-1">☑ ÜCRETSİZ</span>`;
+    }
+    tagsHTML += `<span class="tag-device px-2.5 py-1 rounded-md">📺 TV</span>`;
+    tagsHTML += `<span class="tag-device px-2.5 py-1 rounded-md">📱 MOBİL</span>`;
+    tagsContainer.innerHTML = tagsHTML;
+
+    // Bağlantı İşlemleri
     const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
-    const url = match ? match[0] : 'URL Mevcut Değil';
-    
+    const url = match ? match[0] : 'Bağlantı bulunamadı';
     document.getElementById('modal-url-box').textContent = url;
+    
     document.getElementById('modal-copy-btn').onclick = () => {
         navigator.clipboard.writeText(url);
-        showToast('📋 Manifest kopyalandı!');
+        showToast('📋 Bağlantı kopyalandı!');
     };
+    
+    document.getElementById('modal-go-btn').onclick = () => {
+        if(url.startsWith('http')) {
+            window.open(url, '_blank');
+        } else {
+            showToast('Geçerli bir site bağlantısı bulunamadı.');
+        }
+    };
+
+    // Nuvio Rehberini Göster/Gizle
+    const guide = document.getElementById('modal-nuvio-guide');
+    if(item.app.toLowerCase() === 'nuvio') {
+        guide.classList.remove('hidden');
+    } else {
+        guide.classList.add('hidden');
+    }
+
+    // Yıldızlar
+    const savedRating = userRatings[pKey] || 0;
+    currentRatingDisplay = savedRating;
+    updateStarsUI(savedRating);
+
+    // Kişisel Not
+    const savedNote = userNotes[pKey] || '';
+    document.getElementById('modal-note-input').value = savedNote;
+
     document.getElementById('modal-overlay').classList.add('open');
+}
+
+function copyCurrentLink() {
+    const text = document.getElementById('modal-url-box').textContent;
+    navigator.clipboard.writeText(text);
+    showToast('🔗 Bağlantı panoya kopyalandı!');
 }
 
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+// Oylama (Yıldız) Sistemi
+function hoverStars(index) {
+    updateStarsUI(index, true);
+}
+
+function resetStarHover() {
+    updateStarsUI(currentRatingDisplay);
+}
+
+function ratePlugin(index) {
+    if(!currentModalItem) return;
+    currentRatingDisplay = index;
+    userRatings[pluginKey(currentModalItem)] = index;
+    localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
+    updateStarsUI(index);
+    showToast(`⭐ Puanınız kaydedildi (${index}/5)`);
+    filterData(); // Anasayfadaki yıldızı güncelle
+}
+
+function updateStarsUI(count, isHover = false) {
+    const stars = document.getElementById('modal-rating').children;
+    for(let i = 0; i < 5; i++) {
+        if(i < count) {
+            stars[i].style.color = '#ffb800'; // Aktif Sarı
+        } else {
+            stars[i].style.color = '#3f3c64'; // Pasif Gri
+        }
+    }
+}
+
+// Kişisel Not Sistemi
+function savePersonalNote() {
+    if(!currentModalItem) return;
+    const note = document.getElementById('modal-note-input').value.trim();
+    userNotes[pluginKey(currentModalItem)] = note;
+    localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+    showToast('📝 Notunuz başarıyla kaydedildi!');
+}
+
+function reportBroken() {
+    showToast('🚩 Bildiriminiz alındı. Teşekkürler!');
+    // İleride buraya API call eklenebilir.
+}
 
 function buildTabs() {
     const types = ['Tümü', 'Stremio', 'Nuvio', 'CloudStream'];
@@ -395,13 +525,12 @@ function filterTab(type, el) {
     filterData();
 }
 
-// Örnek Dummy Veri Yükleme (Local Test için)
+// Test Verisi 
 const dummyData = [
-    { name: "Torrentio", app: "Stremio", debrid: "optional", desc: "https://torrentio.strem.fun/manifest.json - En iyi kaynak." },
-    { name: "SuperFlix", app: "Nuvio", debrid: "free", desc: "https://superflix.com/manifest.json - Ücretsiz filmler." }
+    { name: "WebStreamr 4K", app: "Nuvio", debrid: "free", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - 4K Ücretsiz Film Desteği." },
+    { name: "Torrentio", app: "Stremio", debrid: "optional", desc: "https://torrentio.strem.fun/manifest.json - En iyi kaynak." }
 ];
 
-// Fetch işlemi başarısız olursa dummy veriyi kullan
 fetch('plugins.json')
     .then(r => r.json())
     .then(data => {
@@ -410,7 +539,6 @@ fetch('plugins.json')
         filterData();
     })
     .catch(() => {
-        console.error('plugins.json okunamadı, yerel veri kullanılıyor.');
         plugins = dummyData;
         buildTabs();
         filterData();
