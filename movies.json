@@ -1,0 +1,28 @@
+// 2. Filmleri Çek (movies.json)
+const dummyMovies = [
+    {
+        title: "Interstellar", year: "2014", genre: "Bilim Kurgu", imdb: "8.6",
+        plot: "İnsanlığın hayatta kalabilmesi için bir grup kaşifin, yeni keşfedilmiş bir solucan deliğinden geçerek yaşanabilir yeni gezegenler arayışını konu alıyor.",
+        poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+    },
+    {
+        title: "Dune: Çöl Gezegeni", year: "2021", genre: "Aksiyon / Bilim Kurgu", imdb: "8.0",
+        plot: "Soylu bir ailenin, evrendeki en değerli kaynağın tek üreticisi olan tehlikeli çöl gezegeni Arrakis'in kontrolünü sağlama mücadelesi.",
+        poster: "https://image.tmdb.org/t/p/w500/jL8mO8L7vEEDg7b5G7p9N58Vj96.jpg"
+    },
+    {
+        title: "Esaretin Bedeli", year: "1994", genre: "Dram", imdb: "9.3",
+        plot: "Masumiyetini iddia etmesine rağmen cinayetten ömür boyu hapse mahkum edilen bir bankacının hapishanedeki sıra dışı yaşam mücadelesi.",
+        poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg"
+    }
+];
+
+fetch('movies.json')
+    .then(r => r.json())
+    .then(data => {
+        moviesDb = data;
+    })
+    .catch(() => {
+        console.warn("movies.json bulunamadı, yedek film listesi kullanılıyor.");
+        moviesDb = dummyMovies;
+    });
