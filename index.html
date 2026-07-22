@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PluginHub — Streaming Media Portal</title>
+    <meta name="description" content="TCLTVTÜRK topluluğu için Stremio ve Nuvio eklenti rehberi.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <script>
+        // Tüm dış istekler (rapor, TMDB, senkron) artık bu tek worker üzerinden geçiyor.
+        // API anahtarları burada DEĞİL, worker'ın kendi ortam değişkenlerinde saklanmalı.
+        // Bkz: worker.js (birlikte teslim edilen dosya) — action: 'report' | 'tmdb_popular' | 'sync_push' | 'sync_pull'
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
     </script>
 
@@ -34,7 +38,6 @@
             padding-bottom: 90px;
         }
 
-        /* Streaming Service UI Cam & Gölge Efektleri */
         .stream-card {
             background: var(--bg-card);
             border-radius: 16px;
@@ -49,7 +52,6 @@
             box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2);
         }
 
-        /* Featured Medya Hero Kartı */
         .hero-media-box {
             background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%);
             border-radius: 24px;
@@ -69,7 +71,6 @@
         }
         .play-btn-circle:hover { transform: scale(1.1); }
 
-        /* Mobil Alt Navigasyon Barı */
         .stream-dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: #141230;
@@ -92,7 +93,6 @@
             box-shadow: 0 0 15px rgba(255, 184, 0, 0.5);
         }
 
-        /* Pill Tab / Etiketler */
         .pill-tab {
             background: rgba(255,255,255,0.06);
             border-radius: 20px;
@@ -109,7 +109,6 @@
             font-weight: bold;
         }
 
-        /* Modal & Toast */
         #modal-overlay {
             position: fixed; inset: 0; background: rgba(5, 4, 15, 0.85);
             backdrop-filter: blur(12px); z-index: 2000;
@@ -122,17 +121,14 @@
             border-radius: 20px; width: 90%; max-width: 560px; padding: 28px;
             max-height: 90vh; overflow-y: auto;
         }
-        
-        /* Star Rating Hover Effects */
+
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; }
         .star:hover { color: #ffb800; }
-        
-        /* Tag Colors */
+
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
 
-        /* Zar Dönme Animasyonu */
         @keyframes roll-dice {
             0% { transform: rotate(0deg) scale(1); }
             25% { transform: rotate(90deg) scale(1.2); }
@@ -150,10 +146,11 @@
             border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 9999;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 10px 25px rgba(255, 42, 95, 0.4);
+            max-width: 90vw; text-align: center;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
-        
-        /* Özel Scrollbar Modallar için */
+        #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
@@ -161,7 +158,7 @@
 </head>
 <body>
 
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <!-- Header -->
 <header class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
@@ -170,10 +167,13 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-3 items-center text-xs font-semibold text-slate-400">
-        <button onclick="suggestRandomMovie()" class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition flex items-center gap-2 font-bold">
+        <button onclick="suggestRandomMovie()" aria-label="Rastgele film öner" class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition flex items-center gap-2 font-bold">
             <span class="text-sm leading-none">🎲</span> Film Öner
         </button>
-        <button onclick="toggleFavFilter()" id="favBtn" class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ Favoriler</button>
+        <button onclick="openSyncModal()" aria-label="Verilerini senkronize et" class="bg-purple-600/20 text-purple-300 border border-purple-500/30 px-4 py-2 rounded-full hover:bg-purple-600 hover:text-white transition flex items-center gap-2">
+            <span class="text-sm leading-none">🔄</span> Senkron
+        </button>
+        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ Favoriler</button>
     </div>
 </header>
 
@@ -193,22 +193,17 @@
                     <button id="hero-copy-btn" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 transition">📋 Manifest Kopyala</button>
                 </div>
             </div>
-            <div class="play-btn-circle" id="hero-play-btn">
+            <div class="play-btn-circle" id="hero-play-btn" role="button" aria-label="Öne çıkanı kur">
                 <span class="text-white text-xl">▶</span>
             </div>
         </div>
     </div>
 
-    <!-- KATEGORİ & FİLTRELEME ALANI -->
-    <div class="flex gap-2 overflow-x-auto pb-4 mb-6" id="categoryTabs"></div>
+    <!-- KATEGORİ & FİLTRELEME ALANI (tek kontrol: pill sekmeleri arama kutusuyla birlikte platform + serbest metin filtreliyor) -->
+    <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
-        <select id="appSelect" onchange="filterData()" class="bg-indigo-950/80 border border-slate-800 text-xs text-white p-3 rounded-xl outline-none">
-            <option value="all">Tüm Uygulamalar</option>
-            <option value="Stremio">Stremio</option>
-            <option value="Nuvio">Nuvio</option>
-        </select>
-        <input type="text" id="searchInput" oninput="filterData()" placeholder="🔍 Eklenti veya içerik ara..." class="bg-indigo-950/80 border border-slate-800 text-xs text-white p-3 rounded-xl outline-none col-span-3">
+    <div class="grid grid-cols-1 gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Eklenti veya içerik ara..." class="bg-indigo-950/80 border border-slate-800 text-xs text-white p-3 rounded-xl outline-none">
     </div>
 
     <div class="flex justify-between items-center text-xs text-slate-400 mb-4">
@@ -221,9 +216,9 @@
 
 <!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
-    <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})">🏠</button>
-    <button class="dock-btn" onclick="toggleSearchModal()">🔍</button>
-    <button class="dock-btn" onclick="toggleFavFilter()">♡</button>
+    <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Başa dön">🏠</button>
+    <button class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
+    <button class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
 </div>
 
 <!-- GENİŞLETİLMİŞ ARAMA MODALI -->
@@ -231,7 +226,7 @@
     <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
         <div class="flex justify-between items-center mb-2">
             <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
-            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
+            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none" aria-label="Kapat">&times;</button>
         </div>
         <div class="relative">
             <input type="text" id="expandedSearchInput" placeholder="Eklenti, içerik veya platform ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none focus:border-pink-500 transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
@@ -244,60 +239,66 @@
 <!-- DETAY MODAL -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
-        
-        <!-- Üst Etiketler ve Aksiyonlar (DOKUNULMADI) -->
+
         <div class="flex justify-between items-start mb-5">
             <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
-                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala">
+                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala" aria-label="Linki Kopyala">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                 </button>
-                <button onclick="closeModal()" class="hover:text-white text-2xl leading-none transition">✕</button>
+                <button onclick="closeModal()" class="hover:text-white text-2xl leading-none transition" aria-label="Kapat">✕</button>
             </div>
         </div>
 
         <h2 id="modal-title" class="text-3xl font-bold text-white mb-6"></h2>
 
-        <!-- Puanlama (Yıldızlar) -->
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">PUANINIZ</label>
             <div class="flex gap-1 text-2xl" id="modal-rating" onmouseleave="resetStarHover()">
-                <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)">★</button>
-                <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)">★</button>
-                <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)">★</button>
-                <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)">★</button>
-                <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)">★</button>
+                <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)" aria-label="1 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)" aria-label="2 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)" aria-label="3 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)" aria-label="4 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)" aria-label="5 yıldız">★</button>
             </div>
         </div>
 
-        <!-- Bağlantı Alanı -->
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
-            <!-- Input görünümünde kutu -->
             <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all shadow-inner"></div>
-            
+
             <div class="flex gap-3">
                 <button id="modal-copy-btn" class="flex-1 bg-[#252836] hover:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
                 <button id="modal-go-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">
-                    Siteye Git ↗
+                    Kaynağa Git ↗
                 </button>
             </div>
         </div>
 
-        <!-- KİŞİSEL NOTUM ALANI (Görseldeki Dizilim) -->
         <div class="mb-8">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
-            
+
             <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
-            
+
             <div class="flex gap-3">
                 <button onclick="saveNoteFromTextarea()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">
                     Notu Kaydet
                 </button>
-                <button onclick="reportCurrentPlugin()" class="bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">
+                <button onclick="reportCurrentPlugin()" id="report-btn" class="bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">
                     🚩 Çalışmıyor Bildir
                 </button>
             </div>
+        </div>
+
+        <!-- Stremio'ya Nasıl Kurulur? -->
+        <div id="modal-stremio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
+            <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</h3>
+            <ul class="text-sm text-slate-300 space-y-4">
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span><b>Hızlı Kurulum</b> butonuna tıklayın — Stremio uygulaması yüklüyse otomatik açılır.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Otomatik açılmazsa <b>Kopyala</b> ile manifest linkini kopyalayın.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Stremio içinde <b>Eklentiler</b> sekmesine gidip arama kutusuna linki yapıştırın.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Karşınıza çıkan eklentide <b>Install</b> butonuna basın.</span></li>
+            </ul>
         </div>
 
         <!-- Nuvio'ya Nasıl Kurulur? -->
@@ -315,6 +316,25 @@
     </div>
 </div>
 
+<!-- SENKRON MODALI -->
+<div id="sync-modal-overlay" onclick="closeSyncModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-white">Verilerini Senkronize Et</h3>
+            <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Favori, puan ve notların bu cihaza özel kaydedilir. Başka bir cihazdan erişmek için bir kod oluştur ya da mevcut kodunu gir.</p>
+        <div class="flex gap-2 mb-3">
+            <input id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="syncPush()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Bu Kodla Kaydet</button>
+            <button onclick="syncPull()" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Bu Koddan Getir</button>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-4">Not: Bu özellik worker.js'de sync_push / sync_pull uç noktalarının etkin olmasını gerektirir.</p>
+    </div>
+</div>
+
 <!-- 4 SANİYE ZAR DÖNME / YÜKLENİYOR OVERLAY -->
 <div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div class="text-7xl rolling-dice mb-6">🎲</div>
@@ -325,8 +345,7 @@
 <!-- FİLM ÖNERİ MODALI -->
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
-        
-        <!-- Sol: Film Posteri -->
+
         <div class="md:w-5/12 relative">
             <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-64 md:h-full object-cover">
             <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5">
@@ -335,19 +354,18 @@
             </div>
         </div>
 
-        <!-- Sağ: Film Detayları -->
         <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
-            <button onclick="closeMovieModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition">✕</button>
-            
+            <button onclick="closeMovieModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition" aria-label="Kapat">✕</button>
+
             <div class="mb-2 flex items-center gap-2">
                 <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
                 <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
             </div>
-            
+
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
-            
+
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
-            
+
             <button onclick="suggestRandomMovie()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
                 <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
@@ -357,32 +375,60 @@
 
 <script>
 let plugins = [];
-let moviesDb = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
 let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
-let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}'); 
+let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}');
 let showFavsOnly = false;
 let currentModalItem = null;
 let currentRatingDisplay = 0;
+let activeAppFilter = 'all';
 
-function showToast(msg) {
+// ---------------------------
+// GÜVENLİK: HTML KAÇIŞ (XSS ÖNLEMİ)
+// ---------------------------
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function showToast(msg, isError) {
     const t = document.getElementById('toast');
     t.textContent = msg;
+    t.classList.toggle('error', !!isError);
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
 // ---------------------------
-// KİŞİSEL NOT & BİLDİR FONKSİYONLARI (GÜNCELLENDİ)
+// KÜÇÜK DEBOUNCE YARDIMCISI (performans için)
+// ---------------------------
+function debounce(fn, wait) {
+    let t;
+    return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+    };
+}
+const debouncedFilter = debounce(filterData, 180);
+function onSearchInput() { debouncedFilter(); }
+
+// ---------------------------
+// KİŞİSEL NOT & BİLDİR FONKSİYONLARI
 // ---------------------------
 function saveNoteFromTextarea() {
-    if(!currentModalItem) return;
+    if (!currentModalItem) return;
     const key = pluginKey(currentModalItem);
     const noteArea = document.getElementById('modal-note-textarea');
     const text = noteArea.value.trim();
-    
+
     if (text === '') {
         delete userNotes[key];
         showToast('📝 Notunuz silindi.');
@@ -393,30 +439,114 @@ function saveNoteFromTextarea() {
     localStorage.setItem('ph_notes', JSON.stringify(userNotes));
 }
 
-function reportCurrentPlugin() {
-    if(!currentModalItem) return;
-    
-    fetch(REPORT_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            action: 'report',
-            plugin: currentModalItem.name,
-            platform: currentModalItem.app,
-            timestamp: new Date().toISOString()
-        })
-    }).catch(err => console.log('Rapor iletilirken ağ hatası', err));
+async function reportCurrentPlugin() {
+    if (!currentModalItem) return;
+    const btn = document.getElementById('report-btn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Gönderiliyor...';
 
-    showToast(`🚩 ${currentModalItem.name} başarıyla raporlandı! Bildiriminiz için teşekkürler.`);
+    try {
+        const res = await fetch(REPORT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'report',
+                plugin: currentModalItem.name,
+                platform: currentModalItem.app,
+                timestamp: new Date().toISOString()
+            })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast(`🚩 ${currentModalItem.name} başarıyla raporlandı! Bildiriminiz için teşekkürler.`);
+    } catch (err) {
+        console.error('Rapor iletilirken hata:', err);
+        showToast('Rapor gönderilemedi, lütfen daha sonra tekrar deneyin.', true);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+// ---------------------------
+// SENKRON (worker.js: sync_push / sync_pull gerektirir)
+// ---------------------------
+function openSyncModal() {
+    document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    const savedCode = localStorage.getItem('ph_sync_code') || '';
+    document.getElementById('sync-code-input').value = savedCode;
+}
+function closeSyncModal() {
+    document.getElementById('sync-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+}
+function closeSyncModalOnBackdrop(e) {
+    if (e.target.id === 'sync-modal-overlay') closeSyncModal();
+}
+function getOrCreateSyncCode() {
+    let code = document.getElementById('sync-code-input').value.trim().toUpperCase();
+    if (!code) {
+        code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        document.getElementById('sync-code-input').value = code;
+    }
+    return code;
+}
+async function syncPush() {
+    const code = getOrCreateSyncCode();
+    try {
+        const res = await fetch(REPORT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'sync_push',
+                code,
+                data: { favorites, userRatings, userNotes }
+            })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        localStorage.setItem('ph_sync_code', code);
+        showToast(`✅ Verilerin "${code}" koduyla kaydedildi.`);
+        closeSyncModal();
+    } catch (err) {
+        console.error('Sync push hatası:', err);
+        showToast('Senkronizasyon şu an kullanılamıyor.', true);
+    }
+}
+async function syncPull() {
+    const code = document.getElementById('sync-code-input').value.trim().toUpperCase();
+    if (!code) { showToast('Lütfen bir kod girin.', true); return; }
+    try {
+        const res = await fetch(REPORT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'sync_pull', code })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const payload = await res.json();
+        if (!payload || !payload.data) throw new Error('Kod bulunamadı');
+
+        favorites = payload.data.favorites || [];
+        userRatings = payload.data.userRatings || {};
+        userNotes = payload.data.userNotes || {};
+        localStorage.setItem('ph_favs', JSON.stringify(favorites));
+        localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
+        localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+        localStorage.setItem('ph_sync_code', code);
+
+        filterData();
+        showToast('✅ Veriler bu cihaza aktarıldı.');
+        closeSyncModal();
+    } catch (err) {
+        console.error('Sync pull hatası:', err);
+        showToast('Kod bulunamadı veya sunucuya ulaşılamadı.', true);
+    }
 }
 
 // ---------------------------
 // GÜNLÜK ÖNE ÇIKAN EKLENTİ
 // ---------------------------
 function updateDailyFeatured() {
-    if(!plugins || plugins.length === 0) return;
-    
+    if (!plugins || plugins.length === 0) return;
+
     const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const featured = plugins[daysSinceEpoch % plugins.length];
 
@@ -426,29 +556,29 @@ function updateDailyFeatured() {
 
     const match = featured.desc?.match(/(https?:\/\/[^\s]+)/g);
     const url = match ? match[0] : '';
-    
+
     const heroInstallBtn = document.getElementById('hero-install-btn');
     const heroCopyBtn = document.getElementById('hero-copy-btn');
     const heroPlayBtn = document.getElementById('hero-play-btn');
 
     heroInstallBtn.onclick = () => {
-        if(url) {
+        if (url) {
             let installUrl = url;
-            if(featured.app === 'Stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
+            if (featured.app === 'Stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
             window.location.href = installUrl;
             showToast(`🚀 ${featured.name} kurulumu başlatılıyor...`);
         } else {
-            showToast('Kurulum linki bulunamadı.');
+            showToast('Kurulum linki bulunamadı.', true);
         }
     };
 
     heroCopyBtn.onclick = () => {
-        if(url) {
+        if (url) {
             navigator.clipboard.writeText(url);
             showToast('📋 Manifest kopyalandı!');
         }
     };
-    
+
     heroPlayBtn.onclick = heroInstallBtn.onclick;
 }
 
@@ -458,9 +588,9 @@ function updateDailyFeatured() {
 function toggleSearchModal() {
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('expandedSearchInput');
-    if(modal.classList.contains('opacity-0')) {
+    if (modal.classList.contains('opacity-0')) {
         modal.classList.remove('opacity-0', 'pointer-events-none');
-        setTimeout(() => input.focus(), 100); 
+        setTimeout(() => input.focus(), 100);
     } else {
         modal.classList.add('opacity-0', 'pointer-events-none');
     }
@@ -468,14 +598,15 @@ function toggleSearchModal() {
 
 function handleExpandedSearch(val) {
     document.getElementById('searchInput').value = val;
-    filterData();
+    debouncedFilter();
 }
 
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape') {
+    if (e.key === 'Escape') {
         const searchModal = document.getElementById('search-modal');
-        if(!searchModal.classList.contains('opacity-0')) toggleSearchModal();
-        if(document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+        if (!searchModal.classList.contains('opacity-0')) toggleSearchModal();
+        if (document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+        if (!document.getElementById('sync-modal-overlay').classList.contains('opacity-0')) closeSyncModal();
         closeMovieModal();
     }
 });
@@ -493,12 +624,17 @@ function renderCards(data) {
     grid.innerHTML = '';
     count.textContent = `${data.length} Eklenti Listeleniyor`;
 
+    if (data.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-500 text-sm py-16">Aramanızla eşleşen eklenti bulunamadı.</div>`;
+        return;
+    }
+
     data.forEach(item => {
         const isFav = favorites.includes(pluginKey(item));
         const userRating = userRatings[pluginKey(item)] || 0;
-        
+
         let starsHTML = '';
-        for(let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 5; i++) {
             starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
         }
 
@@ -506,14 +642,15 @@ function renderCards(data) {
 
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
+        // Tüm dinamik metinler escapeHtml() ile geçiriliyor (XSS önlemi)
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-start mb-4">
-                    <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${item.app}</span>
-                    <button class="text-slate-500 hover:text-pink-500 text-xl transition" onclick="event.stopPropagation(); toggleFav('${pluginKey(item)}')">${isFav ? '❤️' : '♡'}</button>
+                    <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
+                    <button class="text-slate-500 hover:text-pink-500 text-xl transition" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')" aria-label="Favorilere ekle/çıkar">${isFav ? '❤️' : '♡'}</button>
                 </div>
-                <h3 class="font-bold text-xl text-white mb-2">${item.name}</h3>
-                <p class="text-[13px] text-slate-300 leading-relaxed mb-6 border-b border-white/5 pb-6">Türü: ${addonType}</p>
+                <h3 class="font-bold text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
+                <p class="text-[13px] text-slate-300 leading-relaxed mb-6 border-b border-white/5 pb-6">Türü: ${escapeHtml(addonType)}</p>
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex gap-1 text-lg">
@@ -536,13 +673,11 @@ function toggleFav(key) {
 }
 
 function filterData() {
-    const app = document.getElementById('appSelect').value;
-    const q = document.getElementById('searchInput').value.trim();
-
     let pool = plugins;
-    if (app !== 'all') pool = pool.filter(p => p.app === app);
+    if (activeAppFilter !== 'all') pool = pool.filter(p => p.app === activeAppFilter);
     if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
 
+    const q = document.getElementById('searchInput').value.trim();
     if (q) {
         const fuse = new Fuse(pool, { keys: ['name', 'desc', 'app'], threshold: 0.4 });
         pool = fuse.search(q).map(r => r.item);
@@ -553,45 +688,48 @@ function filterData() {
 function openModalItem(item) {
     currentModalItem = item;
     const pKey = pluginKey(item);
-    
+
     document.getElementById('modal-title').textContent = item.name;
-    
+
     const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
     const tagsContainer = document.getElementById('modal-tags');
-    let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${item.app}</span>`;
+    let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${escapeHtml(item.app)}</span>`;
     tagsHTML += `<span class="tag-free px-3 py-1.5 rounded-md flex items-center gap-1">☑ ÜCRETSİZ</span>`;
-    tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${addonType}</span>`;
+    tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${escapeHtml(addonType)}</span>`;
     tagsContainer.innerHTML = tagsHTML;
 
     const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
-    const url = match ? match[0] : 'Bağlantı bulunamadı';
-    document.getElementById('modal-url-box').textContent = url;
-    
+    const manifestUrl = match ? match[0] : '';
+    // Eklenti verisinde ayrı bir kaynak/site linki varsa ("sourceUrl") onu kullan,
+    // yoksa manifest linkine geri düş.
+    const goUrl = item.sourceUrl || manifestUrl;
+
+    document.getElementById('modal-url-box').textContent = manifestUrl || 'Bağlantı bulunamadı';
+
     document.getElementById('modal-copy-btn').onclick = () => {
-        navigator.clipboard.writeText(url);
+        if (!manifestUrl) { showToast('Kopyalanacak bağlantı yok.', true); return; }
+        navigator.clipboard.writeText(manifestUrl);
         showToast('📋 Bağlantı kopyalandı!');
     };
-    
+
     document.getElementById('modal-go-btn').onclick = () => {
-        if(url.startsWith('http')) {
-            window.open(url, '_blank');
+        if (goUrl && goUrl.startsWith('http')) {
+            window.open(goUrl, '_blank', 'noopener,noreferrer');
         } else {
-            showToast('Geçerli bir site bağlantısı bulunamadı.');
+            showToast('Geçerli bir site bağlantısı bulunamadı.', true);
         }
     };
 
-    const guide = document.getElementById('modal-nuvio-guide');
-    if(item.app.toLowerCase() === 'nuvio') {
-        guide.classList.remove('hidden');
-    } else {
-        guide.classList.add('hidden');
-    }
+    const nuvioGuide = document.getElementById('modal-nuvio-guide');
+    const stremioGuide = document.getElementById('modal-stremio-guide');
+    const appLower = (item.app || '').toLowerCase();
+    nuvioGuide.classList.toggle('hidden', appLower !== 'nuvio');
+    stremioGuide.classList.toggle('hidden', appLower !== 'stremio');
 
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
-    
-    // Açılan eklentinin varsa daha önce kaydedilmiş notunu Textarea içerisine yaz
+
     document.getElementById('modal-note-textarea').value = userNotes[pKey] || '';
 
     document.getElementById('modal-overlay').classList.add('open');
@@ -610,36 +748,32 @@ function hoverStars(index) { updateStarsUI(index, true); }
 function resetStarHover() { updateStarsUI(currentRatingDisplay); }
 
 function ratePlugin(index) {
-    if(!currentModalItem) return;
+    if (!currentModalItem) return;
     currentRatingDisplay = index;
     userRatings[pluginKey(currentModalItem)] = index;
     localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
     updateStarsUI(index);
     showToast(`⭐ Puanınız kaydedildi (${index}/5)`);
-    filterData(); 
+    filterData();
 }
 
 function updateStarsUI(count) {
     const stars = document.getElementById('modal-rating').children;
-    for(let i = 0; i < 5; i++) {
-        if(i < count) {
-            stars[i].style.color = '#ffb800'; 
-        } else {
-            stars[i].style.color = '#2d2a54'; 
-        }
+    for (let i = 0; i < 5; i++) {
+        stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
     }
 }
 
 function buildTabs() {
     const types = ['Tümü', 'Stremio', 'Nuvio'];
     const container = document.getElementById('categoryTabs');
-    container.innerHTML = types.map((t, i) => `<span class="pill-tab ${i===0?'active':''}" onclick="filterTab('${t}', this)">${t}</span>`).join('');
+    container.innerHTML = types.map((t, i) => `<span class="pill-tab ${i === 0 ? 'active' : ''}" onclick="filterTab('${t}', this)">${t}</span>`).join('');
 }
 
 function filterTab(type, el) {
     document.querySelectorAll('.pill-tab').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
-    document.getElementById('appSelect').value = type === 'Tümü' ? 'all' : type;
+    activeAppFilter = type === 'Tümü' ? 'all' : type;
     filterData();
 }
 
@@ -653,65 +787,87 @@ function closeMovieModal(e) {
 // VERİ ÇEKME (FETCH) İŞLEMLERİ
 // ---------------------------
 
-// 1. EKLENTİLERİ ÇEK
 const dummyPlugins = [
     { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
     { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak" }
 ];
 
 fetch('plugins.json')
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+    })
     .then(data => {
         plugins = data;
         buildTabs();
         filterData();
-        updateDailyFeatured(); 
+        updateDailyFeatured();
     })
-    .catch(() => {
+    .catch((err) => {
+        console.warn('plugins.json yüklenemedi, örnek veriler kullanılıyor:', err);
         plugins = dummyPlugins;
         buildTabs();
         filterData();
         updateDailyFeatured();
+        showToast('Eklenti listesi yüklenemedi, örnek veriler gösteriliyor.', true);
     });
 
-// 2. TMDB API İLE RASTGELE FİLM ÖNERİSİ
-const TMDB_API_KEY = 'c4812c0d5f471e53d86c8e178c03df54';
+// ---------------------------
+// FİLM ÖNERİSİ — TMDB'ye artık doğrudan değil, worker üzerinden erişiliyor.
+// worker.js action:'tmdb_popular' route'unu barındırmalı ve TMDB anahtarını
+// kendi ortam değişkeninde (env.TMDB_API_KEY) tutmalıdır. Böylece anahtar
+// tarayıcıda hiç görünmez.
+// ---------------------------
+function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-function suggestRandomMovie() {
+async function suggestRandomMovie() {
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
 
     const randomPage = Math.floor(Math.random() * 50) + 1;
-    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=${randomPage}`;
 
-    fetch(url)
-        .then(res => res.json())
-        .then(data => {
-            const movies = data.results;
-            const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+    try {
+        // Gerçek istek ile kısa bir minimum bekleme paralel çalışır;
+        // böylece animasyon her zaman 4 saniye sabitlenmek yerine
+        // gerçek yanıt süresine yakın bir sürede biter.
+        const [data] = await Promise.all([
+            fetchPopularMovies(randomPage),
+            wait(900)
+        ]);
 
-            setTimeout(() => {
-                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        const movies = data.results || [];
+        if (movies.length === 0) throw new Error('Film listesi boş döndü');
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
 
-                document.getElementById('movie-title').textContent = randomMovie.title;
-                document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
-                document.getElementById('movie-genre').textContent = "Popüler"; 
-                document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
-                document.getElementById('movie-plot').textContent = randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.";
-                
-                const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
-                document.getElementById('movie-poster').src = posterPath;
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
 
-                document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
-            }, 4000); 
-        })
-        .catch(err => {
-            console.error("Film çekilemedi:", err);
-            loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
-            showToast("Film önerisi alınırken bir hata oluştu.");
-        });
+        document.getElementById('movie-title').textContent = randomMovie.title;
+        document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
+        document.getElementById('movie-genre').textContent = "Popüler";
+        document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
+        document.getElementById('movie-plot').textContent = randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.";
+
+        const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
+        document.getElementById('movie-poster').src = posterPath;
+
+        document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    } catch (err) {
+        console.error("Film çekilemedi:", err);
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        showToast("Film önerisi alınırken bir hata oluştu.", true);
+    }
+}
+
+async function fetchPopularMovies(page) {
+    const res = await fetch(REPORT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'tmdb_popular', page, language: 'tr-TR' })
+    });
+    if (!res.ok) throw new Error(`Worker HTTP ${res.status}`);
+    return res.json();
 }
 </script>
 </body>
