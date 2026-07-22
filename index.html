@@ -10,11 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
     <script>
-        // Tüm dış istekler bu worker üzerinden geçiyor, path'e göre yönleniyor:
-        //   POST /             -> "Çalışmıyor Bildir" (Telegram)
-        //   GET/POST/PUT/DELETE /notes  -> film notları
-        //   GET  /tmdb         -> TMDB proxy (anahtar sadece worker'da, env.TMDB_API_KEY)
-        //   GET/POST /sync     -> cihazlar arası favori/puan/not senkronu
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
     </script>
 
@@ -162,7 +157,7 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<!-- Header (Sadeleştirildi, sadece Favoriler bırakıldı) -->
+<!-- Header -->
 <header class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
     <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center font-black text-indigo-400">P</div>
@@ -174,7 +169,6 @@
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-4">
-
     <!-- HERO FEATURED MEDIA -->
     <div class="hero-media-box p-6 md:p-8 mb-8" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -210,7 +204,7 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- FİLM ÖNER FAB (Floating Action Button) -->
+<!-- FİLM ÖNER FAB -->
 <button onclick="suggestRandomMovie()" class="fixed bottom-[100px] right-6 md:bottom-10 md:right-10 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_10px_25px_rgba(37,99,235,0.6)] hover:bg-blue-500 hover:scale-110 transition-all z-[1500]" aria-label="Rastgele film öner">
     🎲
 </button>
@@ -426,6 +420,9 @@ let currentModalItem = null;
 let currentRatingDisplay = 0;
 let activeAppFilter = 'all';
 
+// Sistemin bulduğu en yeni tarih bu değişkende tutulacak
+let newestPluginDate = null; 
+
 // ---------------------------
 // GÜVENLİK: HTML KAÇIŞ (XSS ÖNLEMİ)
 // ---------------------------
@@ -464,7 +461,24 @@ const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
 // ---------------------------
-// MENÜ MODALI İŞLEMLERİ YENİ EKLENDİ
+// EN YENİ EKLENTİYİ BULMA MANTIĞI (YENİ EKLENDİ)
+// ---------------------------
+function calculateNewestDate() {
+    newestPluginDate = null;
+    let maxTime = 0;
+    plugins.forEach(p => {
+        if (p.date) {
+            const time = new Date(p.date).getTime();
+            if (time > maxTime) {
+                maxTime = time;
+                newestPluginDate = p.date;
+            }
+        }
+    });
+}
+
+// ---------------------------
+// MENÜ MODALI İŞLEMLERİ
 // ---------------------------
 function openMenuModal() {
     const overlay = document.getElementById('menu-modal-overlay');
@@ -701,13 +715,21 @@ function renderCards(data) {
         }
 
         const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
+        
+        // --- YENİ ROZETİ KONTROLÜ ---
+        // Eğer eklentinin tarihi en yeni tarihe eşitse rozet HTML'ini oluştur
+        const isNew = item.date && item.date === newestPluginDate;
+        const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
 
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-start mb-4">
-                    <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
+                        ${newBadgeHTML}
+                    </div>
                     <button class="text-slate-500 hover:text-pink-500 text-xl transition" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')" aria-label="Favorilere ekle/çıkar">${isFav ? '❤️' : '♡'}</button>
                 </div>
                 <h3 class="font-bold text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
@@ -846,9 +868,10 @@ function closeMovieModal(e) {
 // VERİ ÇEKME (FETCH) İŞLEMLERİ
 // ---------------------------
 
+// TEST İÇİN DUMMY VERİLERE TARİH EKLENDİ
 const dummyPlugins = [
-    { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
-    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak" }
+    { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi", date: "2026-07-20" },
+    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak", date: "2026-07-22" }
 ];
 
 fetch('plugins.json')
@@ -858,6 +881,7 @@ fetch('plugins.json')
     })
     .then(data => {
         plugins = data;
+        calculateNewestDate(); // Gelen veriden en yeni tarihi bul
         buildTabs();
         filterData();
         updateDailyFeatured(); 
@@ -865,6 +889,7 @@ fetch('plugins.json')
     .catch((err) => {
         console.warn('plugins.json yüklenemedi, örnek veriler kullanılıyor:', err);
         plugins = dummyPlugins;
+        calculateNewestDate(); // Dummy verilerde en yeniyi bul
         buildTabs();
         filterData();
         updateDailyFeatured();
