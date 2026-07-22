@@ -10,9 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <script>
-        // Tüm dış istekler (rapor, TMDB, senkron) artık bu tek worker üzerinden geçiyor.
-        // API anahtarları burada DEĞİL, worker'ın kendi ortam değişkenlerinde saklanmalı.
-        // Bkz: worker.js (birlikte teslim edilen dosya) — action: 'report' | 'tmdb_popular' | 'sync_push' | 'sync_pull'
+        // Tüm dış istekler bu worker üzerinden geçiyor, path'e göre yönleniyor:
+        //   POST /            -> "Çalışmıyor Bildir" (Telegram)
+        //   GET/POST/PUT/DELETE /notes  -> film notları
+        //   GET  /tmdb        -> TMDB proxy (anahtar sadece worker'da, env.TMDB_API_KEY)
+        //   GET/POST /sync    -> cihazlar arası favori/puan/not senkronu
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
     </script>
 
@@ -446,15 +448,16 @@ async function reportCurrentPlugin() {
     btn.disabled = true;
     btn.textContent = '⏳ Gönderiliyor...';
 
+    const addonType = currentModalItem.type || (currentModalItem.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
+
     try {
         const res = await fetch(REPORT_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                action: 'report',
-                plugin: currentModalItem.name,
-                platform: currentModalItem.app,
-                timestamp: new Date().toISOString()
+                pluginName: currentModalItem.name,
+                app: currentModalItem.app,
+                type: addonType
             })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -493,11 +496,10 @@ function getOrCreateSyncCode() {
 async function syncPush() {
     const code = getOrCreateSyncCode();
     try {
-        const res = await fetch(REPORT_ENDPOINT, {
+        const res = await fetch(`${REPORT_ENDPOINT}/sync`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                action: 'sync_push',
                 code,
                 data: { favorites, userRatings, userNotes }
             })
@@ -515,11 +517,7 @@ async function syncPull() {
     const code = document.getElementById('sync-code-input').value.trim().toUpperCase();
     if (!code) { showToast('Lütfen bir kod girin.', true); return; }
     try {
-        const res = await fetch(REPORT_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'sync_pull', code })
-        });
+        const res = await fetch(`${REPORT_ENDPOINT}/sync?code=${encodeURIComponent(code)}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const payload = await res.json();
         if (!payload || !payload.data) throw new Error('Kod bulunamadı');
@@ -861,11 +859,7 @@ async function suggestRandomMovie() {
 }
 
 async function fetchPopularMovies(page) {
-    const res = await fetch(REPORT_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'tmdb_popular', page, language: 'tr-TR' })
-    });
+    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}&language=tr-TR`);
     if (!res.ok) throw new Error(`Worker HTTP ${res.status}`);
     return res.json();
 }
