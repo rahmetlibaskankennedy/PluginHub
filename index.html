@@ -8,8 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <script>
+        // Tüm dış istekler bu worker üzerinden geçiyor, path'e göre yönleniyor:
+        //   POST /            -> "Çalışmıyor Bildir" (Telegram)
+        //   GET/POST/PUT/DELETE /notes  -> film notları
+        //   GET  /tmdb        -> TMDB proxy (anahtar sadece worker'da, env.TMDB_API_KEY)
+        //   GET/POST /sync    -> cihazlar arası favori/puan/not senkronu
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
     </script>
 
@@ -118,10 +123,10 @@
             border-radius: 20px; width: 90%; max-width: 560px; padding: 28px;
             max-height: 90vh; overflow-y: auto;
         }
-        
+
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; }
         .star:hover { color: #ffb800; }
-        
+
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
@@ -147,7 +152,7 @@
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
         #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
-        
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
@@ -164,11 +169,18 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
+        <button onclick="suggestRandomMovie()" aria-label="Rastgele film öner" class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition flex items-center gap-2 font-bold">
+            <span class="text-sm leading-none">🎲</span> <span class="hidden sm:inline">Film Öner</span>
+        </button>
+        <button onclick="openSyncModal()" aria-label="Verilerini senkronize et" class="hidden md:flex bg-purple-600/20 text-purple-300 border border-purple-500/30 px-4 py-2 rounded-full hover:bg-purple-600 hover:text-white transition items-center gap-2">
+            <span class="text-sm leading-none">🔄</span> <span class="hidden sm:inline">Senkron</span>
+        </button>
         <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
     </div>
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-4">
+
     <!-- HERO FEATURED MEDIA -->
     <div class="hero-media-box p-6 md:p-8 mb-8" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -189,7 +201,7 @@
         </div>
     </div>
 
-    <!-- KATEGORİ & FİLTRELEME ALANI -->
+    <!-- KATEGORİ & FİLTRELEME ALANI (tek kontrol: pill sekmeleri arama kutusuyla birlikte platform + serbest metin filtreliyor) -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
 
     <div class="grid grid-cols-1 gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
@@ -204,58 +216,12 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- FİLM ÖNER FAB -->
-<button onclick="suggestRandomMovie()" class="fixed bottom-[100px] right-6 md:bottom-10 md:right-10 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_10px_25px_rgba(37,99,235,0.6)] hover:bg-blue-500 hover:scale-110 transition-all z-[1500]" aria-label="Rastgele film öner">
-    🎲
-</button>
-
-<!-- MOBİL DOCK NAVIGATION (4 Sekme) -->
+<!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
     <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Başa dön">🏠</button>
     <button class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
+    <button class="dock-btn md:hidden" onclick="openSyncModal()" aria-label="Senkron">🔄</button>
     <button class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
-    <button class="dock-btn" onclick="openMenuModal()" aria-label="Menü">☰</button>
-</div>
-
-<!-- MENÜ MODALI -->
-<div id="menu-modal-overlay" onclick="closeMenuModal(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-    <div onclick="event.stopPropagation()" id="menu-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold text-white">Menü</h3>
-            <button onclick="closeMenuModal()" class="text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
-        </div>
-        
-        <div class="flex flex-col gap-3">
-            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-                <span class="text-2xl">🔄</span>
-                <div>
-                    <div class="text-sm font-bold text-white">Senkronizasyon</div>
-                    <div class="text-xs text-slate-400">Verilerini cihazlar arası eşitle</div>
-                </div>
-            </button>
-            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-                <span class="text-2xl">⚙️</span>
-                <div>
-                    <div class="text-sm font-bold text-white">Ayarlar</div>
-                    <div class="text-xs text-slate-400">Uygulama tercihlerini yönet</div>
-                </div>
-            </button>
-            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-                <span class="text-2xl">ℹ️</span>
-                <div>
-                    <div class="text-sm font-bold text-white">Hakkında & Topluluk</div>
-                    <div class="text-xs text-slate-400">Sürüm bilgileri ve destek linkleri</div>
-                </div>
-            </button>
-            <button class="flex items-center gap-4 bg-rose-900/20 hover:bg-rose-900/40 p-4 rounded-xl transition text-left border border-rose-500/10 mt-2">
-                <span class="text-2xl">🚩</span>
-                <div>
-                    <div class="text-sm font-bold text-rose-400">Geri Bildirim</div>
-                    <div class="text-xs text-rose-500/70">Hata bildir veya öneride bulun</div>
-                </div>
-            </button>
-        </div>
-    </div>
 </div>
 
 <!-- GENİŞLETİLMİŞ ARAMA MODALI -->
@@ -276,7 +242,7 @@
 <!-- DETAY MODAL -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
-        
+
         <div class="flex justify-between items-start mb-5">
             <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
@@ -303,7 +269,7 @@
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
             <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all shadow-inner"></div>
-            
+
             <div class="flex gap-3">
                 <button id="modal-copy-btn" class="flex-1 bg-[#252836] hover:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
                 <button id="modal-go-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">
@@ -314,9 +280,9 @@
 
         <div class="mb-8">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
-            
+
             <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
-            
+
             <div class="flex gap-3">
                 <button onclick="saveNoteFromTextarea()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">
                     Notu Kaydet
@@ -382,7 +348,7 @@
 <!-- FİLM ÖNERİ MODALI -->
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
-        
+
         <div class="md:w-5/12 relative">
             <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-64 md:h-full object-cover">
             <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5">
@@ -393,16 +359,16 @@
 
         <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
             <button onclick="closeMovieModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition" aria-label="Kapat">✕</button>
-            
+
             <div class="mb-2 flex items-center gap-2">
                 <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
                 <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
             </div>
-            
+
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
-            
+
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
-            
+
             <button onclick="suggestRandomMovie()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
                 <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
@@ -419,9 +385,6 @@ let showFavsOnly = false;
 let currentModalItem = null;
 let currentRatingDisplay = 0;
 let activeAppFilter = 'all';
-
-// Sistemin bulduğu en yeni tarih bu değişkende tutulacak
-let newestPluginDate = null; 
 
 // ---------------------------
 // GÜVENLİK: HTML KAÇIŞ (XSS ÖNLEMİ)
@@ -448,7 +411,7 @@ function showToast(msg, isError) {
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
 // ---------------------------
-// KÜÇÜK DEBOUNCE YARDIMCISI
+// KÜÇÜK DEBOUNCE YARDIMCISI (performans için)
 // ---------------------------
 function debounce(fn, wait) {
     let t;
@@ -461,45 +424,6 @@ const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
 // ---------------------------
-// EN YENİ EKLENTİYİ BULMA MANTIĞI (YENİ EKLENDİ)
-// ---------------------------
-function calculateNewestDate() {
-    newestPluginDate = null;
-    let maxTime = 0;
-    plugins.forEach(p => {
-        if (p.date) {
-            const time = new Date(p.date).getTime();
-            if (time > maxTime) {
-                maxTime = time;
-                newestPluginDate = p.date;
-            }
-        }
-    });
-}
-
-// ---------------------------
-// MENÜ MODALI İŞLEMLERİ
-// ---------------------------
-function openMenuModal() {
-    const overlay = document.getElementById('menu-modal-overlay');
-    const box = document.getElementById('menu-modal-box');
-    overlay.classList.remove('opacity-0', 'pointer-events-none');
-    setTimeout(() => {
-        box.classList.remove('translate-y-full');
-    }, 10);
-}
-
-function closeMenuModal(e) {
-    if (e && e.target !== document.getElementById('menu-modal-overlay')) return;
-    const overlay = document.getElementById('menu-modal-overlay');
-    const box = document.getElementById('menu-modal-box');
-    box.classList.add('translate-y-full');
-    setTimeout(() => {
-        overlay.classList.add('opacity-0', 'pointer-events-none');
-    }, 300);
-}
-
-// ---------------------------
 // KİŞİSEL NOT & BİLDİR FONKSİYONLARI
 // ---------------------------
 function saveNoteFromTextarea() {
@@ -507,7 +431,7 @@ function saveNoteFromTextarea() {
     const key = pluginKey(currentModalItem);
     const noteArea = document.getElementById('modal-note-textarea');
     const text = noteArea.value.trim();
-    
+
     if (text === '') {
         delete userNotes[key];
         showToast('📝 Notunuz silindi.');
@@ -549,7 +473,7 @@ async function reportCurrentPlugin() {
 }
 
 // ---------------------------
-// SENKRON 
+// SENKRON (worker.js: sync_push / sync_pull gerektirir)
 // ---------------------------
 function openSyncModal() {
     document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
@@ -621,7 +545,7 @@ async function syncPull() {
 // ---------------------------
 function updateDailyFeatured() {
     if (!plugins || plugins.length === 0) return;
-    
+
     const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const featured = plugins[daysSinceEpoch % plugins.length];
 
@@ -631,7 +555,7 @@ function updateDailyFeatured() {
 
     const match = featured.desc?.match(/(https?:\/\/[^\s]+)/g);
     const url = match ? match[0] : '';
-    
+
     const heroInstallBtn = document.getElementById('hero-install-btn');
     const heroCopyBtn = document.getElementById('hero-copy-btn');
     const heroPlayBtn = document.getElementById('hero-play-btn');
@@ -653,7 +577,7 @@ function updateDailyFeatured() {
             showToast('📋 Manifest kopyalandı!');
         }
     };
-    
+
     heroPlayBtn.onclick = heroInstallBtn.onclick;
 }
 
@@ -665,7 +589,7 @@ function toggleSearchModal() {
     const input = document.getElementById('expandedSearchInput');
     if (modal.classList.contains('opacity-0')) {
         modal.classList.remove('opacity-0', 'pointer-events-none');
-        setTimeout(() => input.focus(), 100); 
+        setTimeout(() => input.focus(), 100);
     } else {
         modal.classList.add('opacity-0', 'pointer-events-none');
     }
@@ -682,7 +606,6 @@ document.addEventListener('keydown', (e) => {
         if (!searchModal.classList.contains('opacity-0')) toggleSearchModal();
         if (document.getElementById('modal-overlay').classList.contains('open')) closeModal();
         if (!document.getElementById('sync-modal-overlay').classList.contains('opacity-0')) closeSyncModal();
-        if (!document.getElementById('menu-modal-overlay').classList.contains('opacity-0')) closeMenuModal();
         closeMovieModal();
     }
 });
@@ -708,28 +631,21 @@ function renderCards(data) {
     data.forEach(item => {
         const isFav = favorites.includes(pluginKey(item));
         const userRating = userRatings[pluginKey(item)] || 0;
-        
+
         let starsHTML = '';
         for (let i = 1; i <= 5; i++) {
             starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
         }
 
         const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
-        
-        // --- DİNAMİK YENİ ROZETİ KONTROLÜ ---
-        // JSON listesinin (plugins) en altındaki son elemanı otomatik "YENİ" kabul eder.
-        const isNew = (item === plugins[plugins.length - 1]);
-        const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
 
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
+        // Tüm dinamik metinler escapeHtml() ile geçiriliyor (XSS önlemi)
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
-                        ${newBadgeHTML}
-                    </div>
+                    <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
                     <button class="text-slate-500 hover:text-pink-500 text-xl transition" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')" aria-label="Favorilere ekle/çıkar">${isFav ? '❤️' : '♡'}</button>
                 </div>
                 <h3 class="font-bold text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
@@ -771,9 +687,9 @@ function filterData() {
 function openModalItem(item) {
     currentModalItem = item;
     const pKey = pluginKey(item);
-    
+
     document.getElementById('modal-title').textContent = item.name;
-    
+
     const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
     const tagsContainer = document.getElementById('modal-tags');
     let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${escapeHtml(item.app)}</span>`;
@@ -783,16 +699,18 @@ function openModalItem(item) {
 
     const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
     const manifestUrl = match ? match[0] : '';
+    // Eklenti verisinde ayrı bir kaynak/site linki varsa ("sourceUrl") onu kullan,
+    // yoksa manifest linkine geri düş.
     const goUrl = item.sourceUrl || manifestUrl;
 
     document.getElementById('modal-url-box').textContent = manifestUrl || 'Bağlantı bulunamadı';
-    
+
     document.getElementById('modal-copy-btn').onclick = () => {
         if (!manifestUrl) { showToast('Kopyalanacak bağlantı yok.', true); return; }
         navigator.clipboard.writeText(manifestUrl);
         showToast('📋 Bağlantı kopyalandı!');
     };
-    
+
     document.getElementById('modal-go-btn').onclick = () => {
         if (goUrl && goUrl.startsWith('http')) {
             window.open(goUrl, '_blank', 'noopener,noreferrer');
@@ -810,7 +728,7 @@ function openModalItem(item) {
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
-    
+
     document.getElementById('modal-note-textarea').value = userNotes[pKey] || '';
 
     document.getElementById('modal-overlay').classList.add('open');
@@ -835,13 +753,13 @@ function ratePlugin(index) {
     localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
     updateStarsUI(index);
     showToast(`⭐ Puanınız kaydedildi (${index}/5)`);
-    filterData(); 
+    filterData();
 }
 
 function updateStarsUI(count) {
     const stars = document.getElementById('modal-rating').children;
     for (let i = 0; i < 5; i++) {
-        stars[i].style.color = i < count ? '#ffb800' : '#2d2a54'; 
+        stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
     }
 }
 
@@ -868,10 +786,9 @@ function closeMovieModal(e) {
 // VERİ ÇEKME (FETCH) İŞLEMLERİ
 // ---------------------------
 
-// TEST İÇİN DUMMY VERİLERE TARİH EKLENDİ
 const dummyPlugins = [
-    { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi", date: "2026-07-20" },
-    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak", date: "2026-07-22" }
+    { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
+    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak" }
 ];
 
 fetch('plugins.json')
@@ -881,21 +798,25 @@ fetch('plugins.json')
     })
     .then(data => {
         plugins = data;
-        calculateNewestDate(); // Gelen veriden en yeni tarihi bul
         buildTabs();
         filterData();
-        updateDailyFeatured(); 
+        updateDailyFeatured();
     })
     .catch((err) => {
         console.warn('plugins.json yüklenemedi, örnek veriler kullanılıyor:', err);
         plugins = dummyPlugins;
-        calculateNewestDate(); // Dummy verilerde en yeniyi bul
         buildTabs();
         filterData();
         updateDailyFeatured();
         showToast('Eklenti listesi yüklenemedi, örnek veriler gösteriliyor.', true);
     });
 
+// ---------------------------
+// FİLM ÖNERİSİ — TMDB'ye artık doğrudan değil, worker üzerinden erişiliyor.
+// worker.js action:'tmdb_popular' route'unu barındırmalı ve TMDB anahtarını
+// kendi ortam değişkeninde (env.TMDB_API_KEY) tutmalıdır. Böylece anahtar
+// tarayıcıda hiç görünmez.
+// ---------------------------
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 async function suggestRandomMovie() {
@@ -907,9 +828,12 @@ async function suggestRandomMovie() {
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
     try {
+        // Gerçek istek ile kısa bir minimum bekleme paralel çalışır;
+        // böylece animasyon her zaman 4 saniye sabitlenmek yerine
+        // gerçek yanıt süresine yakın bir sürede biter.
         const [data] = await Promise.all([
             fetchPopularMovies(randomPage),
-            wait(900) 
+            wait(900)
         ]);
 
         const movies = data.results || [];
@@ -920,10 +844,10 @@ async function suggestRandomMovie() {
 
         document.getElementById('movie-title').textContent = randomMovie.title;
         document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
-        document.getElementById('movie-genre').textContent = "Popüler"; 
+        document.getElementById('movie-genre').textContent = "Popüler";
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.";
-        
+
         const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
         document.getElementById('movie-poster').src = posterPath;
 
