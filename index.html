@@ -718,7 +718,7 @@ function renderCards(data) {
         
         // --- YENİ ROZETİ KONTROLÜ ---
         // Eğer eklentinin tarihi en yeni tarihe eşitse rozet HTML'ini oluştur
-        const isNew = item.date && item.date === newestPluginDate;
+        const isNew = item.isNew === true;
         const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
 
         const card = document.createElement('div');
