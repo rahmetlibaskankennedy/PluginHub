@@ -127,7 +127,7 @@
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; }
         .star:hover { color: #ffb800; }
         
-        /* Tag Colors (Görsele uygun rozetler) */
+        /* Tag Colors */
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
@@ -170,7 +170,6 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-3 items-center text-xs font-semibold text-slate-400">
-        <!-- Film Öneri Butonu -->
         <button onclick="suggestRandomMovie()" class="bg-blue-600/20 text-blue-300 border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition flex items-center gap-2 font-bold">
             <span class="text-sm leading-none">🎲</span> Film Öner
         </button>
@@ -180,7 +179,7 @@
 
 <main class="max-w-7xl mx-auto px-6 py-4">
 
-    <!-- HERO FEATURED MEDIA (Dinamik) -->
+    <!-- HERO FEATURED MEDIA -->
     <div class="hero-media-box p-6 md:p-8 mb-8" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="max-w-xl">
@@ -246,7 +245,7 @@
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
         
-        <!-- Üst Etiketler ve Aksiyonlar -->
+        <!-- Üst Etiketler ve Aksiyonlar (DOKUNULMADI) -->
         <div class="flex justify-between items-start mb-5">
             <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
@@ -271,16 +270,11 @@
             </div>
         </div>
 
-        <!-- Kullanıcı Notu Gösterim Alanı (Gizli Başlar) -->
-        <div id="modal-user-note" class="hidden mb-6 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300 relative">
-            <div class="font-bold text-slate-400 mb-1 text-[10px] uppercase tracking-wider">Kişisel Notunuz</div>
-            <p id="modal-user-note-text"></p>
-        </div>
-
         <!-- Bağlantı Alanı -->
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
-            <div id="modal-url-box" class="bg-[#151333] border border-white/5 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all"></div>
+            <!-- Input görünümünde kutu -->
+            <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all shadow-inner"></div>
             
             <div class="flex gap-3">
                 <button id="modal-copy-btn" class="flex-1 bg-[#252836] hover:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
@@ -290,14 +284,20 @@
             </div>
         </div>
 
-        <!-- NOT EKLE VE BİLDİR BUTONLARI -->
-        <div class="flex gap-3 mb-8">
-            <button onclick="addNoteToPlugin()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-xl transition border border-white/5 flex justify-center items-center gap-2">
-                📝 Not Ekle
-            </button>
-            <button onclick="reportCurrentPlugin()" class="flex-1 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-sm py-3 rounded-xl transition flex justify-center items-center gap-2">
-                🚩 Bildir
-            </button>
+        <!-- KİŞİSEL NOTUM ALANI (Görseldeki Dizilim) -->
+        <div class="mb-8">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
+            
+            <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
+            
+            <div class="flex gap-3">
+                <button onclick="saveNoteFromTextarea()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">
+                    Notu Kaydet
+                </button>
+                <button onclick="reportCurrentPlugin()" class="bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">
+                    🚩 Çalışmıyor Bildir
+                </button>
+            </div>
         </div>
 
         <!-- Nuvio'ya Nasıl Kurulur? -->
@@ -360,7 +360,7 @@ let plugins = [];
 let moviesDb = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
 let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
-let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}'); // Kişisel Notlar
+let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}'); 
 let showFavsOnly = false;
 let currentModalItem = null;
 let currentRatingDisplay = 0;
@@ -375,49 +375,30 @@ function showToast(msg) {
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
 // ---------------------------
-// KİŞİSEL NOT & BİLDİR FONKSİYONLARI
+// KİŞİSEL NOT & BİLDİR FONKSİYONLARI (GÜNCELLENDİ)
 // ---------------------------
-function addNoteToPlugin() {
+function saveNoteFromTextarea() {
     if(!currentModalItem) return;
     const key = pluginKey(currentModalItem);
-    const existingNote = userNotes[key] || '';
+    const noteArea = document.getElementById('modal-note-textarea');
+    const text = noteArea.value.trim();
     
-    const note = prompt(`"${currentModalItem.name}" için notunuzu girin:\n(Silmek için boş bırakıp Tamam'a basın)`, existingNote);
-    
-    if (note !== null) { // Kullanıcı iptal etmediyse
-        if (note.trim() === '') {
-            delete userNotes[key];
-            showToast('📝 Notunuz silindi.');
-        } else {
-            userNotes[key] = note.trim();
-            showToast('📝 Notunuz başarıyla kaydedildi!');
-        }
-        localStorage.setItem('ph_notes', JSON.stringify(userNotes));
-        renderUserNote();
-    }
-}
-
-function renderUserNote() {
-    if(!currentModalItem) return;
-    const key = pluginKey(currentModalItem);
-    const noteContainer = document.getElementById('modal-user-note');
-    const noteText = document.getElementById('modal-user-note-text');
-    
-    if (userNotes[key]) {
-        noteText.textContent = userNotes[key];
-        noteContainer.classList.remove('hidden');
+    if (text === '') {
+        delete userNotes[key];
+        showToast('📝 Notunuz silindi.');
     } else {
-        noteContainer.classList.add('hidden');
+        userNotes[key] = text;
+        showToast('📝 Notunuz başarıyla kaydedildi!');
     }
+    localStorage.setItem('ph_notes', JSON.stringify(userNotes));
 }
 
 function reportCurrentPlugin() {
     if(!currentModalItem) return;
     
-    // Cloudflare Worker'a (REPORT_ENDPOINT) veriyi gönder
     fetch(REPORT_ENDPOINT, {
         method: 'POST',
-        mode: 'no-cors', // CORS engeline takılmamak için
+        mode: 'no-cors', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             action: 'report',
@@ -427,7 +408,6 @@ function reportCurrentPlugin() {
         })
     }).catch(err => console.log('Rapor iletilirken ağ hatası', err));
 
-    // Kullanıcıya başarılı mesajı göster
     showToast(`🚩 ${currentModalItem.name} başarıyla raporlandı! Bildiriminiz için teşekkürler.`);
 }
 
@@ -473,46 +453,6 @@ function updateDailyFeatured() {
 }
 
 // ---------------------------
-// FİLM ÖNERİ (4 SANİYE ZAR DÖNME)
-// ---------------------------
-function suggestRandomMovie() {
-    if(moviesDb.length === 0) {
-        showToast("Filmler yükleniyor, lütfen bekleyin...");
-        return;
-    }
-
-    // Önce varsa açık olan film modalını kapat
-    document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
-
-    // 4 Saniye boyunca dönecek olan zar yüklenme ekranını aç
-    const loadingOverlay = document.getElementById('dice-loading-overlay');
-    loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
-
-    // 4000 milisaniye (4 saniye) sonra zarları durdur ve filmi göster
-    setTimeout(() => {
-        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
-
-        const randomIndex = Math.floor(Math.random() * moviesDb.length);
-        const movie = moviesDb[randomIndex];
-
-        document.getElementById('movie-title').textContent = movie.title;
-        document.getElementById('movie-year').textContent = movie.year;
-        document.getElementById('movie-genre').textContent = movie.genre;
-        document.getElementById('movie-imdb').textContent = movie.imdb;
-        document.getElementById('movie-plot').textContent = movie.plot;
-        document.getElementById('movie-poster').src = movie.poster;
-
-        document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
-    }, 4000);
-}
-
-function closeMovieModal(e) {
-    if (!e || e.target.id === 'movie-modal-overlay') {
-        document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
-    }
-}
-
-// ---------------------------
 // GENEL FONKSİYONLAR
 // ---------------------------
 function toggleSearchModal() {
@@ -525,6 +465,7 @@ function toggleSearchModal() {
         modal.classList.add('opacity-0', 'pointer-events-none');
     }
 }
+
 function handleExpandedSearch(val) {
     document.getElementById('searchInput').value = val;
     filterData();
@@ -615,7 +556,6 @@ function openModalItem(item) {
     
     document.getElementById('modal-title').textContent = item.name;
     
-    // EKLENTİ TÜRÜ VE ROZETLER DÜZENLENDİ
     const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
     const tagsContainer = document.getElementById('modal-tags');
     let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${item.app}</span>`;
@@ -651,8 +591,8 @@ function openModalItem(item) {
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
     
-    // Kullanıcı notunu ekrana bas
-    renderUserNote();
+    // Açılan eklentinin varsa daha önce kaydedilmiş notunu Textarea içerisine yaz
+    document.getElementById('modal-note-textarea').value = userNotes[pKey] || '';
 
     document.getElementById('modal-overlay').classList.add('open');
 }
@@ -703,11 +643,17 @@ function filterTab(type, el) {
     filterData();
 }
 
+function closeMovieModal(e) {
+    if (!e || e.target.id === 'movie-modal-overlay') {
+        document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    }
+}
+
 // ---------------------------
 // VERİ ÇEKME (FETCH) İŞLEMLERİ
 // ---------------------------
 
-// 1. EKLENTİLERİ ÇEK (Ana sistemin çalışması için bu şart)
+// 1. EKLENTİLERİ ÇEK
 const dummyPlugins = [
     { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
     { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak" }
@@ -728,19 +674,15 @@ fetch('plugins.json')
         updateDailyFeatured();
     });
 
-// 2. TMDB API İLE RASTGELE FİLM ÖNERİSİ (Zar Animasyonuna Entegre)
+// 2. TMDB API İLE RASTGELE FİLM ÖNERİSİ
 const TMDB_API_KEY = 'c4812c0d5f471e53d86c8e178c03df54';
 
-// Önceki suggestRandomMovie fonksiyonunu eziyoruz/güncelliyoruz
 function suggestRandomMovie() {
-    // Varsa açık olan film modalını kapat
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
 
-    // 4 Saniye boyunca dönecek olan zar yüklenme ekranını aç
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
 
-    // Zar dönerken arka planda TMDB'den veriyi çekiyoruz
     const randomPage = Math.floor(Math.random() * 50) + 1;
     const url = `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=${randomPage}`;
 
@@ -750,12 +692,9 @@ function suggestRandomMovie() {
             const movies = data.results;
             const randomMovie = movies[Math.floor(Math.random() * movies.length)];
 
-            // 4 saniyelik animasyonun bitmesini bekliyoruz
             setTimeout(() => {
-                // Yükleniyor ekranını kapat
                 loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
 
-                // HTML'e TMDB'den gelen verileri yazdır
                 document.getElementById('movie-title').textContent = randomMovie.title;
                 document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
                 document.getElementById('movie-genre').textContent = "Popüler"; 
@@ -765,9 +704,8 @@ function suggestRandomMovie() {
                 const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
                 document.getElementById('movie-poster').src = posterPath;
 
-                // Modalı ekranda göster
                 document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
-            }, 4000); // 4000ms = 4 saniye
+            }, 4000); 
         })
         .catch(err => {
             console.error("Film çekilemedi:", err);
