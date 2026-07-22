@@ -130,7 +130,7 @@
         /* Tag Colors (Görsele uygun rozetler) */
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
-        .tag-device { background: rgba(243, 232, 255, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
+        .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
 
         /* Zar Dönme Animasyonu */
         @keyframes roll-dice {
@@ -271,8 +271,14 @@
             </div>
         </div>
 
+        <!-- Kullanıcı Notu Gösterim Alanı (Gizli Başlar) -->
+        <div id="modal-user-note" class="hidden mb-6 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300 relative">
+            <div class="font-bold text-slate-400 mb-1 text-[10px] uppercase tracking-wider">Kişisel Notunuz</div>
+            <p id="modal-user-note-text"></p>
+        </div>
+
         <!-- Bağlantı Alanı -->
-        <div class="mb-8">
+        <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
             <div id="modal-url-box" class="bg-[#151333] border border-white/5 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all"></div>
             
@@ -282,6 +288,16 @@
                     Siteye Git ↗
                 </button>
             </div>
+        </div>
+
+        <!-- NOT EKLE VE BİLDİR BUTONLARI -->
+        <div class="flex gap-3 mb-8">
+            <button onclick="addNoteToPlugin()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-xl transition border border-white/5 flex justify-center items-center gap-2">
+                📝 Not Ekle
+            </button>
+            <button onclick="reportCurrentPlugin()" class="flex-1 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-sm py-3 rounded-xl transition flex justify-center items-center gap-2">
+                🚩 Bildir
+            </button>
         </div>
 
         <!-- Nuvio'ya Nasıl Kurulur? -->
@@ -344,6 +360,7 @@ let plugins = [];
 let moviesDb = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
 let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
+let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}'); // Kişisel Notlar
 let showFavsOnly = false;
 let currentModalItem = null;
 let currentRatingDisplay = 0;
@@ -356,6 +373,63 @@ function showToast(msg) {
 }
 
 function pluginKey(p) { return `${p.app}|${p.name}`; }
+
+// ---------------------------
+// KİŞİSEL NOT & BİLDİR FONKSİYONLARI
+// ---------------------------
+function addNoteToPlugin() {
+    if(!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const existingNote = userNotes[key] || '';
+    
+    const note = prompt(`"${currentModalItem.name}" için notunuzu girin:\n(Silmek için boş bırakıp Tamam'a basın)`, existingNote);
+    
+    if (note !== null) { // Kullanıcı iptal etmediyse
+        if (note.trim() === '') {
+            delete userNotes[key];
+            showToast('📝 Notunuz silindi.');
+        } else {
+            userNotes[key] = note.trim();
+            showToast('📝 Notunuz başarıyla kaydedildi!');
+        }
+        localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+        renderUserNote();
+    }
+}
+
+function renderUserNote() {
+    if(!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const noteContainer = document.getElementById('modal-user-note');
+    const noteText = document.getElementById('modal-user-note-text');
+    
+    if (userNotes[key]) {
+        noteText.textContent = userNotes[key];
+        noteContainer.classList.remove('hidden');
+    } else {
+        noteContainer.classList.add('hidden');
+    }
+}
+
+function reportCurrentPlugin() {
+    if(!currentModalItem) return;
+    
+    // Cloudflare Worker'a (REPORT_ENDPOINT) veriyi gönder
+    fetch(REPORT_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors', // CORS engeline takılmamak için
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'report',
+            plugin: currentModalItem.name,
+            platform: currentModalItem.app,
+            timestamp: new Date().toISOString()
+        })
+    }).catch(err => console.log('Rapor iletilirken ağ hatası', err));
+
+    // Kullanıcıya başarılı mesajı göster
+    showToast(`🚩 ${currentModalItem.name} başarıyla raporlandı! Bildiriminiz için teşekkürler.`);
+}
 
 // ---------------------------
 // GÜNLÜK ÖNE ÇIKAN EKLENTİ
@@ -416,10 +490,8 @@ function suggestRandomMovie() {
 
     // 4000 milisaniye (4 saniye) sonra zarları durdur ve filmi göster
     setTimeout(() => {
-        // Yüklenme ekranını kapat
         loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
 
-        // Rastgele film seç
         const randomIndex = Math.floor(Math.random() * moviesDb.length);
         const movie = moviesDb[randomIndex];
 
@@ -430,7 +502,6 @@ function suggestRandomMovie() {
         document.getElementById('movie-plot').textContent = movie.plot;
         document.getElementById('movie-poster').src = movie.poster;
 
-        // Film detay modalını aç
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     }, 4000);
 }
@@ -544,11 +615,12 @@ function openModalItem(item) {
     
     document.getElementById('modal-title').textContent = item.name;
     
+    // EKLENTİ TÜRÜ VE ROZETLER DÜZENLENDİ
+    const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
     const tagsContainer = document.getElementById('modal-tags');
     let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${item.app}</span>`;
     tagsHTML += `<span class="tag-free px-3 py-1.5 rounded-md flex items-center gap-1">☑ ÜCRETSİZ</span>`;
-    tagsHTML += `<span class="tag-device px-3 py-1.5 rounded-md">📺 TV</span>`;
-    tagsHTML += `<span class="tag-device px-3 py-1.5 rounded-md">📱 MOBİL</span>`;
+    tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${addonType}</span>`;
     tagsContainer.innerHTML = tagsHTML;
 
     const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
@@ -578,6 +650,9 @@ function openModalItem(item) {
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
+    
+    // Kullanıcı notunu ekrana bas
+    renderUserNote();
 
     document.getElementById('modal-overlay').classList.add('open');
 }
@@ -634,7 +709,7 @@ function filterTab(type, el) {
 
 const dummyPlugins = [
     { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
-    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı" }
+    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak" }
 ];
 
 const dummyMovies = [
