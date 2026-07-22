@@ -2,13 +2,17 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0b0a1f">
     <title>PluginHub — Streaming Media Portal</title>
     <meta name="description" content="TCLTVTÜRK topluluğu için Stremio ve Nuvio eklenti rehberi.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <script>
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
     </script>
@@ -27,12 +31,13 @@
         }
 
         * { box-sizing: border-box; }
+        html { -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-main);
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 90px;
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
         }
 
         .stream-card {
@@ -40,7 +45,7 @@
             border-radius: 16px;
             border: 1px solid var(--border);
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .stream-card:hover {
             transform: translateY(-4px);
@@ -48,6 +53,7 @@
             border-color: rgba(108, 92, 231, 0.5);
             box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2);
         }
+        .stream-card:active { transform: scale(0.98); }
 
         .hero-media-box {
             background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%);
@@ -67,23 +73,27 @@
             cursor: pointer;
         }
         .play-btn-circle:hover { transform: scale(1.1); }
+        .play-btn-circle:active { transform: scale(0.95); }
 
         .stream-dock {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            left: 50%; transform: translateX(-50%);
             background: #141230;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 40px;
-            padding: 8px 24px;
-            display: flex; align-items: center; gap: 24px;
+            padding: 8px 20px;
+            display: flex; align-items: center; gap: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             z-index: 1000;
         }
         .dock-btn {
-            width: 42px; height: 42px; border-radius: 50%;
+            width: 48px; height: 48px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); font-size: 18px; transition: all 0.2s;
+            color: var(--text-muted); font-size: 19px; transition: all 0.2s;
             cursor: pointer;
         }
+        .dock-btn:active { transform: scale(0.9); }
         .dock-btn.active {
             background: var(--accent-yellow);
             color: #000;
@@ -93,17 +103,40 @@
         .pill-tab {
             background: rgba(255,255,255,0.06);
             border-radius: 20px;
-            padding: 6px 16px;
+            padding: 8px 16px;
             font-size: 12px;
             color: var(--text-muted);
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
         }
         .pill-tab.active {
             background: var(--accent-purple);
             color: #fff;
             font-weight: bold;
+        }
+
+        .filter-chip {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+        }
+        .filter-chip.active {
+            background: var(--accent-purple);
+            color: #fff;
+            border-color: var(--accent-purple);
         }
 
         #modal-overlay {
@@ -118,13 +151,14 @@
             border-radius: 20px; width: 90%; max-width: 560px; padding: 28px;
             max-height: 90vh; overflow-y: auto;
         }
-        
-        .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; }
+
+        .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; padding: 6px; }
         .star:hover { color: #ffb800; }
-        
+
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
+        .tag-debrid-required { background: rgba(255, 184, 0, 0.1); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
 
         @keyframes roll-dice {
             0% { transform: rotate(0deg) scale(1); }
@@ -138,7 +172,7 @@
         }
 
         #toast {
-            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            position: fixed; top: calc(24px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) translateY(-100px);
             background: var(--accent-pink); color: #fff; padding: 10px 24px;
             border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 9999;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -147,7 +181,21 @@
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
         #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
-        
+
+        .sheet-handle {
+            width: 40px; height: 5px; border-radius: 10px;
+            background: rgba(255,255,255,0.15);
+            margin: 0 auto 18px;
+        }
+
+        .modal-close-btn {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:active { background: rgba(255,255,255,0.08); }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
@@ -164,7 +212,7 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
-        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
+        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
     </div>
 </header>
 
@@ -177,10 +225,10 @@
                 <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Yükleniyor...</h1>
                 <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
                 <div class="flex gap-3">
-                    <button id="hero-install-btn" class="bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
+                    <button id="hero-install-btn" class="min-h-[44px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
                         <span>🚀</span> Hızlı Kurulum
                     </button>
-                    <button id="hero-copy-btn" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 transition">📋 Manifest Kopyala</button>
+                    <button id="hero-copy-btn" class="min-h-[44px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 active:bg-slate-700 transition">📋 Manifest Kopyala</button>
                 </div>
             </div>
             <div class="play-btn-circle" id="hero-play-btn" role="button" aria-label="Öne çıkanı kur">
@@ -189,11 +237,16 @@
         </div>
     </div>
 
-    <!-- KATEGORİ & FİLTRELEME ALANI -->
+    <!-- KATEGORİ SEKMELERİ (type alanına göre dinamik) -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
 
-    <div class="grid grid-cols-1 gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Eklenti veya içerik ara..." class="bg-indigo-950/80 border border-slate-800 text-xs text-white p-3 rounded-xl outline-none">
+    <!-- ARAMA + FİLTRELE -->
+    <div class="flex gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Eklenti veya içerik ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
+        <button onclick="openFilterModal()" id="filterOpenBtn" class="relative shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-white text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5" aria-label="Filtrele ve sırala">
+            <span>⚙️</span><span class="hidden sm:inline">Filtrele</span>
+            <span id="filterBadge" class="hidden absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center">0</span>
+        </button>
     </div>
 
     <div class="flex justify-between items-center text-xs text-slate-400 mb-4">
@@ -204,50 +257,51 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- FİLM ÖNER FAB -->
+<!-- FİLM ÖNER FAB (değiştirilmedi) -->
 <button onclick="suggestRandomMovie()" class="fixed bottom-[100px] right-6 md:bottom-10 md:right-10 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_10px_25px_rgba(37,99,235,0.6)] hover:bg-blue-500 hover:scale-110 transition-all z-[1500]" aria-label="Rastgele film öner">
     🎲
 </button>
 
-<!-- MOBİL DOCK NAVIGATION (4 Sekme) -->
+<!-- MOBİL DOCK NAVIGATION (4 Sekme, aktif durum yönetimli) -->
 <div class="stream-dock">
-    <button class="dock-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Başa dön">🏠</button>
-    <button class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
-    <button class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
-    <button class="dock-btn" onclick="openMenuModal()" aria-label="Menü">☰</button>
+    <button id="dock-home" class="dock-btn active" onclick="goHome()" aria-label="Başa dön">🏠</button>
+    <button id="dock-search" class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
+    <button id="dock-fav" class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
+    <button id="dock-menu" class="dock-btn" onclick="openMenuModal()" aria-label="Menü">☰</button>
 </div>
 
 <!-- MENÜ MODALI -->
 <div id="menu-modal-overlay" onclick="closeMenuModal(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-    <div onclick="event.stopPropagation()" id="menu-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+    <div onclick="event.stopPropagation()" id="menu-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="sheet-handle md:hidden"></div>
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold text-white">Menü</h3>
-            <button onclick="closeMenuModal()" class="text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeMenuModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
         </div>
-        
+
         <div class="flex flex-col gap-3">
-            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">🔄</span>
                 <div>
                     <div class="text-sm font-bold text-white">Senkronizasyon</div>
                     <div class="text-xs text-slate-400">Verilerini cihazlar arası eşitle</div>
                 </div>
             </button>
-            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">⚙️</span>
                 <div>
                     <div class="text-sm font-bold text-white">Ayarlar</div>
                     <div class="text-xs text-slate-400">Uygulama tercihlerini yönet</div>
                 </div>
             </button>
-            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">ℹ️</span>
                 <div>
                     <div class="text-sm font-bold text-white">Hakkında & Topluluk</div>
                     <div class="text-xs text-slate-400">Sürüm bilgileri ve destek linkleri</div>
                 </div>
             </button>
-            <button class="flex items-center gap-4 bg-rose-900/20 hover:bg-rose-900/40 p-4 rounded-xl transition text-left border border-rose-500/10 mt-2">
+            <button class="flex items-center gap-4 bg-rose-900/20 hover:bg-rose-900/40 active:bg-rose-900/40 p-4 rounded-xl transition text-left border border-rose-500/10 mt-2">
                 <span class="text-2xl">🚩</span>
                 <div>
                     <div class="text-sm font-bold text-rose-400">Geri Bildirim</div>
@@ -263,7 +317,7 @@
     <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
         <div class="flex justify-between items-center mb-2">
             <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
-            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none" aria-label="Kapat">&times;</button>
+            <button onclick="toggleSearchModal()" class="modal-close-btn text-slate-400 hover:text-white text-3xl leading-none" aria-label="Kapat">&times;</button>
         </div>
         <div class="relative">
             <input type="text" id="expandedSearchInput" placeholder="Eklenti, içerik veya platform ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none focus:border-pink-500 transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
@@ -273,17 +327,53 @@
     </div>
 </div>
 
+<!-- FİLTRELE & SIRALA MODALI (yeni) -->
+<div id="filter-modal-overlay" onclick="closeFilterModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="filter-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 max-h-[85vh] overflow-y-auto shadow-2xl">
+        <div class="sheet-handle md:hidden"></div>
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-white">Filtrele & Sırala</h3>
+            <button onclick="closeFilterModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+        </div>
+
+        <div class="mb-6">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sıralama</label>
+            <select id="sortSelect" onchange="setSort(this.value)" class="w-full min-h-[44px] bg-[#1a173d] border border-white/10 text-white text-sm p-3.5 rounded-xl outline-none">
+                <option value="default">Varsayılan</option>
+                <option value="name-asc">İsme Göre (A-Z)</option>
+                <option value="newest">Yeni Eklenenler Önce</option>
+                <option value="debrid-free">Ücretsiz Önce</option>
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Debrid Durumu</label>
+            <div class="flex flex-wrap gap-2" id="debridFilterGroup"></div>
+        </div>
+
+        <div class="mb-8">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Platform</label>
+            <div class="flex flex-wrap gap-2" id="platformFilterGroup"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
+            <button onclick="applyFilters()" class="min-h-[46px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Uygula</button>
+        </div>
+    </div>
+</div>
+
 <!-- DETAY MODAL -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
-        
+
         <div class="flex justify-between items-start mb-5">
             <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
                 <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala" aria-label="Linki Kopyala">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                 </button>
-                <button onclick="closeModal()" class="hover:text-white text-2xl leading-none transition" aria-label="Kapat">✕</button>
+                <button onclick="closeModal()" class="modal-close-btn hover:text-white text-2xl leading-none transition" aria-label="Kapat">✕</button>
             </div>
         </div>
 
@@ -303,10 +393,10 @@
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
             <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all shadow-inner"></div>
-            
+
             <div class="flex gap-3">
-                <button id="modal-copy-btn" class="flex-1 bg-[#252836] hover:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
-                <button id="modal-go-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">
+                <button id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] hover:bg-[#2f3342] active:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
+                <button id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 hover:bg-blue-500 active:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">
                     Kaynağa Git ↗
                 </button>
             </div>
@@ -314,14 +404,14 @@
 
         <div class="mb-8">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
-            
+
             <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
-            
+
             <div class="flex gap-3">
-                <button onclick="saveNoteFromTextarea()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">
+                <button onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">
                     Notu Kaydet
                 </button>
-                <button onclick="reportCurrentPlugin()" id="report-btn" class="bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">
+                <button onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 hover:bg-rose-600/20 active:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">
                     🚩 Çalışmıyor Bildir
                 </button>
             </div>
@@ -358,31 +448,31 @@
     <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-white">Verilerini Senkronize Et</h3>
-            <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeSyncModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
         </div>
         <p class="text-xs text-slate-400 mb-4">Favori, puan ve notların bu cihaza özel kaydedilir. Başka bir cihazdan erişmek için bir kod oluştur ya da mevcut kodunu gir.</p>
         <div class="flex gap-2 mb-3">
-            <input id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest">
+            <input id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 min-h-[44px] bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest">
         </div>
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="syncPush()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Bu Kodla Kaydet</button>
-            <button onclick="syncPull()" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Bu Koddan Getir</button>
+            <button onclick="syncPush()" class="min-h-[46px] bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Bu Kodla Kaydet</button>
+            <button onclick="syncPull()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Bu Koddan Getir</button>
         </div>
         <p class="text-[10px] text-slate-500 mt-4">Not: Bu özellik worker.js'de sync_push / sync_pull uç noktalarının etkin olmasını gerektirir.</p>
     </div>
 </div>
 
-<!-- 4 SANİYE ZAR DÖNME / YÜKLENİYOR OVERLAY -->
+<!-- 4 SANİYE ZAR DÖNME / YÜKLENİYOR OVERLAY (değiştirilmedi) -->
 <div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div class="text-7xl rolling-dice mb-6">🎲</div>
     <p class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
     <p class="text-slate-400 text-xs mt-2">Zarlar atılıyor...</p>
 </div>
 
-<!-- FİLM ÖNERİ MODALI -->
+<!-- FİLM ÖNERİ MODALI (değiştirilmedi) -->
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
-        
+
         <div class="md:w-5/12 relative">
             <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-64 md:h-full object-cover">
             <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5">
@@ -393,16 +483,16 @@
 
         <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
             <button onclick="closeMovieModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition" aria-label="Kapat">✕</button>
-            
+
             <div class="mb-2 flex items-center gap-2">
                 <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
                 <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
             </div>
-            
+
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
-            
+
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
-            
+
             <button onclick="suggestRandomMovie()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
                 <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
@@ -418,10 +508,13 @@ let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}');
 let showFavsOnly = false;
 let currentModalItem = null;
 let currentRatingDisplay = 0;
-let activeAppFilter = 'all';
 
-// Sistemin bulduğu en yeni tarih bu değişkende tutulacak
-let newestPluginDate = null; 
+let activeTypeFilter = 'all';
+let activeDebridFilter = 'all';
+let activePlatformFilter = 'all';
+let activeSort = 'default';
+let fuseIndex = null;
+let scrollLockCount = 0;
 
 // ---------------------------
 // GÜVENLİK: HTML KAÇIŞ (XSS ÖNLEMİ)
@@ -447,6 +540,34 @@ function showToast(msg, isError) {
 
 function pluginKey(p) { return `${p.app}|${p.name}`; }
 
+function extractUrl(desc) {
+    const m = desc?.match(/(https?:\/\/[^\s]+)/);
+    return m ? m[0] : '';
+}
+
+async function copyToClipboard(text, emptyMsg) {
+    if (!text) { showToast(emptyMsg || 'Kopyalanacak içerik yok.', true); return; }
+    try {
+        await navigator.clipboard.writeText(text);
+        showToast('📋 Bağlantı kopyalandı!');
+    } catch (err) {
+        console.error('Kopyalama hatası:', err);
+        showToast('Kopyalama başarısız, elle seçip kopyalayın.', true);
+    }
+}
+
+// ---------------------------
+// MOBİL: ARKA PLAN KAYDIRMA KİLİDİ (bottom sheet açıkken)
+// ---------------------------
+function lockBodyScroll() {
+    scrollLockCount++;
+    document.body.style.overflow = 'hidden';
+}
+function unlockBodyScroll() {
+    scrollLockCount = Math.max(0, scrollLockCount - 1);
+    if (scrollLockCount === 0) document.body.style.overflow = '';
+}
+
 // ---------------------------
 // KÜÇÜK DEBOUNCE YARDIMCISI
 // ---------------------------
@@ -461,20 +582,24 @@ const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
 // ---------------------------
-// EN YENİ EKLENTİYİ BULMA MANTIĞI (YENİ EKLENDİ)
+// DOCK: AKTİF İKON YÖNETİMİ
 // ---------------------------
-function calculateNewestDate() {
-    newestPluginDate = null;
-    let maxTime = 0;
-    plugins.forEach(p => {
-        if (p.date) {
-            const time = new Date(p.date).getTime();
-            if (time > maxTime) {
-                maxTime = time;
-                newestPluginDate = p.date;
-            }
-        }
-    });
+function setActiveDock(id) {
+    document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+    const el = document.getElementById(`dock-${id}`);
+    if (el) el.classList.add('active');
+}
+
+function goHome() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (showFavsOnly) {
+        showFavsOnly = false;
+        const favBtn = document.getElementById('favBtn');
+        favBtn.style.background = '';
+        favBtn.style.color = '';
+        filterData();
+    }
+    setActiveDock('home');
 }
 
 // ---------------------------
@@ -484,9 +609,9 @@ function openMenuModal() {
     const overlay = document.getElementById('menu-modal-overlay');
     const box = document.getElementById('menu-modal-box');
     overlay.classList.remove('opacity-0', 'pointer-events-none');
-    setTimeout(() => {
-        box.classList.remove('translate-y-full');
-    }, 10);
+    lockBodyScroll();
+    setActiveDock('menu');
+    setTimeout(() => box.classList.remove('translate-y-full'), 10);
 }
 
 function closeMenuModal(e) {
@@ -494,8 +619,10 @@ function closeMenuModal(e) {
     const overlay = document.getElementById('menu-modal-overlay');
     const box = document.getElementById('menu-modal-box');
     box.classList.add('translate-y-full');
+    setActiveDock(showFavsOnly ? 'fav' : 'home');
     setTimeout(() => {
         overlay.classList.add('opacity-0', 'pointer-events-none');
+        unlockBodyScroll();
     }, 300);
 }
 
@@ -507,7 +634,7 @@ function saveNoteFromTextarea() {
     const key = pluginKey(currentModalItem);
     const noteArea = document.getElementById('modal-note-textarea');
     const text = noteArea.value.trim();
-    
+
     if (text === '') {
         delete userNotes[key];
         showToast('📝 Notunuz silindi.');
@@ -525,8 +652,6 @@ async function reportCurrentPlugin() {
     btn.disabled = true;
     btn.textContent = '⏳ Gönderiliyor...';
 
-    const addonType = currentModalItem.type || (currentModalItem.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
-
     try {
         const res = await fetch(REPORT_ENDPOINT, {
             method: 'POST',
@@ -534,7 +659,7 @@ async function reportCurrentPlugin() {
             body: JSON.stringify({
                 pluginName: currentModalItem.name,
                 app: currentModalItem.app,
-                type: addonType
+                type: currentModalItem.type || ''
             })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -549,15 +674,17 @@ async function reportCurrentPlugin() {
 }
 
 // ---------------------------
-// SENKRON 
+// SENKRON
 // ---------------------------
 function openSyncModal() {
     document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
     const savedCode = localStorage.getItem('ph_sync_code') || '';
     document.getElementById('sync-code-input').value = savedCode;
 }
 function closeSyncModal() {
     document.getElementById('sync-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    unlockBodyScroll();
 }
 function closeSyncModalOnBackdrop(e) {
     if (e.target.id === 'sync-modal-overlay') closeSyncModal();
@@ -621,17 +748,15 @@ async function syncPull() {
 // ---------------------------
 function updateDailyFeatured() {
     if (!plugins || plugins.length === 0) return;
-    
+
     const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const featured = plugins[daysSinceEpoch % plugins.length];
 
     document.getElementById('heroTitle').textContent = featured.name;
-    const addonType = featured.type || (featured.desc?.toLowerCase().includes('altyazı') ? 'Altyazı Eklentisi' : 'Film & Dizi Eklentisi');
-    document.getElementById('heroDesc').textContent = `${featured.app} platformu için günün seçilen ${addonType}.`;
+    document.getElementById('heroDesc').textContent = `${featured.app} platformu için günün seçilen ${featured.type || 'eklentisi'}.`;
 
-    const match = featured.desc?.match(/(https?:\/\/[^\s]+)/g);
-    const url = match ? match[0] : '';
-    
+    const url = extractUrl(featured.desc);
+
     const heroInstallBtn = document.getElementById('hero-install-btn');
     const heroCopyBtn = document.getElementById('hero-copy-btn');
     const heroPlayBtn = document.getElementById('hero-play-btn');
@@ -639,7 +764,7 @@ function updateDailyFeatured() {
     heroInstallBtn.onclick = () => {
         if (url) {
             let installUrl = url;
-            if (featured.app === 'Stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
+            if ((featured.installGuide || featured.app || '').toLowerCase() === 'stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
             window.location.href = installUrl;
             showToast(`🚀 ${featured.name} kurulumu başlatılıyor...`);
         } else {
@@ -647,27 +772,26 @@ function updateDailyFeatured() {
         }
     };
 
-    heroCopyBtn.onclick = () => {
-        if (url) {
-            navigator.clipboard.writeText(url);
-            showToast('📋 Manifest kopyalandı!');
-        }
-    };
-    
+    heroCopyBtn.onclick = () => copyToClipboard(url, 'Kopyalanacak bağlantı yok.');
+
     heroPlayBtn.onclick = heroInstallBtn.onclick;
 }
 
 // ---------------------------
-// GENEL FONKSİYONLAR
+// ARAMA MODALI
 // ---------------------------
 function toggleSearchModal() {
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('expandedSearchInput');
     if (modal.classList.contains('opacity-0')) {
         modal.classList.remove('opacity-0', 'pointer-events-none');
-        setTimeout(() => input.focus(), 100); 
+        lockBodyScroll();
+        setActiveDock('search');
+        setTimeout(() => input.focus(), 100);
     } else {
         modal.classList.add('opacity-0', 'pointer-events-none');
+        unlockBodyScroll();
+        setActiveDock(showFavsOnly ? 'fav' : 'home');
     }
 }
 
@@ -683,17 +807,23 @@ document.addEventListener('keydown', (e) => {
         if (document.getElementById('modal-overlay').classList.contains('open')) closeModal();
         if (!document.getElementById('sync-modal-overlay').classList.contains('opacity-0')) closeSyncModal();
         if (!document.getElementById('menu-modal-overlay').classList.contains('opacity-0')) closeMenuModal();
+        if (!document.getElementById('filter-modal-overlay').classList.contains('opacity-0')) closeFilterModal();
         closeMovieModal();
     }
 });
 
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
-    document.getElementById('favBtn').style.background = showFavsOnly ? 'var(--accent-pink)' : '';
-    document.getElementById('favBtn').style.color = showFavsOnly ? '#fff' : '';
+    const favBtn = document.getElementById('favBtn');
+    favBtn.style.background = showFavsOnly ? 'var(--accent-pink)' : '';
+    favBtn.style.color = showFavsOnly ? '#fff' : '';
+    setActiveDock(showFavsOnly ? 'fav' : 'home');
     filterData();
 }
 
+// ---------------------------
+// KART RENDER
+// ---------------------------
 function renderCards(data) {
     const grid = document.getElementById('resultsGrid');
     const count = document.getElementById('resultCount');
@@ -705,41 +835,43 @@ function renderCards(data) {
         return;
     }
 
+    const debridLabels = { free: '🆓 Ücretsiz', optional: '🔓 Debrid Opsiyonel', required: '⚡ Debrid Gerekli' };
+    const platformIcons = { tv: '📺', mobile: '📱', web: '💻' };
+
     data.forEach(item => {
         const isFav = favorites.includes(pluginKey(item));
         const userRating = userRatings[pluginKey(item)] || 0;
-        
+
         let starsHTML = '';
         for (let i = 1; i <= 5; i++) {
             starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
         }
 
-        const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
-        
-        // --- DİNAMİK YENİ ROZETİ KONTROLÜ ---
-        // JSON listesinin (plugins) en altındaki son elemanı otomatik "YENİ" kabul eder.
-        const isNew = (item === plugins[plugins.length - 1]);
-        const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
+        const newBadgeHTML = item.isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
+        const debridLabel = debridLabels[item.debrid] || '';
+        const platformIconsHTML = (item.platform || []).map(p => platformIcons[p] || '').join(' ');
 
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
                         ${newBadgeHTML}
                     </div>
-                    <button class="text-slate-500 hover:text-pink-500 text-xl transition" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')" aria-label="Favorilere ekle/çıkar">${isFav ? '❤️' : '♡'}</button>
+                    <button class="w-11 h-11 flex items-center justify-center text-slate-500 hover:text-pink-500 active:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')" aria-label="Favorilere ekle/çıkar">${isFav ? '❤️' : '♡'}</button>
                 </div>
                 <h3 class="font-bold text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
-                <p class="text-[13px] text-slate-300 leading-relaxed mb-6 border-b border-white/5 pb-6">Türü: ${escapeHtml(addonType)}</p>
+                <div class="flex items-center justify-between text-[13px] text-slate-300 mb-3">
+                    <span>Türü: ${escapeHtml(item.type || '—')}</span>
+                    <span class="text-sm opacity-80">${platformIconsHTML}</span>
+                </div>
+                <p class="text-[11px] font-bold text-slate-400 mb-6 border-b border-white/5 pb-6">${debridLabel}</p>
             </div>
             <div class="flex items-center justify-between">
-                <div class="flex gap-1 text-lg">
-                    ${starsHTML}
-                </div>
-                <button class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition">İncele</button>
+                <div class="flex gap-1 text-lg">${starsHTML}</div>
+                <button class="min-h-[44px] bg-indigo-600/20 hover:bg-indigo-600 active:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition">İncele</button>
             </div>
         `;
         card.onclick = () => openModalItem(item);
@@ -755,44 +887,147 @@ function toggleFav(key) {
     filterData();
 }
 
-function filterData() {
-    let pool = plugins;
-    if (activeAppFilter !== 'all') pool = pool.filter(p => p.app === activeAppFilter);
-    if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
-
-    const q = document.getElementById('searchInput').value.trim();
-    if (q) {
-        const fuse = new Fuse(pool, { keys: ['name', 'desc', 'app'], threshold: 0.4 });
-        pool = fuse.search(q).map(r => r.item);
+// ---------------------------
+// SIRALAMA
+// ---------------------------
+function sortPool(pool) {
+    const arr = [...pool];
+    if (activeSort === 'name-asc') {
+        arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    } else if (activeSort === 'newest') {
+        arr.sort((a, b) => (b.isNew === true) - (a.isNew === true));
+    } else if (activeSort === 'debrid-free') {
+        const rank = { free: 0, optional: 1, required: 2 };
+        arr.sort((a, b) => (rank[a.debrid] ?? 3) - (rank[b.debrid] ?? 3));
     }
-    renderCards(pool);
+    return arr;
 }
 
+// ---------------------------
+// FİLTRELEME (kategori sekmesi + arama + debrid + platform + favori)
+// ---------------------------
+function filterData() {
+    let pool = plugins;
+
+    const q = document.getElementById('searchInput').value.trim();
+    if (q && fuseIndex) {
+        pool = fuseIndex.search(q).map(r => r.item);
+    }
+
+    if (activeTypeFilter !== 'all') pool = pool.filter(p => p.type === activeTypeFilter);
+    if (activeDebridFilter !== 'all') pool = pool.filter(p => p.debrid === activeDebridFilter);
+    if (activePlatformFilter !== 'all') pool = pool.filter(p => Array.isArray(p.platform) && p.platform.includes(activePlatformFilter));
+    if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
+
+    renderCards(sortPool(pool));
+}
+
+// ---------------------------
+// FİLTRELE & SIRALA MODALI (yeni)
+// ---------------------------
+function buildFilterOptions() {
+    const debridOptions = [
+        { v: 'all', l: 'Tümü' },
+        { v: 'free', l: '🆓 Ücretsiz' },
+        { v: 'optional', l: '🔓 Opsiyonel' },
+        { v: 'required', l: '⚡ Gerekli' }
+    ];
+    document.getElementById('debridFilterGroup').innerHTML = debridOptions.map(o =>
+        `<span class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</span>`
+    ).join('');
+
+    const platformOptions = [
+        { v: 'all', l: 'Tümü' },
+        { v: 'mobile', l: '📱 Mobil' },
+        { v: 'tv', l: '📺 TV' },
+        { v: 'web', l: '💻 Web' }
+    ];
+    document.getElementById('platformFilterGroup').innerHTML = platformOptions.map(o =>
+        `<span class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${o.v}" onclick="selectChip(this)">${o.l}</span>`
+    ).join('');
+}
+
+function selectChip(el) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`.filter-chip[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    if (group === 'debrid') activeDebridFilter = el.dataset.value;
+    if (group === 'platform') activePlatformFilter = el.dataset.value;
+}
+
+function setSort(v) { activeSort = v; }
+
+function updateFilterBadge() {
+    let count = 0;
+    if (activeDebridFilter !== 'all') count++;
+    if (activePlatformFilter !== 'all') count++;
+    if (activeSort !== 'default') count++;
+    const badge = document.getElementById('filterBadge');
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+    badge.classList.toggle('flex', count > 0);
+}
+
+function openFilterModal() {
+    const overlay = document.getElementById('filter-modal-overlay');
+    const box = document.getElementById('filter-modal-box');
+    document.getElementById('sortSelect').value = activeSort;
+    buildFilterOptions();
+    overlay.classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+    setTimeout(() => box.classList.remove('translate-y-full'), 10);
+}
+
+function closeFilterModal() {
+    const overlay = document.getElementById('filter-modal-overlay');
+    const box = document.getElementById('filter-modal-box');
+    box.classList.add('translate-y-full');
+    setTimeout(() => {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        unlockBodyScroll();
+    }, 300);
+}
+function closeFilterModalOnBackdrop(e) { if (e.target.id === 'filter-modal-overlay') closeFilterModal(); }
+
+function applyFilters() {
+    updateFilterBadge();
+    closeFilterModal();
+    filterData();
+}
+
+function resetFilters() {
+    activeDebridFilter = 'all';
+    activePlatformFilter = 'all';
+    activeSort = 'default';
+    document.getElementById('sortSelect').value = 'default';
+    buildFilterOptions();
+    updateFilterBadge();
+    filterData();
+}
+
+// ---------------------------
+// DETAY MODAL
+// ---------------------------
 function openModalItem(item) {
     currentModalItem = item;
     const pKey = pluginKey(item);
-    
+
     document.getElementById('modal-title').textContent = item.name;
-    
-    const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
+
+    const debridTagMap = { free: '🆓 ÜCRETSİZ', optional: '🔓 DEBRID OPSİYONEL', required: '⚡ DEBRID GEREKLİ' };
     const tagsContainer = document.getElementById('modal-tags');
     let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${escapeHtml(item.app)}</span>`;
-    tagsHTML += `<span class="tag-free px-3 py-1.5 rounded-md flex items-center gap-1">☑ ÜCRETSİZ</span>`;
-    tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${escapeHtml(addonType)}</span>`;
+    tagsHTML += `<span class="${item.debrid === 'required' ? 'tag-debrid-required' : 'tag-free'} px-3 py-1.5 rounded-md flex items-center gap-1">${debridTagMap[item.debrid] || '🆓 ÜCRETSİZ'}</span>`;
+    tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${escapeHtml(item.type || '')}</span>`;
     tagsContainer.innerHTML = tagsHTML;
 
-    const match = item.desc?.match(/(https?:\/\/[^\s]+)/g);
-    const manifestUrl = match ? match[0] : '';
+    const manifestUrl = extractUrl(item.desc);
     const goUrl = item.sourceUrl || manifestUrl;
 
     document.getElementById('modal-url-box').textContent = manifestUrl || 'Bağlantı bulunamadı';
-    
-    document.getElementById('modal-copy-btn').onclick = () => {
-        if (!manifestUrl) { showToast('Kopyalanacak bağlantı yok.', true); return; }
-        navigator.clipboard.writeText(manifestUrl);
-        showToast('📋 Bağlantı kopyalandı!');
-    };
-    
+
+    document.getElementById('modal-copy-btn').onclick = () => copyToClipboard(manifestUrl, 'Kopyalanacak bağlantı yok.');
+
     document.getElementById('modal-go-btn').onclick = () => {
         if (goUrl && goUrl.startsWith('http')) {
             window.open(goUrl, '_blank', 'noopener,noreferrer');
@@ -803,26 +1038,29 @@ function openModalItem(item) {
 
     const nuvioGuide = document.getElementById('modal-nuvio-guide');
     const stremioGuide = document.getElementById('modal-stremio-guide');
-    const appLower = (item.app || '').toLowerCase();
-    nuvioGuide.classList.toggle('hidden', appLower !== 'nuvio');
-    stremioGuide.classList.toggle('hidden', appLower !== 'stremio');
+    const guide = item.installGuide || (item.app || '').toLowerCase();
+    nuvioGuide.classList.toggle('hidden', guide !== 'nuvio');
+    stremioGuide.classList.toggle('hidden', guide !== 'stremio');
 
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
     updateStarsUI(savedRating);
-    
+
     document.getElementById('modal-note-textarea').value = userNotes[pKey] || '';
 
     document.getElementById('modal-overlay').classList.add('open');
+    lockBodyScroll();
 }
 
 function copyCurrentLink() {
     const text = document.getElementById('modal-url-box').textContent;
-    navigator.clipboard.writeText(text);
-    showToast('🔗 Bağlantı panoya kopyalandı!');
+    copyToClipboard(text, 'Kopyalanacak bağlantı yok.');
 }
 
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    unlockBodyScroll();
+}
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 
 function hoverStars(index) { updateStarsUI(index, true); }
@@ -835,26 +1073,29 @@ function ratePlugin(index) {
     localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
     updateStarsUI(index);
     showToast(`⭐ Puanınız kaydedildi (${index}/5)`);
-    filterData(); 
+    filterData();
 }
 
 function updateStarsUI(count) {
     const stars = document.getElementById('modal-rating').children;
     for (let i = 0; i < 5; i++) {
-        stars[i].style.color = i < count ? '#ffb800' : '#2d2a54'; 
+        stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
     }
 }
 
+// ---------------------------
+// KATEGORİ SEKMELERİ (type alanına göre dinamik)
+// ---------------------------
 function buildTabs() {
-    const types = ['Tümü', 'Stremio', 'Nuvio'];
+    const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
     const container = document.getElementById('categoryTabs');
-    container.innerHTML = types.map((t, i) => `<span class="pill-tab ${i === 0 ? 'active' : ''}" onclick="filterTab('${t}', this)">${t}</span>`).join('');
+    container.innerHTML = types.map((t, i) => `<span class="pill-tab ${i === 0 ? 'active' : ''}" onclick="filterTab('${escapeHtml(t)}', this)">${escapeHtml(t)}</span>`).join('');
 }
 
 function filterTab(type, el) {
-    document.querySelectorAll('.pill-tab').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('#categoryTabs .pill-tab').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
-    activeAppFilter = type === 'Tümü' ? 'all' : type;
+    activeTypeFilter = type === 'Tümü' ? 'all' : type;
     filterData();
 }
 
@@ -867,12 +1108,13 @@ function closeMovieModal(e) {
 // ---------------------------
 // VERİ ÇEKME (FETCH) İŞLEMLERİ
 // ---------------------------
-
-// TEST İÇİN DUMMY VERİLERE TARİH EKLENDİ
 const dummyPlugins = [
-    { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi", date: "2026-07-20" },
-    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak", date: "2026-07-22" }
+    { app: "Nuvio", type: "4K", name: "WebStreamr", desc: "Bağlantı Linki: https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure", isNew: false, installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile"] },
+    { app: "Nuvio", type: "Altyazı", name: "OpenSubtitles", desc: "Bağlantı Linki: https://opensubtitles-v3.strem.io/manifest.json", isNew: true, installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile", "web"] }
 ];
+
+buildFilterOptions();
+updateFilterBadge();
 
 fetch('plugins.json')
     .then(r => {
@@ -881,15 +1123,15 @@ fetch('plugins.json')
     })
     .then(data => {
         plugins = data;
-        calculateNewestDate(); // Gelen veriden en yeni tarihi bul
+        fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type'], threshold: 0.4 });
         buildTabs();
         filterData();
-        updateDailyFeatured(); 
+        updateDailyFeatured();
     })
     .catch((err) => {
         console.warn('plugins.json yüklenemedi, örnek veriler kullanılıyor:', err);
         plugins = dummyPlugins;
-        calculateNewestDate(); // Dummy verilerde en yeniyi bul
+        fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type'], threshold: 0.4 });
         buildTabs();
         filterData();
         updateDailyFeatured();
@@ -909,7 +1151,7 @@ async function suggestRandomMovie() {
     try {
         const [data] = await Promise.all([
             fetchPopularMovies(randomPage),
-            wait(900) 
+            wait(900)
         ]);
 
         const movies = data.results || [];
@@ -920,10 +1162,10 @@ async function suggestRandomMovie() {
 
         document.getElementById('movie-title').textContent = randomMovie.title;
         document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
-        document.getElementById('movie-genre').textContent = "Popüler"; 
+        document.getElementById('movie-genre').textContent = "Popüler";
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.";
-        
+
         const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
         document.getElementById('movie-poster').src = posterPath;
 
