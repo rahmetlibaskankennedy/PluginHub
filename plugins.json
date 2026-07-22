@@ -946,5 +946,19 @@
       "mobile",
       "web"
     ]
-  }
+  },
+ {
+    "app": "Nuvio",
+    "type": "4K",
+    "name": "deneme",
+    "desc": "Bağlantı Linki: drnrmr",
+    "isNew": false,
+    "installGuide": "nuvio",
+    "debrid": "free",
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ]
+  } 
 ]
