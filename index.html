@@ -716,9 +716,9 @@ function renderCards(data) {
 
         const addonType = item.type || (item.desc?.toLowerCase().includes('altyazı') ? 'Altyazı' : 'Film & Dizi');
         
-        // --- YENİ ROZETİ KONTROLÜ ---
-        // Eğer eklentinin tarihi en yeni tarihe eşitse rozet HTML'ini oluştur
-        const isNew = item.isNew === true;
+        // --- DİNAMİK YENİ ROZETİ KONTROLÜ ---
+        // JSON listesinin (plugins) en altındaki son elemanı otomatik "YENİ" kabul eder.
+        const isNew = (item === plugins[plugins.length - 1]);
         const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
 
         const card = document.createElement('div');
