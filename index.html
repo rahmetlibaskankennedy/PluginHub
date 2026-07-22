@@ -707,10 +707,40 @@ function filterTab(type, el) {
 // VERİ ÇEKME (FETCH) İŞLEMLERİ
 // ---------------------------
 
+// 1. EKLENTİLERİ ÇEK (Ana sistemin çalışması için bu şart)
+const dummyPlugins = [
+    { name: "WebStreamr", app: "Nuvio", desc: "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure - Film & Dizi izleme eklentisi" },
+    { name: "Torrentio", app: "Stremio", desc: "https://torrentio.strem.fun/manifest.json - Altyazı ve film kaynağı", type: "Katalog & Kaynak" }
+];
+
+fetch('plugins.json')
+    .then(r => r.json())
+    .then(data => {
+        plugins = data;
+        buildTabs();
+        filterData();
+        updateDailyFeatured(); 
+    })
+    .catch(() => {
+        plugins = dummyPlugins;
+        buildTabs();
+        filterData();
+        updateDailyFeatured();
+    });
+
+// 2. TMDB API İLE RASTGELE FİLM ÖNERİSİ (Zar Animasyonuna Entegre)
 const TMDB_API_KEY = 'c4812c0d5f471e53d86c8e178c03df54';
 
-function fetchRandomMovieFromAPI() {
-    // Rastgele bir sayfa seçerek çeşitliliği artırıyoruz (Örn: İlk 50 sayfa arası)
+// Önceki suggestRandomMovie fonksiyonunu eziyoruz/güncelliyoruz
+function suggestRandomMovie() {
+    // Varsa açık olan film modalını kapat
+    document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+
+    // 4 Saniye boyunca dönecek olan zar yüklenme ekranını aç
+    const loadingOverlay = document.getElementById('dice-loading-overlay');
+    loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+
+    // Zar dönerken arka planda TMDB'den veriyi çekiyoruz
     const randomPage = Math.floor(Math.random() * 50) + 1;
     const url = `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=${randomPage}`;
 
@@ -719,21 +749,31 @@ function fetchRandomMovieFromAPI() {
         .then(data => {
             const movies = data.results;
             const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-            
-            // Veriyi senin UI formatına uygun hale getir
-            const formattedMovie = {
-                title: randomMovie.title,
-                year: randomMovie.release_date.split('-')[0],
-                genre: "Popüler", // Türleri eşleştirmek için TMDB Genre listesi kullanılabilir
-                imdb: randomMovie.vote_average.toFixed(1),
-                plot: randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.",
-                poster: `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}`
-            };
 
-            // Ekrana basma fonksiyonlarını çağır
-            displayMovieInModal(formattedMovie);
+            // 4 saniyelik animasyonun bitmesini bekliyoruz
+            setTimeout(() => {
+                // Yükleniyor ekranını kapat
+                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+
+                // HTML'e TMDB'den gelen verileri yazdır
+                document.getElementById('movie-title').textContent = randomMovie.title;
+                document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
+                document.getElementById('movie-genre').textContent = "Popüler"; 
+                document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
+                document.getElementById('movie-plot').textContent = randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.";
+                
+                const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
+                document.getElementById('movie-poster').src = posterPath;
+
+                // Modalı ekranda göster
+                document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+            }, 4000); // 4000ms = 4 saniye
         })
-        .catch(err => console.error("Film çekilemedi:", err));
+        .catch(err => {
+            console.error("Film çekilemedi:", err);
+            loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+            showToast("Film önerisi alınırken bir hata oluştu.");
+        });
 }
 </script>
 </body>
