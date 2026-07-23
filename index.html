@@ -596,11 +596,35 @@ function debounce(fn, wait) {
 const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
+function moveIndicator(activeEl) {
+    const indicator = document.getElementById('dockIndicator');
+    if (indicator && activeEl) {
+        // Tıklanan butonun menü içindeki yatay pozisyonunu alır ve topu oraya kaydırır
+        indicator.style.transform = `translateX(${activeEl.offsetLeft}px)`;
+    }
+}
+
 function setActiveDock(id) {
     document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
     const el = document.getElementById(`dock-${id}`);
-    if (el) el.classList.add('active');
+    if (el) {
+        el.classList.add('active');
+        moveIndicator(el);
+    }
 }
+
+// Sayfa yüklendiğinde ve ekran boyutu değiştiğinde neon topun yerini hesapla
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const activeEl = document.querySelector('.dock-btn.active');
+        if (activeEl) moveIndicator(activeEl);
+    }, 100);
+});
+
+window.addEventListener('resize', () => {
+    const activeEl = document.querySelector('.dock-btn.active');
+    if (activeEl) moveIndicator(activeEl);
+});
 
 function goHome() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
