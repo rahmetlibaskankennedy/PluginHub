@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">zar
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0a1f">
     <title>PluginHub — Streaming Media Portal</title>
@@ -190,17 +190,14 @@
     <div class="dock-indicator" id="dockIndicator"></div>
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     
-    <!-- YENİ: Dolby Atmos Butonu (Resim Eklendi) -->
     <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
         <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 25px;">
     </button>
       
-    <!-- YENİ: IMAX Enhanced Butonu (Resim Eklendi) -->
     <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
         <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
     </button>
 
-    <!-- Rastgele (Zar) Butonu -->
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
     
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
@@ -292,7 +289,7 @@
         <h2 id="modal-title" class="text-2xl font-bold text-white mb-2 break-words"></h2>
         <div id="modal-subtitle" class="text-xs text-slate-400 mb-6 font-semibold"></div>
 
-        <!-- BÖLÜM 1: APK / EKLENTİ BİLGİLERİ -->
+        <!-- BÖLÜM 1: APK / EKLENTİ BİLGİLERİ (Kurulum Rehberleri Geri Eklendi) -->
         <div id="modal-apk-info" class="hidden">
             <div class="mb-6">
                 <label id="modal-url-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
@@ -321,6 +318,34 @@
                     <button onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl border border-white/5">Notu Kaydet</button>
                     <button onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2">🚩 Bildir</button>
                 </div>
+            </div>
+
+            <!-- Kurulum Kılavuzları -->
+            <div id="modal-stremio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
+                <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</h3>
+                <ul class="text-sm text-slate-300 space-y-4">
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span><b>Hızlı Kurulum</b> butonuna tıklayın — Stremio yüklüyse otomatik açılır.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Otomatik açılmazsa <b>Kopyala</b> ile manifest linkini kopyalayın.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Stremio içinde <b>Eklentiler</b> sekmesine gidip arama kutusuna linki yapıştırın.</span></li>
+                </ul>
+            </div>
+            <div id="modal-nuvio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
+                <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</h3>
+                <ul class="text-sm text-slate-300 space-y-4">
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
+                </ul>
+            </div>
+            <div id="modal-downloader-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
+                <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📥 TV'ye Nasıl Kurulur? (Downloader)</h3>
+                <ul class="text-sm text-slate-300 space-y-4">
+                    <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>TV'nizin mağazasından <b>Downloader</b> uygulamasını indirin.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Arama çubuğuna yukarıdaki <b class="text-emerald-400">Kodu</b> yazıp Go tuşuna basın.</span></li>
+                    <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>İndirme bittikten sonra "Yükle" diyerek işlemi tamamlayın.</span></li>
+                </ul>
             </div>
         </div>
 
@@ -365,7 +390,8 @@
         </div>
     </div>
 </div>
-    <!-- ZAR VE FİLM MODALI -->
+
+<!-- ZAR (RASTGELE FİLM) MODALI -->
 <div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div class="text-7xl rolling-dice mb-6">🎲</div>
     <p class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
@@ -374,17 +400,20 @@
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative">
         <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
-        <div class="md:w-5/12 relative shrink-0">
-            <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-56 sm:h-64 md:h-full md:absolute md:inset-0 object-cover">
+        
+        <!-- POSTER ALANI (Mobilde kırpılmayı önlemek için bg eklendi ve object-contain ayarlandı) -->
+        <div class="md:w-5/12 relative shrink-0 bg-[#05040f] flex items-center justify-center">
+            <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-72 sm:h-80 md:h-full md:absolute md:inset-0 object-contain md:object-cover">
             <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5 z-10">
                 <span class="text-lg leading-none">★</span>
                 <span id="movie-imdb"></span>
             </div>
         </div>
+        
         <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
             <div class="mb-3 flex items-center gap-2 flex-wrap mt-2 md:mt-0">
                 <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
-                <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
+                <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md hidden" id="movie-genre"></span>
             </div>
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
@@ -566,7 +595,6 @@ function updateDailyFeatured() {
 function moveIndicator(activeEl) {
     const indicator = document.getElementById('dockIndicator');
     if (indicator && activeEl) {
-        // İndikatörün tam ortalanması: Butonun solu + Buton Genişliği/2 - İndikatör Genişliği/2
         const leftPos = activeEl.offsetLeft + (activeEl.offsetWidth / 2) - 22;
         indicator.style.transform = `translateX(${leftPos}px)`;
     }
@@ -911,6 +939,20 @@ function openModalItem(item) {
             goBtn.onclick = () => { if(urlStr) window.open(urlStr, '_blank'); };
         }
 
+        // --- KURULUM REHBERLERİ GÖRÜNÜRLÜK MANTIĞI ---
+        const appArray = Array.isArray(item.app) ? item.app : [item.app];
+        const appsLower = appArray.map(a => String(a).toLowerCase());
+        const isAPK = currentMainCategory !== 'eklentiler';
+
+        const nuvioGuide = document.getElementById('modal-nuvio-guide');
+        const stremioGuide = document.getElementById('modal-stremio-guide');
+        const downloaderGuide = document.getElementById('modal-downloader-guide');
+
+        if(nuvioGuide) nuvioGuide.classList.toggle('hidden', isAPK || (!appsLower.some(a => a.includes('nuvio')) && item.installGuide !== 'nuvio'));
+        if(stremioGuide) stremioGuide.classList.toggle('hidden', isAPK || (!appsLower.some(a => a.includes('stremio')) && item.installGuide !== 'stremio'));
+        if(downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
+        // ----------------------------------------------
+
         const savedRating = userRatings[key] || 0;
         currentRatingDisplay = savedRating; updateStarsUI(savedRating);
         document.getElementById('modal-note-textarea').value = userNotes[key] || '';
@@ -926,7 +968,12 @@ function copyCurrentLink() {
 }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); unlockBodyScroll(); }
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { 
+    if (e.key === 'Escape') {
+        closeModal();
+        if(typeof closeMovieModal === 'function') closeMovieModal();
+    } 
+});
 
 function hoverStars(i) { updateStarsUI(i, true); }
 function resetStarHover() { updateStarsUI(currentRatingDisplay); }
@@ -1058,7 +1105,8 @@ function closeMenuModal(e) {
     document.getElementById('menu-modal-box').classList.add('translate-y-full');
     setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
 }
-    function closeMovieModal(e) { 
+
+function closeMovieModal(e) { 
     if (!e || e.target.id === 'movie-modal-overlay') {
         document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); 
     }
@@ -1071,7 +1119,6 @@ async function suggestRandomMovie() {
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
     
-    // Cloudflare TMDB API'den rastgele bir sayfa çek
     const randomPage = Math.floor(Math.random() * 50) + 1;
     
     try {
@@ -1091,6 +1138,18 @@ posterEl.onerror = () => { posterEl.src = 'https://via.placeholder.com/500x750/1
 posterEl.src = randomMovie.poster_path 
     ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` 
     : 'https://via.placeholder.com/500x750/151333/8c89b4?text=Poster+Yok';
+        
+        // TMDB ID eşleştirme - Boş tür kutucuğu engelleme
+        const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
+        const genreId = randomMovie.genre_ids && randomMovie.genre_ids.length > 0 ? randomMovie.genre_ids[0] : null;
+        const genreEl = document.getElementById('movie-genre');
+        
+        if (genreId && tmdbGenres[genreId]) {
+            genreEl.textContent = tmdbGenres[genreId];
+            genreEl.classList.remove('hidden');
+        } else {
+            genreEl.classList.add('hidden');
+        }
         
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     } catch (err) {
