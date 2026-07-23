@@ -469,29 +469,22 @@
     <p class="text-slate-400 text-xs mt-2">Zarlar atılıyor...</p>
 </div>
 
-<!-- FİLM ÖNERİ MODALI -->
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative">
 
-        <!-- Kapatma Butonu -->
-        <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-30 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/20 rounded-full text-slate-200 hover:text-white hover:bg-black text-lg transition" aria-label="Kapat">✕</button>
+        <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
 
-        <!-- Poster Alanı (Güncellendi) -->
-        <div class="w-full md:w-5/12 relative shrink-0 bg-[#0b091a] flex justify-center items-center rounded-t-3xl md:rounded-none md:rounded-l-3xl overflow-hidden min-h-[35vh] md:min-h-0 border-b md:border-b-0 md:border-r border-white/5">
+        <div class="md:w-5/12 relative shrink-0">
+            <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-56 sm:h-64 md:h-full md:absolute md:inset-0 object-cover">
             
-            <!-- IMDB Rozeti -->
-            <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5 z-20 shadow-lg">
+            <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5 z-10">
                 <span class="text-lg leading-none">★</span>
                 <span id="movie-imdb"></span>
             </div>
-
-            <!-- Resim: Mobilde kırpmadan sığdır (object-contain), Masaüstünde kutuyu doldur (object-cover) -->
-            <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-full max-h-[40vh] sm:max-h-[45vh] md:max-h-none md:absolute md:inset-0 object-contain md:object-cover p-4 md:p-0 drop-shadow-2xl md:drop-shadow-none transition-opacity duration-300">
         </div>
 
-        <!-- Metin Alanı -->
-        <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
-            <div class="mb-3 flex items-center gap-2 flex-wrap">
+        <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
+            <div class="mb-3 flex items-center gap-2 flex-wrap mt-2 md:mt-0">
                 <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
                 <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
             </div>
@@ -517,11 +510,12 @@ let currentModalItem = null;
 let currentRatingDisplay = 0;
 
 let activeTypeFilter = 'all';
-let activeDebridFilter = 'all';
-let activePlatformFilter = 'all';
-let activeSort = 'default';
+let activeDebridFilter = localStorage.getItem('ph_debrid_filter') || 'all';
+let activePlatformFilter = localStorage.getItem('ph_platform_filter') || 'all';
+let activeSort = localStorage.getItem('ph_sort') || 'default';
 let fuseIndex = null;
 let scrollLockCount = 0;
+let newestDate = null;
 
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
@@ -801,7 +795,7 @@ function toggleFavFilter() {
     filterData();
 }
 
-// KART RENDER FONKSİYONU (GÜNCELLENDİ: Dinamik "YENİ" rozeti)
+// KART RENDER FONKSİYONU (tarihe göre YENİ rozeti: en yeni dateAdded, üzerine yenisi eklenene kadar kalır)
 function renderCards(data) {
     const grid = document.getElementById('resultsGrid');
     const count = document.getElementById('resultCount');
@@ -825,10 +819,9 @@ function renderCards(data) {
             starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
         }
 
-        // DİNAMİK YENİ ROZETİ: JSON listesinin en altındaki elemanı "YENİ" kabul eder.
-        const isNew = (item === plugins[plugins.length - 1]);
+        const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
         const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
-        
+
         const debridLabel = debridLabels[item.debrid] || '';
         const platformIconsHTML = (item.platform || []).map(p => platformIcons[p] || '').join(' ');
 
@@ -868,12 +861,22 @@ function toggleFav(key) {
     filterData();
 }
 
+// En yeni dateAdded değerini bul (ISO "YYYY-MM-DD" formatı doğrudan karşılaştırılabilir)
+function computeNewestDate() {
+    newestDate = null;
+    plugins.forEach(p => {
+        if (p.dateAdded && (!newestDate || p.dateAdded > newestDate)) {
+            newestDate = p.dateAdded;
+        }
+    });
+}
+
 function sortPool(pool) {
     const arr = [...pool];
     if (activeSort === 'name-asc') {
         arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
     } else if (activeSort === 'newest') {
-        arr.sort((a, b) => (b.isNew === true) - (a.isNew === true));
+        arr.sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || ''));
     } else if (activeSort === 'debrid-free') {
         const rank = { free: 0, optional: 1, required: 2 };
         arr.sort((a, b) => (rank[a.debrid] ?? 3) - (rank[b.debrid] ?? 3));
@@ -962,6 +965,9 @@ function closeFilterModal() {
 function closeFilterModalOnBackdrop(e) { if (e.target.id === 'filter-modal-overlay') closeFilterModal(); }
 
 function applyFilters() {
+    localStorage.setItem('ph_sort', activeSort);
+    localStorage.setItem('ph_debrid_filter', activeDebridFilter);
+    localStorage.setItem('ph_platform_filter', activePlatformFilter);
     updateFilterBadge();
     closeFilterModal();
     filterData();
@@ -971,6 +977,9 @@ function resetFilters() {
     activeDebridFilter = 'all';
     activePlatformFilter = 'all';
     activeSort = 'default';
+    localStorage.setItem('ph_sort', 'default');
+    localStorage.setItem('ph_debrid_filter', 'all');
+    localStorage.setItem('ph_platform_filter', 'all');
     document.getElementById('sortSelect').value = 'default';
     buildFilterOptions();
     updateFilterBadge();
@@ -1072,8 +1081,8 @@ function closeMovieModal(e) {
 }
 
 const dummyPlugins = [
-    { app: "Nuvio", type: "4K", name: "WebStreamr", desc: "Bağlantı Linki: https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure", isNew: false, installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile"] },
-    { app: "Nuvio", type: "Altyazı", name: "OpenSubtitles", desc: "Bağlantı Linki: https://opensubtitles-v3.strem.io/manifest.json", isNew: true, installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile", "web"] }
+    { app: "Nuvio", type: "4K", name: "WebStreamr", desc: "Bağlantı Linki: https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure", dateAdded: "2026-07-10", installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile"] },
+    { app: "Nuvio", type: "Altyazı", name: "OpenSubtitles", desc: "Bağlantı Linki: https://opensubtitles-v3.strem.io/manifest.json", dateAdded: "2026-07-22", installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile", "web"] }
 ];
 
 buildFilterOptions();
@@ -1086,6 +1095,7 @@ fetch('plugins.json')
     })
     .then(data => {
         plugins = data;
+        computeNewestDate();
         fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type'], threshold: 0.4 });
         buildTabs();
         filterData();
@@ -1094,6 +1104,7 @@ fetch('plugins.json')
     .catch((err) => {
         console.warn('plugins.json yüklenemedi, örnek veriler kullanılıyor:', err);
         plugins = dummyPlugins;
+        computeNewestDate();
         fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type'], threshold: 0.4 });
         buildTabs();
         filterData();
