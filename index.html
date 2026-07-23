@@ -107,7 +107,7 @@
 
 <main class="max-w-7xl mx-auto px-6 py-4">
     
-    <!-- YENİ: ANA KATEGORİLER (SPA GEÇİŞLERİ) -->
+    <!-- ANA KATEGORİLER (SPA SEKMELERİ) -->
     <div class="flex gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
@@ -115,7 +115,7 @@
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
     </div>
 
-    <!-- HERO FEATURED MEDIA (Sadece Eklentilerde Görünecek) -->
+    <!-- HERO FEATURED MEDIA (Sadece Eklentilerde Görünür) -->
     <div class="hero-media-box p-6 md:p-8 mb-8 transition-all" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="max-w-xl">
@@ -137,7 +137,7 @@
 
     <!-- ARAMA + GÖRÜNÜM DEĞİŞTİRİCİ + FİLTRELE -->
     <div class="flex gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Uygulama veya içerik ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 İçerik veya uygulama ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
         
         <!-- Izgara / Liste Değiştirici -->
         <button onclick="toggleViewMode()" id="viewToggleBtn" class="shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-slate-300 hover:text-white px-3 py-3 rounded-xl flex items-center justify-center transition" aria-label="Görünümü Değiştir">
@@ -155,7 +155,7 @@
         <span id="resultCount">Yükleniyor...</span>
     </div>
 
-    <!-- EKLENTİ/APK KARTLARI AKIŞI -->
+    <!-- KARTLAR AKIŞI -->
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
@@ -165,7 +165,6 @@
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     <button class="dock-btn" id="dock-search" aria-label="Arama" onclick="toggleSearchModal()">🔍</button>
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
-    
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
 
@@ -371,7 +370,7 @@
 </div>
 
 <script>
-// SPA Veri Altyapısı
+// SPA Veri Altyapısı (Hangi sekme hangi JSON dosyasını okuyacak)
 const DATA_SOURCES = {
     'eklentiler': 'plugins.json',
     'tvapk': 'tvapk.json',
@@ -454,9 +453,8 @@ function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = 
 const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
-// SPA GEÇİŞ FONKSİYONU
+// ÜST ANA KATEGORİ GEÇİŞLERİ (SPA)
 async function switchMainCategory(key, btnEl) {
-    // Aktif stilini güncelle
     document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
         b.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
     });
@@ -466,21 +464,19 @@ async function switchMainCategory(key, btnEl) {
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
-    // Eklentiler dışında ise Filtredeki "Debrid" ve Hero bölümünü gizle
+    // Eklentiler dışındaki sayfalarda Debrid filtresini ve Hero alanını gizle
     if(key !== 'eklentiler') {
         document.getElementById('debridFilterWrapper').style.display = 'none';
         document.getElementById('heroSection').style.display = 'none';
-        document.getElementById('movieFabBtn').style.display = 'none';
     } else {
         document.getElementById('debridFilterWrapper').style.display = 'block';
         document.getElementById('heroSection').style.display = 'block';
-        document.getElementById('movieFabBtn').style.display = 'flex';
     }
 
     await loadCategoryData(key);
 }
 
-// CACHE MANTIKLI VERİ ÇEKME
+// CACHE DESTEKLİ VERİ YÜKLEME
 async function loadCategoryData(key) {
     if (cachedData[key]) {
         plugins = cachedData[key];
@@ -499,7 +495,7 @@ async function loadCategoryData(key) {
         postLoadSetup();
     } catch (err) {
         showToast(key + ' verisi yüklenemedi.', true);
-        document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri bağlantısı kurulamadı. Yeni json dosyalarını oluşturduğunuzdan emin olun.</div>';
+        document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri yüklenemedi. İlgili .json dosyasının sunucuda olduğundan emin olun.</div>';
     }
 }
 
@@ -510,7 +506,6 @@ function postLoadSetup() {
     filterData();
     if(currentMainCategory === 'eklentiler') updateDailyFeatured();
 }
-
 
 // DOCK YÖNETİMİ
 function moveIndicator(activeEl) {
@@ -532,8 +527,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const activeEl = document.querySelector('.dock-btn.active');
         if (activeEl) moveIndicator(activeEl);
     }, 100);
-    // İlk açılışta veriyi yükle
-    loadCategoryData('eklentiler');
+    loadCategoryData('eklentiler'); // İlk açılışta Eklentileri yükle
 });
 window.addEventListener('resize', () => {
     const activeEl = document.querySelector('.dock-btn.active');
@@ -758,10 +752,11 @@ function renderCards(data) {
         const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
         const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
         
-        // Yeni: Downloader Kodu Rozeti ve Çalışmıyor rozeti
+        // Downloader Kodu Rozeti ve Çalışmıyor rozeti
         const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-black tracking-widest shadow-[0_0_10px_rgba(16,185,129,0.2)]">KOD: ${item.code}</span>` : '';
         const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">ÇALIŞMIYOR</span>` : '';
 
+        // app dizisini veya string'i güvenli şekilde işleme
         const appArray = Array.isArray(item.app) ? item.app : [item.app];
         const appBadgesHTML = appArray.map(appName => {
             const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
@@ -788,7 +783,7 @@ function renderCards(data) {
                     <span>Türü: ${escapeHtml(item.type || '—')}</span>
                     <span class="text-sm opacity-80">${(item.platform || []).map(p => platformIcons[p] || '').join(' ')}</span>
                 </div>
-                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mb-4 md:mb-6 border-b border-white/5 pb-4 md:pb-6">${debridLabels[item.debrid] || ''}</p>
+                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mb-4 md:mb-6 border-b border-white/5 pb-4 md:pb-6">${currentMainCategory === 'eklentiler' ? (debridLabels[item.debrid] || '') : escapeHtml(item.desc || '')}</p>
                 ` : ''}
             </div>
             
@@ -916,7 +911,6 @@ function openModalItem(item) {
         tagsHTML += `<span class="${badgeClass} px-3 py-1.5 rounded-md uppercase">${escapeHtml(appName)}</span>`;
     });
     
-    // Eklentiyse Debrid etiketi ekle, Değilse Durum etiketi
     if(currentMainCategory === 'eklentiler') {
         tagsHTML += `<span class="${item.debrid === 'required' ? 'tag-debrid-required' : 'tag-free'} px-3 py-1.5 rounded-md">${item.debrid === 'required' ? '⚡ Gerekli' : (item.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz')}</span>`;
     } else if(item.status === 'dead') {
@@ -926,7 +920,6 @@ function openModalItem(item) {
     tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${escapeHtml(item.type || '')}</span>`;
     tagsContainer.innerHTML = tagsHTML;
 
-    // YENİ: URL KUTUSU KONTROLÜ (APK ve Kod Ayrımı)
     const code = item.code;
     const manifestUrl = extractUrl(item.desc) || item.sourceUrl;
     
@@ -939,11 +932,11 @@ function openModalItem(item) {
         urlLabel.textContent = "DOWNLOADER KODU";
         urlBox.innerHTML = `<span class="text-emerald-400 text-3xl font-black">${code}</span>`;
         copyBtn.onclick = () => copyToClipboard(code, 'Kopyalanacak kod yok.');
-        goBtn.style.display = 'none'; // Siteye Git butonunu gizle
+        goBtn.style.display = 'none';
     } else {
         urlLabel.textContent = "BAĞLANTI";
-        urlBox.textContent = manifestUrl || 'Bağlantı bulunamadı';
-        copyBtn.onclick = () => copyToClipboard(manifestUrl, 'Kopyalanacak bağlantı yok.');
+        urlBox.textContent = manifestUrl || item.desc || 'Bağlantı bulunamadı';
+        copyBtn.onclick = () => copyToClipboard(manifestUrl || item.desc, 'Kopyalanacak veri yok.');
         goBtn.style.display = 'flex';
         goBtn.onclick = () => {
             if (manifestUrl && manifestUrl.startsWith('http')) window.open(manifestUrl, '_blank', 'noopener,noreferrer');
@@ -957,7 +950,6 @@ function openModalItem(item) {
     document.getElementById('modal-nuvio-guide').classList.toggle('hidden', isAPK || (!appsLower.includes('nuvio') && item.installGuide !== 'nuvio'));
     document.getElementById('modal-stremio-guide').classList.toggle('hidden', isAPK || (!appsLower.includes('stremio') && item.installGuide !== 'stremio'));
     
-    // YENİ: Downloader rehberi kontrolü
     const downloaderGuide = document.getElementById('modal-downloader-guide');
     if(downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
 
