@@ -369,8 +369,8 @@
   },
   {
     "app": "Nuvio",
-    "type": "Dublaj",
-    "name": "Wekmed (Plug-in)",
+    "type": "Repo",
+    "name": "Wekmed",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/Wekmed/nuvio/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
