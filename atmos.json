@@ -1,0 +1,52 @@
+[
+  {
+    "rank": 1,
+    "name": "Blade Runner 2049",
+    "year": 2017,
+    "genre": "Bilim Kurgu",
+    "platform": ["Netflix", "Prime"],
+    "type": "Top 100 Atmos"
+  },
+  {
+    "rank": 2,
+    "name": "Dune",
+    "year": 2021,
+    "genre": "Bilim Kurgu",
+    "platform": ["TV+", "Max"],
+    "type": "Top 100 Atmos"
+  },
+  {
+    "rank": 3,
+    "name": "Mad Max: Fury Road",
+    "year": 2015,
+    "genre": "Aksiyon",
+    "platform": ["Prime"],
+    "type": "Top 100 Atmos",
+    "hint": "Açılış sahnesi ve Bölüm 4 Max'in kafa çıkışı"
+  },
+  {
+    "rank": 1,
+    "name": "Avatar 1-2-3",
+    "year": "2009-2024",
+    "genre": "Bilim Kurgu",
+    "platform": ["Disney+"],
+    "type": "Genel Ses"
+  },
+  {
+    "rank": 1,
+    "name": "A Quiet Place",
+    "year": 2018,
+    "genre": "Korku",
+    "platform": [],
+    "type": "Tavan"
+  },
+  {
+    "rank": 1,
+    "name": "War of the Worlds",
+    "year": 2005,
+    "genre": "Macera",
+    "platform": ["TV+"],
+    "type": "Bas",
+    "hint": "Bilinen en alt frekansa inen film"
+  }
+]
