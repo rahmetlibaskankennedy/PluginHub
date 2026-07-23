@@ -1,11 +1,58 @@
 [
   {
-    "app": ["Android TV", "Mobil"],
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
     "type": "Canlı",
     "name": "Sports Fire",
     "desc": "Global canlı spor karşılaşmalarını HD yayınlayan popüler araç.",
     "code": "12345",
     "status": "warn",
-    "platform": ["tv", "mobile"]
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "Live NetTV",
+    "desc": "Yüzlerce canlı spor kanalına anında erişim sağlayan ücretsiz platform.",
+    "code": "84521",
+    "status": "ok",
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "Canlı",
+    "name": "RedBox TV",
+    "desc": "Farklı ülkelerin spor kanallarını barındıran, sade arayüzlü yayın uygulaması.",
+    "code": "93817",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "NavixSport",
+    "desc": "Özellikle futbol ve basketbol maçlarını canlı takip edebileceğiniz mobil odaklı uygulama.",
+    "code": "44102",
+    "status": "ok",
+    "platform": [
+      "mobile"
+    ]
   }
 ]
