@@ -35,12 +35,10 @@
         html { -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); min-height: 100vh; padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
 
-        .stream-card.list-view { display: flex; flex-direction: row; align-items: center; padding: 12px 16px; gap: 16px; }
-        .stream-card.list-view .card-header { margin-bottom: 0; width: auto; flex-shrink: 0; }
-        .stream-card.list-view .card-body { flex: 1; min-width: 0; }
-        .stream-card.list-view .card-footer { display: none; }
-        .stream-card.list-view h3 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-        .stream-card.list-view p { border: none; padding: 0; margin: 0; display: inline-block; }
+        .stream-card.list-view { display: flex; flex-direction: row; align-items: center; padding: 12px 16px; gap: 12px; }
+        .stream-card.list-view .card-header { margin-bottom: 0; width: auto; flex: 1; min-width: 0; }
+        .stream-card.list-view .card-footer { margin-top: 0; width: auto; flex-shrink: 0; }
+        .stream-card.list-view h3 { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 
         .stream-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .stream-card:hover { transform: translateY(-4px); background: var(--bg-card-hover); border-color: rgba(108, 92, 231, 0.5); box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2); }
@@ -370,7 +368,7 @@
 </div>
 
 <script>
-// SPA Veri Altyapısı (Hangi sekme hangi JSON dosyasını okuyacak)
+// SPA Veri Altyapısı
 const DATA_SOURCES = {
     'eklentiler': 'plugins.json',
     'tvapk': 'tvapk.json',
@@ -464,7 +462,6 @@ async function switchMainCategory(key, btnEl) {
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
-    // Eklentiler dışındaki sayfalarda Debrid filtresini ve Hero alanını gizle
     if(key !== 'eklentiler') {
         document.getElementById('debridFilterWrapper').style.display = 'none';
         document.getElementById('heroSection').style.display = 'none';
@@ -522,13 +519,47 @@ function setActiveDock(id) {
         moveIndicator(el);
     }
 }
+
+// EVENT DELEGATION INITIALIZATION
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const activeEl = document.querySelector('.dock-btn.active');
         if (activeEl) moveIndicator(activeEl);
     }, 100);
-    loadCategoryData('eklentiler'); // İlk açılışta Eklentileri yükle
+
+    // Kart Etkileşimleri (Favori Tıklaması vs. Kart Tıklaması) - Madde 1 Çözümü
+    const resultsGrid = document.getElementById('resultsGrid');
+    resultsGrid.addEventListener('click', (e) => {
+        const favBtn = e.target.closest('.fav-btn');
+        if (favBtn) {
+            e.stopPropagation();
+            const key = favBtn.dataset.key;
+            if (key) toggleFav(key);
+            return;
+        }
+
+        const card = e.target.closest('.stream-card');
+        if (card && card.dataset.key) {
+            const item = plugins.find(p => pluginKey(p) === card.dataset.key);
+            if (item) openModalItem(item);
+        }
+    });
+
+    // Alt Kategori Sekme Tıklaması - Madde 1 Çözümü
+    const categoryTabs = document.getElementById('categoryTabs');
+    categoryTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.pill-tab');
+        if (btn && btn.dataset.type) {
+            document.querySelectorAll('#categoryTabs .pill-tab').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            activeTypeFilter = btn.dataset.type === 'Tümü' ? 'all' : btn.dataset.type;
+            filterData();
+        }
+    });
+
+    loadCategoryData('eklentiler');
 });
+
 window.addEventListener('resize', () => {
     const activeEl = document.querySelector('.dock-btn.active');
     if (activeEl) moveIndicator(activeEl);
@@ -727,6 +758,81 @@ function renderSkeletons() {
     }
 }
 
+// BİRLEŞTİRİLMİŞ KART RENDER FONKSİYONU - Madde 5 Çözümü
+function buildCardHTML(item) {
+    const itemKey = pluginKey(item);
+    const isFav = favorites.includes(itemKey);
+    const userRating = userRatings[itemKey] || 0;
+    
+    const debridLabels = { free: '🆓 Ücretsiz', optional: '🔓 Debrid Opsiyonel', required: '⚡ Debrid Gerekli' };
+    const platformIcons = { tv: '📺', mobile: '📱', web: '💻' };
+
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
+    }
+
+    const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
+    const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
+    const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-black tracking-widest shadow-[0_0_10px_rgba(16,185,129,0.2)]">KOD: ${item.code}</span>` : '';
+    const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">ÇALIŞMIYOR</span>` : '';
+
+    const appArray = Array.isArray(item.app) ? item.app : [item.app];
+    const appBadgesHTML = appArray.map(appName => {
+        const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
+        return `<span class="${badgeClass} px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">${escapeHtml(appName)}</span>`;
+    }).join('');
+
+    const favButtonHTML = `<button class="fav-btn w-9 h-9 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}" aria-label="Favori">${isFav ? '❤️' : '♡'}</button>`;
+
+    if (viewMode === 'list') {
+        // Liste Görünümü (Madde 2 ve Madde 5 Kapsamında Yıldız Eklendi)
+        return `
+            <div class="card-header">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    ${appBadgesHTML}
+                    ${codeBadgeHTML}
+                    ${deadBadgeHTML}
+                    ${newBadgeHTML}
+                </div>
+                <h3 class="font-bold text-white">${escapeHtml(item.name)}</h3>
+                <span class="text-xs text-slate-400">${escapeHtml(item.type || '—')}</span>
+            </div>
+            <div class="card-footer flex items-center gap-3">
+                <div class="flex gap-0.5 text-xs md:text-sm" title="Puan: ${userRating}/5">${starsHTML}</div>
+                ${favButtonHTML}
+            </div>
+        `;
+    }
+
+    // Izgara (Grid) Görünümü
+    return `
+        <div class="card-header w-full">
+            <div class="flex justify-between items-start mb-3 md:mb-4">
+                <div class="flex items-center gap-2 flex-wrap">
+                    ${appBadgesHTML}
+                    ${codeBadgeHTML}
+                    ${deadBadgeHTML}
+                    ${newBadgeHTML}
+                </div>
+                ${favButtonHTML}
+            </div>
+            <h3 class="font-bold text-lg md:text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
+            
+            <div class="flex items-center justify-between text-[12px] md:text-[13px] text-slate-300 mb-3">
+                <span>Türü: ${escapeHtml(item.type || '—')}</span>
+                <span class="text-sm opacity-80">${(item.platform || []).map(p => platformIcons[p] || '').join(' ')}</span>
+            </div>
+            <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mb-4 md:mb-6 border-b border-white/5 pb-4 md:pb-6">${currentMainCategory === 'eklentiler' ? (debridLabels[item.debrid] || '') : escapeHtml(item.desc || '')}</p>
+        </div>
+        
+        <div class="card-footer w-full flex items-center justify-between">
+            <div class="flex gap-1 text-base md:text-lg">${starsHTML}</div>
+            <button class="min-h-[40px] bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition pointer-events-none">İncele</button>
+        </div>
+    `;
+}
+
 function renderCards(data) {
     const grid = document.getElementById('resultsGrid');
     const count = document.getElementById('resultCount');
@@ -739,67 +845,12 @@ function renderCards(data) {
         return;
     }
 
-    const debridLabels = { free: '🆓 Ücretsiz', optional: '🔓 Debrid Opsiyonel', required: '⚡ Debrid Gerekli' };
-    const platformIcons = { tv: '📺', mobile: '📱', web: '💻' };
-
     data.forEach(item => {
-        const isFav = favorites.includes(pluginKey(item));
-        const userRating = userRatings[pluginKey(item)] || 0;
-
-        let starsHTML = '';
-        for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
-
-        const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
-        const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
-        
-        // Downloader Kodu Rozeti ve Çalışmıyor rozeti
-        const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-black tracking-widest shadow-[0_0_10px_rgba(16,185,129,0.2)]">KOD: ${item.code}</span>` : '';
-        const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">ÇALIŞMIYOR</span>` : '';
-
-        // app dizisini veya string'i güvenli şekilde işleme
-        const appArray = Array.isArray(item.app) ? item.app : [item.app];
-        const appBadgesHTML = appArray.map(appName => {
-            const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
-            return `<span class="${badgeClass} px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">${escapeHtml(appName)}</span>`;
-        }).join('');
-
+        const itemKey = pluginKey(item);
         const card = document.createElement('div');
         card.className = `stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col justify-between'} ${item.status === 'dead' ? 'opacity-60 grayscale' : ''}`;
-        card.innerHTML = `
-            <div class="card-header w-full">
-                <div class="flex justify-between items-start mb-3 md:mb-4">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        ${appBadgesHTML}
-                        ${codeBadgeHTML}
-                        ${deadBadgeHTML}
-                        ${newBadgeHTML}
-                    </div>
-                    ${viewMode === 'grid' ? `<button class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')">${isFav ? '❤️' : '♡'}</button>` : ''}
-                </div>
-                <h3 class="font-bold text-lg md:text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
-                
-                ${viewMode === 'grid' ? `
-                <div class="flex items-center justify-between text-[12px] md:text-[13px] text-slate-300 mb-3">
-                    <span>Türü: ${escapeHtml(item.type || '—')}</span>
-                    <span class="text-sm opacity-80">${(item.platform || []).map(p => platformIcons[p] || '').join(' ')}</span>
-                </div>
-                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mb-4 md:mb-6 border-b border-white/5 pb-4 md:pb-6">${currentMainCategory === 'eklentiler' ? (debridLabels[item.debrid] || '') : escapeHtml(item.desc || '')}</p>
-                ` : ''}
-            </div>
-            
-            <div class="card-footer w-full flex items-center justify-between">
-                <div class="flex gap-1 text-base md:text-lg">${starsHTML}</div>
-                <button class="min-h-[40px] bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition pointer-events-none">İncele</button>
-            </div>
-
-            ${viewMode === 'list' ? `
-                <div class="flex-1 text-right">
-                    <span class="text-xs text-slate-400 block">${escapeHtml(item.type || '—')}</span>
-                </div>
-                <button class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')">${isFav ? '❤️' : '♡'}</button>
-            ` : ''}
-        `;
-        card.onclick = () => openModalItem(item);
+        card.dataset.key = itemKey; // Event delegation için veri anahtarı saklama
+        card.innerHTML = buildCardHTML(item);
         grid.appendChild(card);
     });
 }
@@ -981,15 +1032,8 @@ function buildTabs() {
     const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
     const container = document.getElementById('categoryTabs');
     container.innerHTML = types.map((t, i) => {
-        return `<button class="pill-tab ${i === 0 ? 'active' : ''}" onclick="filterTab('${escapeHtml(t)}', this)">${escapeHtml(t)}</button>`;
+        return `<button class="pill-tab ${i === 0 ? 'active' : ''}" data-type="${escapeHtml(t)}">${escapeHtml(t)}</button>`;
     }).join('');
-}
-
-function filterTab(type, el) {
-    document.querySelectorAll('#categoryTabs .pill-tab').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    activeTypeFilter = type === 'Tümü' ? 'all' : type;
-    filterData();
 }
 
 function closeMovieModal(e) { if (!e || e.target.id === 'movie-modal-overlay') document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); }
