@@ -65,58 +65,63 @@
             overflow: hidden;
         }
 
-      /* ŞEFFAF NEON DOCK STİLLERİ */
-        .stream-dock {
-            position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom));
-            left: 50%; 
-            transform: translateX(-50%);
-            background: transparent; /* Tamamen şeffaf zemin */
-            display: flex; 
-            align-items: center; 
-            gap: 24px;
-            z-index: 1000;
-        }
+     /* ARKA PLANLI VE NEON PARLAMALI DOCK STİLLERİ */
+.stream-dock {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: 50%; 
+    transform: translateX(-50%);
+    /* YENİ: Yarı saydam, bulanık (blur) cam efekti arka plan */
+    background: rgba(15, 13, 35, 0.85); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 40px;
+    padding: 10px 24px;
+    display: flex; 
+    align-items: center; 
+    gap: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    z-index: 1000;
+}
 
-        .dock-btn {
-            position: relative;
-            width: 48px; height: 48px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .dock-btn svg {
-            width: 24px; height: 24px;
-            position: relative;
-            z-index: 10;
-            transition: all 0.3s ease;
-    /* Kartların üzerinden geçerken şeffaf ikonların görünür kalmasını sağlar */
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); 
-        }
+.dock-btn {
+    position: relative;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
 
-        .dock-btn:active { transform: scale(0.9); }
-        .dock-btn:hover { color: #ffffff; }
+.dock-btn svg {
+    width: 24px; height: 24px;
+    position: relative;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.dock-btn:active { transform: scale(0.9); }
+.dock-btn:hover { color: #ffffff; }
 
 /* Aktif Buton Efektleri */
-        .dock-btn.active { color: var(--accent-pink); }
-        .dock-btn.active svg { width: 28px; height: 28px; }
+.dock-btn.active { color: var(--accent-pink); }
+.dock-btn.active svg { width: 28px; height: 28px; }
 
 /* Neon Parlama (Glow) Efekti */
-        .dock-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--accent-pink);
-            border-radius: 50%;
-            filter: blur(12px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .dock-btn.active::before { 
-            opacity: 0.35; 
-        }
+.dock-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-pink);
+    border-radius: 50%;
+    filter: blur(10px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.dock-btn.active::before { 
+    opacity: 0.35; 
+}
 
         .pill-tab {
             background: rgba(255,255,255,0.06);
