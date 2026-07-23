@@ -5,9 +5,24 @@
       "Mobil"
     ],
     "type": "Canlı",
-    "name": "Sports Fire",
-    "desc": "Global canlı spor karşılaşmalarını HD yayınlayan popüler araç.",
-    "code": "12345",
+    "name": "SportzX",
+    "desc": "100+ ücretsiz canlı spor kanalı. Futbol, kriket, tenis, hokey. Reklamsız, HD kalite. M3U/IPTV desteği var.",
+    "code": "6840704",
+    "status": "ok",
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "Cricfy TV",
+    "desc": "Kriket ve futbol odaklı hafif uygulama. Özel M3U desteği, çoklu sunucu bağlantısı, reklamsız arayüz.",
+    "code": "8103377",
     "status": "warn",
     "platform": [
       "tv",
@@ -20,9 +35,9 @@
       "Mobil"
     ],
     "type": "Canlı",
-    "name": "Live NetTV",
-    "desc": "Yüzlerce canlı spor kanalına anında erişim sağlayan ücretsiz platform.",
-    "code": "84521",
+    "name": "Sportzfy TV",
+    "desc": "Premier League, Serie A, Champions League ve FIFA 2026 canlı yayınları. Xtream Codes API desteği.",
+    "code": "730116",
     "status": "ok",
     "platform": [
       "tv",
@@ -31,27 +46,108 @@
   },
   {
     "app": [
-      "Android TV"
+      "Android TV",
+      "Mobil"
     ],
     "type": "Canlı",
-    "name": "RedBox TV",
-    "desc": "Farklı ülkelerin spor kanallarını barındıran, sade arayüzlü yayın uygulaması.",
-    "code": "93817",
-    "status": "ok",
+    "name": "AK47 Sports",
+    "desc": "Futbol, dart, kriket, tenis ve PPV etkinlikleri ücretsiz. Reklam yok. M3U playlist ve Xtream Codes desteği.",
+    "code": "4564006",
+    "status": "warn",
     "platform": [
-      "tv"
+      "tv",
+      "mobile"
     ]
   },
   {
     "app": [
+      "Android TV",
       "Mobil"
     ],
     "type": "Canlı",
-    "name": "NavixSport",
-    "desc": "Özellikle futbol ve basketbol maçlarını canlı takip edebileceğiniz mobil odaklı uygulama.",
-    "code": "44102",
+    "name": "Volta TV (Voltra)",
+    "desc": "Binlerce canlı kanal, dizi, film ve canlı spor etkinlikleri. AFL, MLB, NBA ve dünya kupası yayınları.",
+    "code": "730116",
     "status": "ok",
     "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "TFlix",
+    "desc": "Spor ağırlıklı canlı yayın uygulaması. FireStick ve Android TV uyumlu. Geniş kanal arşivi.",
+    "code": "4020823",
+    "status": "ok",
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "PlayFy TV",
+    "desc": "Reklamsız spor yayın uygulaması. 1080p/720p/480p ayarlanabilir. Futbol, kriket, WWE ve MotoGP.",
+    "code": "8415232",
+    "status": "warn",
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "MaxLiv TV",
+    "desc": "Yeni nesil ücretsiz spor uygulaması. Futbol, kriket, boks, tenis. Tamamen reklamsız. Alçak kalite modu mevcut.",
+    "code": "730116",
+    "status": "ok",
+    "isNew": true,
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "MagLink TV",
+    "desc": "Canlı spor ve TV kanalları için güçlü link toplayıcı. Android TV uyumlu, hızlı yükleme süresi.",
+    "code": "9606654",
+    "status": "ok",
+    "isNew": true,
+    "platform": [
+      "tv",
+      "mobile"
+    ]
+  },
+  {
+    "app": [
+      "Android TV",
+      "Mobil"
+    ],
+    "type": "Canlı",
+    "name": "Crexify TV",
+    "desc": "Kriket, futbol ve canlı spor yayınları için optimize edilmiş uygulama. Çoklu kalite seçeneği, reklamsız arayüz.",
+    "code": "8508442",
+    "status": "ok",
+    "platform": [
+      "tv",
       "mobile"
     ]
   }
