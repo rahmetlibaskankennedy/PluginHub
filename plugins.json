@@ -226,7 +226,7 @@
     "type": "Repo",
     "name": "Yoru's Repo",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/yoruix/nuvio-providers/refs/heads/main/manifest.json",
-    "isNew": true,
+    "isNew": false,
     "installGuide": "nuvio",
     "debrid": "free",
     "platform": [
@@ -399,7 +399,7 @@
     "type": "Repo",
     "name": "D3adlyRocket",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/D3adlyRocket/All-in-One-Nuvio/refs/heads/main/manifest.json",
-    "isNew": true,
+    "isNew": false,
     "installGuide": "nuvio",
     "debrid": "free",
     "platform": [
