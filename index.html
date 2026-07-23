@@ -1125,7 +1125,7 @@ function closeMovieModal(e) {
     if (!e || e.target.id === 'movie-modal-overlay') {
         document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); 
         
-        // YENİ: Modal kapanınca videoyu durdur
+        // Modal kapanınca arkadaki videonun sesini/oynatmasını durdur
         const trailerEl = document.getElementById('movie-trailer');
         if(trailerEl) trailerEl.src = '';
     }
@@ -1154,15 +1154,12 @@ async function suggestRandomMovie() {
         
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
         
-        // --- 1. ADIM: FRAGMANI ÇEK ---
+        // --- 1. ADIM: FRAGMANI WORKER ÜZERİNDEN GÜVENLİ ÇEK ---
         let youtubeKey = null;
         try {
-            const TMDB_API_KEY = "e9e9d8da18ae29fc430845952232787c"; 
-            const vidRes = await fetch(`https://api.themoviedb.org/3/movie/${randomMovie.id}/videos?api_key=${TMDB_API_KEY}`);
-            
+            const vidRes = await fetch(`${REPORT_ENDPOINT}/tmdb-video?id=${randomMovie.id}`);
             if (vidRes.ok) {
                 const vidData = await vidRes.json();
-                // YouTube üzerinde olan ve resmi "Trailer" tipindeki videoyu bul
                 const trailer = vidData.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
                 if (trailer) youtubeKey = trailer.key;
             }
@@ -1176,12 +1173,10 @@ async function suggestRandomMovie() {
 
         // --- 2. ADIM: EKRANA BAS (FRAGMAN VEYA POSTER) ---
         if (youtubeKey && trailerEl) {
-            // Fragman bulunduysa: Posteri gizle, YouTube videosunu otomatik (autoplay) ve sessiz (mute) başlat
             posterEl.classList.add('hidden');
             trailerEl.src = `https://www.youtube.com/embed/${youtubeKey}?autoplay=1&mute=1&controls=1&loop=1&playlist=${youtubeKey}&modestbranding=1`;
             trailerEl.classList.remove('hidden');
         } else {
-            // Fragman bulunamadıysa standart posteri göster
             const FALLBACK_POSTER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750"><rect width="500" height="750" fill="%23151333"/><text x="50%" y="50%" fill="%238c89b4" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Poster Yok</text></svg>`);
             posterEl.onerror = () => { posterEl.onerror = null; posterEl.src = FALLBACK_POSTER; };
             posterEl.src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : FALLBACK_POSTER;
@@ -1207,11 +1202,10 @@ async function suggestRandomMovie() {
     }
 }
 
-// ARTIK WORKER YERİNE DOĞRUDAN TMDB API KULLANILIYOR
+// Popüler Filmleri Worker Üzerinden Güvenli Çekme Fonksiyonu
 async function fetchPopularMovies(page) {
-    const TMDB_API_KEY = "e9e9d8da18ae29fc430845952232787c"; 
-    const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=${page}`);
-    if (!res.ok) throw new Error(`TMDB API Hatası: ${res.status}`); 
+    const res = await fetch(`${REPORT_ENDPOINT}/tmdb-popular?page=${page}`);
+    if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); 
     return res.json();
 }
 </script>
