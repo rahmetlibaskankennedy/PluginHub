@@ -16,6 +16,7 @@
     <script>
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
         const NOTES_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev/notes';
+        const SYNC_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev/sync';
     </script>
 
     <style>
@@ -191,11 +192,11 @@
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     
     <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 24px;">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 25px;">
     </button>
       
     <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 21px;">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
     </button>
 
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
@@ -566,7 +567,7 @@ async function loadCategoryData(key) {
 
 function postLoadSetup() {
     computeNewestDate();
-    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code', 'year', 'genre', 'platform', 'studio'], threshold: 0.35 });
+    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code', 'genre', 'platform', 'studio', { name: 'year', getFn: (item) => (item.year !== undefined && item.year !== null) ? String(item.year) : '' }], threshold: 0.35 });
     buildTabs();
     buildFilterOptions();
     filterData();
@@ -987,6 +988,29 @@ function updateStarsUI(count) {
     const stars = document.getElementById('modal-rating').children;
     for (let i = 0; i < 5; i++) stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
 }
+async function reportCurrentPlugin() {
+    if (!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const btn = document.getElementById('report-btn');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Gönderiliyor...';
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item: key, name: currentModalItem.name, ownerId: getOwnerId() })
+        });
+        if (!res.ok) throw new Error();
+        showToast('🚩 Bildirim gönderildi, teşekkürler!');
+    } catch (err) {
+        showToast('Bildirim gönderilemedi.', true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+}
+
 function saveNoteFromTextarea() {
     if (!currentModalItem) return;
     const key = pluginKey(currentModalItem);
@@ -1096,6 +1120,23 @@ function toggleSearchModal() {
 }
 function handleExpandedSearch(v) { document.getElementById('searchInput').value = v; debouncedFilter(); }
 
+function exportFavorites() {
+    if (!favorites.length) { showToast('Favori listen boş.', true); return; }
+    const allItems = Object.values(cachedData).flat();
+    const lines = favorites.map(key => {
+        const item = allItems.find(p => pluginKey(p) === key);
+        if (!item) return key;
+        if (item.app) {
+            const link = item.code || extractUrl(item.desc) || item.sourceUrl || '';
+            return `${item.name} — ${link}`;
+        } else {
+            return `${item.name} (${item.year || ''})`;
+        }
+    });
+    copyToClipboard(lines.join('\n'), 'Favori bulunamadı.');
+    closeMenuModal();
+}
+
 function openMenuModal() {
     document.getElementById('menu-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     lockBodyScroll(); setTimeout(() => document.getElementById('menu-modal-box').classList.remove('translate-y-full'), 10);
@@ -1104,6 +1145,80 @@ function closeMenuModal(e) {
     if(e && e.target!==document.getElementById('menu-modal-overlay')) return;
     document.getElementById('menu-modal-box').classList.add('translate-y-full');
     setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+
+function openSyncModal() {
+    document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+    const codeInput = document.getElementById('sync-code-input');
+    if (codeInput) codeInput.value = localStorage.getItem('ph_sync_code') || '';
+}
+function closeSyncModal() {
+    document.getElementById('sync-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    unlockBodyScroll();
+}
+function closeSyncModalOnBackdrop(e) {
+    if (e.target.id === 'sync-modal-overlay') closeSyncModal();
+}
+
+function generateSyncCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+function getSyncPayload() {
+    return { favorites, userRatings, userNotes };
+}
+function applySyncPayload(data) {
+    if (!data) return;
+    favorites = Array.isArray(data.favorites) ? data.favorites : [];
+    userRatings = (data.userRatings && typeof data.userRatings === 'object') ? data.userRatings : {};
+    userNotes = (data.userNotes && typeof data.userNotes === 'object') ? data.userNotes : {};
+    localStorage.setItem('ph_favs', JSON.stringify(favorites));
+    localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
+    localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+}
+
+async function syncPush() {
+    const input = document.getElementById('sync-code-input');
+    let code = input.value.trim().toUpperCase();
+    if (!code) { code = generateSyncCode(); input.value = code; }
+    try {
+        const res = await fetch(SYNC_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, data: getSyncPayload() })
+        });
+        if (!res.ok) throw new Error();
+        localStorage.setItem('ph_sync_code', code);
+        showToast(`⬆️ Kaydedildi! Kod: ${code}`);
+    } catch (err) {
+        showToast('Senkronizasyon kaydedilemedi.', true);
+    }
+}
+
+async function syncPull() {
+    const input = document.getElementById('sync-code-input');
+    const code = input.value.trim().toUpperCase();
+    if (!code) { showToast('Lütfen bir kod girin.', true); return; }
+    try {
+        const res = await fetch(`${SYNC_ENDPOINT}?code=${encodeURIComponent(code)}`);
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        applySyncPayload(json.data || json);
+        localStorage.setItem('ph_sync_code', code);
+        showToast('⬇️ Veriler getirildi!');
+        filterData();
+        if (currentModalItem) {
+            const key = pluginKey(currentModalItem);
+            currentRatingDisplay = userRatings[key] || 0;
+            const ratingBox = document.getElementById('modal-rating');
+            if (ratingBox) updateStarsUI(currentRatingDisplay);
+            const noteBox = document.getElementById('modal-note-textarea');
+            if (noteBox) noteBox.value = userNotes[key] || '';
+        }
+    } catch (err) {
+        showToast('Kod bulunamadı veya getirilemedi.', true);
+    }
 }
 
 function closeMovieModal(e) { 
