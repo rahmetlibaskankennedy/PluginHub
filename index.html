@@ -45,14 +45,12 @@
 
         .hero-media-box { background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%); border-radius: 24px; border: 1px solid rgba(255, 42, 95, 0.2); position: relative; overflow: hidden; }
 
-        /* MOBİL DOCK GÜNCELLEMESİ (Esnek genişlik ve hizalama) */
         .stream-dock { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; justify-content: center; gap: clamp(6px, 2.5vw, 24px); box-shadow: 0 20px 40px rgba(0,0,0,0.8); z-index: 1000; white-space: nowrap; width: max-content; max-width: 95%; margin: 0 auto; }
         .dock-indicator { position: absolute; top: 10px; left: 0; width: 44px; height: 44px; background: var(--accent-pink); border-radius: 50%; filter: blur(12px); opacity: 0.35; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; pointer-events: none; }
         .dock-btn { position: relative; min-width: 44px; padding: 0 6px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 20px; transition: all 0.3s ease; cursor: pointer; z-index: 10; }
         .dock-btn:active { transform: scale(0.9); }
         .dock-btn.active { font-size: 24px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); color: #fff; }
-        
-        /* ÖZEL LOGO SINIFI */
+
         .dock-logo { height: 18px; width: auto; object-fit: contain; opacity: 0.5; transition: all 0.3s ease; }
         .dock-btn.active .dock-logo { opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)); transform: scale(1.15); }
 
@@ -136,7 +134,7 @@
 
 <main class="max-w-7xl mx-auto px-6 py-4">
     
-   <!-- ANA KATEGORİLER (Sadece Eklenti ve APK'lar var) -->
+   <!-- ANA KATEGORİLER -->
     <div class="flex gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
@@ -144,7 +142,7 @@
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
     </div>
 
-    <!-- HERO FEATURED MEDIA (Mobil Şablon Bozulması Düzeltildi) -->
+    <!-- HERO FEATURED MEDIA -->
     <div class="hero-media-box p-6 md:p-8 mb-8 transition-all" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="max-w-xl w-full">
@@ -187,19 +185,19 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- MOBİL DOCK NAVIGATION (GÜNCELLENDİ) -->
+<!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
     <div class="dock-indicator" id="dockIndicator"></div>
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     
     <!-- YENİ: Dolby Atmos Butonu (Resim Eklendi) -->
     <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 23px;">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 25px;">
     </button>
       
     <!-- YENİ: IMAX Enhanced Butonu (Resim Eklendi) -->
     <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 21px;">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
     </button>
 
     <!-- Rastgele (Zar) Butonu -->
@@ -642,10 +640,10 @@ function buildCardHTML(item) {
     if (isMovie) {
         if (viewMode === 'list') {
             return `
-                <div class="card-header flex items-center gap-3">
-                    ${item.rank ? `<div class="text-sm font-black text-slate-500 w-6 text-center ${item.rank <= 3 ? 'text-amber-400 text-lg' : ''}">${item.rank}</div>` : ''}
-                    <div>
-                        <h3 class="font-bold text-white text-sm">${escapeHtml(item.name)}</h3>
+                <div class="card-header flex items-center gap-3 flex-1 min-w-0">
+                    ${item.rank ? `<div class="text-sm font-black text-slate-500 w-6 shrink-0 text-center ${item.rank <= 3 ? 'text-amber-400 text-lg' : ''}">${item.rank}</div>` : ''}
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
                         <div class="text-[10px] text-slate-400">${item.year} · ${escapeHtml(item.genre || '')}</div>
                     </div>
                 </div>
@@ -656,11 +654,11 @@ function buildCardHTML(item) {
             `;
         }
         return `
-            <div class="card-header w-full flex items-start justify-between mb-4">
-                <div class="flex items-start gap-3">
-                    ${item.rank ? `<div class="text-lg font-black text-slate-500 w-8 text-center pt-1 ${item.rank <= 3 ? 'text-amber-400 text-2xl' : ''}">${item.rank}</div>` : ''}
-                    <div class="min-w-0">
-                        <h3 class="font-bold text-lg text-white mb-1 truncate">${escapeHtml(item.name)}</h3>
+            <div class="card-header w-full flex items-start justify-between mb-4 gap-2">
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                    ${item.rank ? `<div class="text-lg font-black text-slate-500 w-8 shrink-0 text-center pt-1 ${item.rank <= 3 ? 'text-amber-400 text-2xl' : ''}">${item.rank}</div>` : ''}
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-bold text-lg text-white mb-1 truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
                         <div class="text-xs text-slate-400 mb-2">${item.year}</div>
                         <div class="flex flex-wrap gap-2">
                             <span class="badge ${getGenreClass(item.genre)} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">${escapeHtml(item.genre)}</span>
@@ -701,10 +699,12 @@ function buildCardHTML(item) {
 
         if (viewMode === 'list') {
             return `
-                <div class="card-header">
-                    <div class="flex items-center gap-2 flex-wrap mb-1">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
-                    <h3 class="font-bold text-white truncate">${escapeHtml(item.name)}</h3>
-                    <span class="text-xs text-slate-400">${escapeHtml(item.type || '—')}</span>
+                <div class="card-header flex items-center gap-3 flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap mb-1 shrink-0">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
+                        <span class="text-xs text-slate-400 truncate block">${escapeHtml(item.type || '—')}</span>
+                    </div>
                 </div>
                 <div class="card-footer flex items-center gap-3">
                     <div class="flex gap-0.5 text-xs">${starsHTML}</div>
@@ -713,12 +713,12 @@ function buildCardHTML(item) {
             `;
         }
         return `
-            <div class="card-header w-full">
+            <div class="card-header w-full flex flex-col min-w-0">
                 <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-2 flex-wrap">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
                     ${favBtnHTML}
                 </div>
-                <h3 class="font-bold text-lg text-white mb-2 truncate">${escapeHtml(item.name)}</h3>
+                <h3 class="font-bold text-lg text-white mb-2 truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
                 <div class="flex items-center justify-between text-[12px] text-slate-300 mb-3">
                     <span>${escapeHtml(item.type || '—')}</span>
                 </div>
