@@ -1,0 +1,20 @@
+[
+  {
+    "app": ["Android TV"],
+    "type": "APK",
+    "name": "SmartTube",
+    "desc": "Reklamsız, SponsorBlock destekli açık kaynaklı YouTube istemcisi.",
+    "code": "79040",
+    "status": "ok",
+    "platform": ["tv"]
+  },
+  {
+    "app": ["Android TV"],
+    "type": "VOD",
+    "name": "Cinema HD",
+    "desc": "Yıllarca en çok tercih edilen film arşivi uygulaması. Kurulum: https://cinemahdapp.com/",
+    "code": "5726169",
+    "status": "dead",
+    "platform": ["tv"]
+  }
+]
