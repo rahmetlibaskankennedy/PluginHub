@@ -159,17 +159,13 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- FİLM ÖNER FAB -->
-<button id="movieFabBtn" onclick="suggestRandomMovie()" class="fixed bottom-[100px] right-6 md:bottom-10 md:right-10 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_10px_25px_rgba(37,99,235,0.6)] hover:bg-blue-500 hover:scale-110 transition-all z-[1500]" aria-label="Rastgele film öner">
-    🎲
-</button>
-
 <!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
     <div class="dock-indicator" id="dockIndicator"></div>
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     <button class="dock-btn" id="dock-search" aria-label="Arama" onclick="toggleSearchModal()">🔍</button>
-    <button class="dock-btn" id="dock-fav" aria-label="Favoriler" onclick="toggleFavFilter()">♡</button>
+    <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
+    
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
 
