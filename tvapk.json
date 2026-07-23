@@ -1,20 +1,249 @@
 [
   {
-    "app": ["Android TV"],
+    "app": [
+      "Android TV"
+    ],
     "type": "APK",
-    "name": "SmartTube",
-    "desc": "Reklamsız, SponsorBlock destekli açık kaynaklı YouTube istemcisi.",
-    "code": "79040",
+    "name": "Stremio",
+    "desc": "Tüm torrent ve streaming servislerini tek çatı altında toplayan modern medya merkezi. Eklenti desteği ile sınırsız içerik sunar. Kurulum: https://www.stremio.com/downloads",
+    "code": "71893",
     "status": "ok",
-    "platform": ["tv"]
+    "platform": [
+      "tv"
+    ]
   },
   {
-    "app": ["Android TV"],
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "CloudStream",
+    "desc": "Android tabanlı, reklam barındırmayan ve tamamen modüler dizi/film izleme uygulaması. Repolar ile özelleştirilebilir. Kurulum: https://github.com/recloudstream/cloudstream/releases",
+    "code": "7264432",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "APK",
+    "name": "Nuvio",
+    "desc": "Stremio benzeri, daha hafif ve hızlı bir alternatif. Özellikle TV box cihazlarında yüksek performans sergiler. Kurulum: https://github.com/tapframe/NuvioTV/releases",
+    "code": "9231168",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "APK",
+    "name": "SmartTube",
+    "desc": "Reklamsız, SponsorBlock destekli açık kaynaklı YouTube istemcisi. 4K/8K, HDR, 60fps desteği. Google hesabı gerekmez. Kurulum: https://github.com/yuliskov/SmartTube",
+    "code": "79040",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "APK",
+    "name": "WuPlay",
+    "desc": "Gizlilik odaklı, hesap gerektirmeyen Android TV streaming uygulaması. Stremio eklentileriyle uyumlu. Kurulum: github.com/wuplayapp/wuplay-releases",
+    "code": "5781040",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Netfly",
+    "desc": "Yerli ve yabancı içeriklere hızlı erişim sağlayan, kullanıcı dostu arayüze sahip popüler streaming uygulaması. Kurulum: https://netflyapp.com/",
+    "code": null,
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "FilmPlus",
+    "desc": "En popüler yerli ve yabancı yapımlara kolayca ulaşmanızı sağlayan kullanıcı dostu bir araç.",
+    "code": "52193",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Flix Vision",
+    "desc": "Zengin kütüphanesi ve sürekli güncellenen kaynakları ile kesintisiz izleme imkanı. VOD + canlı kanal desteği.",
+    "code": "8799666",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Viva TV",
+    "desc": "Geniş içerik yelpazesi ve farklı sunucu seçenekleri ile donatılmış popüler medya izleme aracı.",
+    "code": "82927",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Nova TV",
+    "desc": "Yüksek çözünürlüklü içerikleri ve stabiliteyi ön planda tutan modern streaming aracı.",
+    "code": "70064",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "SStream",
+    "desc": "Hızlı ve akıcı arayüzü ile yerli/yabancı dizi ve filmleri kolayca izlemenizi sağlar.",
+    "code": "959386",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Ocean Streamz",
+    "desc": "Birden fazla kaynaktan veri çekerek her zaman çalışan linkler sunan güvenilir alternatif.",
+    "code": "99317",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Flixoid",
+    "desc": "Cinema HD tabanlı fork, hızlı ve güvenli streaming deneyimi. Düzenli güncellemeler alıyor.",
+    "code": "529057",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "NetMirror",
+    "desc": "Film, dizi ve spor içerikleri için popüler alternatif streaming uygulaması.",
+    "code": "6166931",
+    "status": "ok",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "Tea TV",
+    "desc": "Geniş VOD arşivi ve M3U desteğiyle köklü streaming platformu. Uyarı: Yükleme her zaman başarılı olmayabilir.",
+    "code": "9829464",
+    "status": "warn",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "BeeTV",
+    "desc": "Eskiden en popüler uygulamalardan biriydi. Uyarı: Geliştirme yavaşladı, çöküyor olabilir. Alternatif öneririz.",
+    "code": "5671710",
+    "status": "warn",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
     "type": "VOD",
     "name": "Cinema HD",
-    "desc": "Yıllarca en çok tercih edilen film arşivi uygulaması. Kurulum: https://cinemahdapp.com/",
+    "desc": "Yıllarca en çok tercih edilen film arşivi uygulaması. Uyarı: Aktif geliştirme durdu. Alternatif: Cinema HQ (6989332).",
     "code": "5726169",
     "status": "dead",
-    "platform": ["tv"]
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "HDO Box",
+    "desc": "TV ekranları için tasarlanmış oto-oynatma özellikli uygulama. Uyarı: Güncellenmiyor, yeni cihazlarda çalışmıyor olabilir.",
+    "code": "3475826",
+    "status": "dead",
+    "platform": [
+      "tv"
+    ]
+  },
+  {
+    "app": [
+      "Android TV"
+    ],
+    "type": "VOD",
+    "name": "OnStream",
+    "desc": "Otomatik oynatma özelliğiyle minimalist izleme deneyimi sunan uygulama. Uyarı: Resmi APK dosyası şu an çalışmıyor.",
+    "code": "814529",
+    "status": "dead",
+    "platform": [
+      "tv"
+    ]
   }
 ]
