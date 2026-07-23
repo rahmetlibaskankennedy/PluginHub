@@ -156,6 +156,7 @@
         .star:hover { color: #ffb800; }
 
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
+        .tag-stremio { background: rgba(192, 132, 252, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
         .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
         .tag-debrid-required { background: rgba(255, 184, 0, 0.1); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
@@ -536,7 +537,10 @@ function showToast(msg, isError) {
     showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function pluginKey(p) { return `${p.app}|${p.name}`; }
+function pluginKey(p) {
+    const appStr = Array.isArray(p.app) ? p.app.join('-') : p.app;
+    return `${appStr}|${p.name}`; 
+}
 
 function extractUrl(desc) {
     const m = desc?.match(/(https?:\/\/[^\s]+)/);
@@ -635,13 +639,15 @@ async function reportCurrentPlugin() {
     btn.disabled = true;
     btn.textContent = '⏳ Gönderiliyor...';
 
+    const appStr = Array.isArray(currentModalItem.app) ? currentModalItem.app.join(', ') : currentModalItem.app;
+
     try {
         const res = await fetch(REPORT_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 pluginName: currentModalItem.name,
-                app: currentModalItem.app,
+                app: appStr,
                 type: currentModalItem.type || ''
             })
         });
@@ -728,12 +734,12 @@ function updateDailyFeatured() {
 
     const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const featured = plugins[daysSinceEpoch % plugins.length];
+    const appNames = Array.isArray(featured.app) ? featured.app.join(' & ') : featured.app;
 
     document.getElementById('heroTitle').textContent = featured.name;
-    document.getElementById('heroDesc').textContent = `${featured.app} platformu için günün seçilen ${featured.type || 'eklentisi'}.`;
+    document.getElementById('heroDesc').textContent = `${appNames} platformu için günün seçilen ${featured.type || 'eklentisi'}.`;
 
     const url = extractUrl(featured.desc);
-
     const heroInstallBtn = document.getElementById('hero-install-btn');
     const heroCopyBtn = document.getElementById('hero-copy-btn');
     const heroPlayBtn = document.getElementById('hero-play-btn');
@@ -741,7 +747,10 @@ function updateDailyFeatured() {
     heroInstallBtn.onclick = () => {
         if (url) {
             let installUrl = url;
-            if ((featured.installGuide || featured.app || '').toLowerCase() === 'stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
+            const apps = Array.isArray(featured.app) ? featured.app.map(a => a.toLowerCase()) : [(featured.app || '').toLowerCase()];
+            if (apps.includes('stremio') || (featured.installGuide || '').toLowerCase() === 'stremio') {
+                installUrl = url.replace(/^https?:\/\//i, 'stremio://');
+            }
             window.location.href = installUrl;
             showToast(`🚀 ${featured.name} kurulumu başlatılıyor...`);
         } else {
@@ -750,7 +759,6 @@ function updateDailyFeatured() {
     };
 
     heroCopyBtn.onclick = () => copyToClipboard(url, 'Kopyalanacak bağlantı yok.');
-
     heroPlayBtn.onclick = heroInstallBtn.onclick;
 }
 
@@ -795,7 +803,7 @@ function toggleFavFilter() {
     filterData();
 }
 
-// KART RENDER FONKSİYONU (tarihe göre YENİ rozeti: en yeni dateAdded, üzerine yenisi eklenene kadar kalır)
+// KART RENDER FONKSİYONU
 function renderCards(data) {
     const grid = document.getElementById('resultsGrid');
     const count = document.getElementById('resultCount');
@@ -825,13 +833,19 @@ function renderCards(data) {
         const debridLabel = debridLabels[item.debrid] || '';
         const platformIconsHTML = (item.platform || []).map(p => platformIcons[p] || '').join(' ');
 
+        const appArray = Array.isArray(item.app) ? item.app : [item.app];
+        const appBadgesHTML = appArray.map(appName => {
+            const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
+            return `<span class="${badgeClass} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(appName)}</span>`;
+        }).join('');
+
         const card = document.createElement('div');
         card.className = 'stream-card p-5 flex flex-col justify-between cursor-pointer';
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <span class="tag-nuvio px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(item.app)}</span>
+                        ${appBadgesHTML}
                         ${newBadgeHTML}
                     </div>
                     <button class="w-11 h-11 flex items-center justify-center text-slate-500 hover:text-pink-500 active:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')" aria-label="Favorilere ekle/çıkar">${isFav ? '❤️' : '♡'}</button>
@@ -861,7 +875,6 @@ function toggleFav(key) {
     filterData();
 }
 
-// En yeni dateAdded değerini bul (ISO "YYYY-MM-DD" formatı doğrudan karşılaştırılabilir)
 function computeNewestDate() {
     newestDate = null;
     plugins.forEach(p => {
@@ -886,17 +899,14 @@ function sortPool(pool) {
 
 function filterData() {
     let pool = plugins;
-
     const q = document.getElementById('searchInput').value.trim();
     if (q && fuseIndex) {
         pool = fuseIndex.search(q).map(r => r.item);
     }
-
     if (activeTypeFilter !== 'all') pool = pool.filter(p => p.type === activeTypeFilter);
     if (activeDebridFilter !== 'all') pool = pool.filter(p => p.debrid === activeDebridFilter);
     if (activePlatformFilter !== 'all') pool = pool.filter(p => Array.isArray(p.platform) && p.platform.includes(activePlatformFilter));
     if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
-
     renderCards(sortPool(pool));
 }
 
@@ -994,7 +1004,14 @@ function openModalItem(item) {
 
     const debridTagMap = { free: '🆓 ÜCRETSİZ', optional: '🔓 DEBRID OPSİYONEL', required: '⚡ DEBRID GEREKLİ' };
     const tagsContainer = document.getElementById('modal-tags');
-    let tagsHTML = `<span class="tag-nuvio px-3 py-1.5 rounded-md uppercase">${escapeHtml(item.app)}</span>`;
+    let tagsHTML = '';
+    
+    const appArray = Array.isArray(item.app) ? item.app : [item.app];
+    appArray.forEach(appName => {
+        const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
+        tagsHTML += `<span class="${badgeClass} px-3 py-1.5 rounded-md uppercase">${escapeHtml(appName)}</span>`;
+    });
+
     tagsHTML += `<span class="${item.debrid === 'required' ? 'tag-debrid-required' : 'tag-free'} px-3 py-1.5 rounded-md flex items-center gap-1">${debridTagMap[item.debrid] || '🆓 ÜCRETSİZ'}</span>`;
     tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${escapeHtml(item.type || '')}</span>`;
     tagsContainer.innerHTML = tagsHTML;
@@ -1016,9 +1033,10 @@ function openModalItem(item) {
 
     const nuvioGuide = document.getElementById('modal-nuvio-guide');
     const stremioGuide = document.getElementById('modal-stremio-guide');
-    const guide = item.installGuide || (item.app || '').toLowerCase();
-    nuvioGuide.classList.toggle('hidden', guide !== 'nuvio');
-    stremioGuide.classList.toggle('hidden', guide !== 'stremio');
+    const appsLower = appArray.map(a => a.toLowerCase());
+    
+    nuvioGuide.classList.toggle('hidden', !appsLower.includes('nuvio'));
+    stremioGuide.classList.toggle('hidden', !appsLower.includes('stremio'));
 
     const savedRating = userRatings[pKey] || 0;
     currentRatingDisplay = savedRating;
@@ -1080,10 +1098,7 @@ function closeMovieModal(e) {
     }
 }
 
-const dummyPlugins = [
-    { app: "Nuvio", type: "4K", name: "WebStreamr", desc: "Bağlantı Linki: https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure", dateAdded: "2026-07-10", installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile"] },
-    { app: "Nuvio", type: "Altyazı", name: "OpenSubtitles", desc: "Bağlantı Linki: https://opensubtitles-v3.strem.io/manifest.json", dateAdded: "2026-07-22", installGuide: "nuvio", debrid: "free", platform: ["tv", "mobile", "web"] }
-];
+const dummyPlugins = [];
 
 buildFilterOptions();
 updateFilterBadge();
@@ -1109,17 +1124,15 @@ fetch('plugins.json')
         buildTabs();
         filterData();
         updateDailyFeatured();
-        showToast('Eklenti listesi yüklenemedi, örnek veriler gösteriliyor.', true);
+        showToast('Eklenti listesi yüklenemedi.', true);
     });
 
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 async function suggestRandomMovie() {
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
-
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
-
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
     try {
@@ -1127,19 +1140,16 @@ async function suggestRandomMovie() {
             fetchPopularMovies(randomPage),
             wait(900)
         ]);
-
         const movies = data.results || [];
         if (movies.length === 0) throw new Error('Film listesi boş döndü');
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
 
         loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
-
         document.getElementById('movie-title').textContent = randomMovie.title;
         document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
         document.getElementById('movie-genre').textContent = "Popüler";
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Bu film için Türkçe özet bulunmuyor.";
-
         const posterPath = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
         document.getElementById('movie-poster').src = posterPath;
 
