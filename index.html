@@ -8,7 +8,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0a1f">
     <title>PluginHub — Streaming Media Portal</title>
-    <meta name="description" content="TCLTVTÜRK topluluğu için Stremio ve Nuvio eklenti rehberi.">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
@@ -16,6 +15,7 @@
 
     <script>
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
+        const NOTES_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev/notes';
     </script>
 
     <style>
@@ -26,7 +26,6 @@
             --border: rgba(255, 255, 255, 0.08);
             --accent-pink: #ff2a5f;
             --accent-purple: #6c5ce7;
-            --accent-yellow: #ffb800;
             --text-main: #ffffff;
             --text-muted: #8c89b4;
         }
@@ -65,11 +64,43 @@
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; padding: 6px; }
         .star:hover { color: #ffb800; }
 
+        /* Film & Platform CSS'leri */
+        .b-aksiyon{background:rgba(59,130,246,0.15);color:#93c5fd}
+        .b-bilimkurgu{background:rgba(139,92,246,0.15);color:#c4b5fd}
+        .b-macera{background:rgba(34,197,94,0.15);color:#86efac}
+        .b-savas{background:rgba(245,158,11,0.15);color:#fcd34d}
+        .b-korku{background:rgba(239,68,68,0.15);color:#fca5a5}
+        .b-dram{background:rgba(20,184,166,0.15);color:#5eead4}
+        .b-animasyon{background:rgba(236,72,153,0.15);color:#f9a8d4}
+        .b-muzik{background:rgba(148,163,184,0.15);color:#cbd5e1}
+        .b-gerilim{background:rgba(249,115,22,0.15);color:#fdba74}
+        .b-fantastik{background:rgba(217,70,239,0.15);color:#e879f9}
+        .b-tarih{background:rgba(161,98,7,0.15);color:#fde68a}
+        .b-suc{background:rgba(220,38,38,0.15);color:#fca5a5}
+        
+        .pt-prime{background:rgba(0,168,225,0.12);color:#38bdf8;border:1px solid rgba(0,168,225,0.25)}
+        .pt-netflix{background:rgba(229,9,20,0.12);color:#f87171;border:1px solid rgba(229,9,20,0.25)}
+        .pt-tvplus{background:rgba(96,165,250,0.12);color:#93c5fd;border:1px solid rgba(96,165,250,0.25)}
+        .pt-max{background:rgba(99,102,241,0.12);color:#a5b4fc;border:1px solid rgba(99,102,241,0.25)}
+        .pt-disney{background:rgba(37,99,235,0.12);color:#60a5fa;border:1px solid rgba(37,99,235,0.25)}
+        .pt-tod{background:rgba(20,184,166,0.12);color:#5eead4;border:1px solid rgba(20,184,166,0.25)}
+        .pt-mubi{background:rgba(255,199,0,0.12);color:#fde68a;border:1px solid rgba(255,199,0,0.25)}
+        .pt-bravia{background:rgba(245,158,11,0.12);color:#fcd34d;border:1px solid rgba(245,158,11,0.25)}
+        .pt-uhd{background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25)}
+        .pt-dijital{background:rgba(148,163,184,0.12);color:#cbd5e1;border:1px solid rgba(148,163,184,0.25)}
+
+        .st-marvel{background:rgba(237,29,36,0.14);color:#f87171;border:1px solid rgba(237,29,36,0.28)}
+        .st-sony{background:rgba(0,168,225,0.12);color:#38bdf8;border:1px solid rgba(0,168,225,0.25)}
+        .st-paramount{background:rgba(148,101,224,0.14);color:#c4b5fd;border:1px solid rgba(148,101,224,0.28)}
+
+        /* Genel Bileşenler */
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-stremio { background: rgba(192, 132, 252, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
-        .tag-free { background: rgba(220, 252, 231, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
-        .tag-debrid-required { background: rgba(255, 184, 0, 0.1); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
+        
+        .note-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+        .note-item.mine { border-color: rgba(59,130,246,0.35); }
+        .note-action-btn { font-size: 10px; font-weight: 700; background: none; border: none; cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: background 0.15s; }
 
         @keyframes pulse-bg { 0% { background-color: rgba(255, 255, 255, 0.05); } 50% { background-color: rgba(255, 255, 255, 0.1); } 100% { background-color: rgba(255, 255, 255, 0.05); } }
         .skeleton-box { animation: pulse-bg 1.5s infinite ease-in-out; border-radius: 8px; }
@@ -80,10 +111,6 @@
         #toast { position: fixed; top: calc(24px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--accent-pink); color: #fff; padding: 10px 24px; border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 9999; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 25px rgba(255, 42, 95, 0.4); max-width: 90vw; text-align: center; }
         #toast.show { transform: translateX(-50%) translateY(0); }
         #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
-
-        .sheet-handle { width: 40px; height: 5px; border-radius: 10px; background: rgba(255,255,255,0.15); margin: 0 auto 18px; }
-        .modal-close-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s; }
-        .modal-close-btn:active { background: rgba(255,255,255,0.08); }
 
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
     </style>
@@ -109,8 +136,8 @@
     <div class="flex gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('mobilapk', this)">📱 Telefon APK</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
+        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('atmos', this)">🎧 Dolby Atmos</button>
+        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('imax', this)">🎬 IMAX Enhanced</button>
     </div>
 
     <!-- HERO FEATURED MEDIA (Sadece Eklentilerde Görünür) -->
@@ -135,9 +162,8 @@
 
     <!-- ARAMA + GÖRÜNÜM DEĞİŞTİRİCİ + FİLTRELE -->
     <div class="flex gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 İçerik veya uygulama ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 İçerik, film veya uygulama ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
         
-        <!-- Izgara / Liste Değiştirici -->
         <button onclick="toggleViewMode()" id="viewToggleBtn" class="shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-slate-300 hover:text-white px-3 py-3 rounded-xl flex items-center justify-center transition" aria-label="Görünümü Değiştir">
             <svg id="viewIconGrid" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
             <svg id="viewIconList" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
@@ -169,32 +195,23 @@
 <!-- MENÜ MODALI -->
 <div id="menu-modal-overlay" onclick="closeMenuModal(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
     <div onclick="event.stopPropagation()" id="menu-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
-        <div class="sheet-handle md:hidden"></div>
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold text-white">Menü</h3>
-            <button onclick="closeMenuModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeMenuModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
         </div>
-
         <div class="flex flex-col gap-3">
-            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">🔄</span>
                 <div>
                     <div class="text-sm font-bold text-white">Senkronizasyon</div>
-                    <div class="text-xs text-slate-400">Verilerini cihazlar arası eşitle</div>
+                    <div class="text-xs text-slate-400">Kişisel verilerini eşitle</div>
                 </div>
             </button>
-            <button onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">📋</span>
                 <div>
-                    <div class="text-sm font-bold text-white">Favorileri Toplu Kopyala</div>
-                    <div class="text-xs text-slate-400">Tüm favori linklerini panoya yapıştır</div>
-                </div>
-            </button>
-            <button class="flex items-center gap-4 bg-rose-900/20 hover:bg-rose-900/40 active:bg-rose-900/40 p-4 rounded-xl transition text-left border border-rose-500/10 mt-2">
-                <span class="text-2xl">🚩</span>
-                <div>
-                    <div class="text-sm font-bold text-rose-400">Geri Bildirim</div>
-                    <div class="text-xs text-rose-500/70">Hata bildir veya öneride bulun</div>
+                    <div class="text-sm font-bold text-white">Favorileri Kopyala</div>
+                    <div class="text-xs text-slate-400">Favori linklerini panoya yapıştır</div>
                 </div>
             </button>
         </div>
@@ -206,31 +223,28 @@
     <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
         <div class="flex justify-between items-center mb-2">
             <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
-            <button onclick="toggleSearchModal()" class="modal-close-btn text-slate-400 hover:text-white text-3xl leading-none" aria-label="Kapat">&times;</button>
+            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
         </div>
         <div class="relative">
-            <input type="text" id="expandedSearchInput" placeholder="İçerik ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
+            <input type="text" id="expandedSearchInput" placeholder="Arama yap..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none font-black" oninput="handleExpandedSearch(this.value)">
             <span class="absolute right-2 top-1/2 -translate-y-1/2 text-3xl opacity-50">🔍</span>
         </div>
-        <p class="text-xs text-slate-500 mt-2">Arama sonuçları arka planda anlık olarak listelenir. Kapatmak için çarpıya veya dışarı tıklayın.</p>
     </div>
 </div>
 
 <!-- FİLTRELE & SIRALA MODALI -->
 <div id="filter-modal-overlay" onclick="closeFilterModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div onclick="event.stopPropagation()" id="filter-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 max-h-[85vh] overflow-y-auto shadow-2xl">
-        <div class="sheet-handle md:hidden"></div>
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg font-bold text-white">Filtrele & Sırala</h3>
-            <button onclick="closeFilterModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeFilterModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
         </div>
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sıralama</label>
             <select id="sortSelect" onchange="setSort(this.value)" class="w-full min-h-[44px] bg-[#1a173d] border border-white/10 text-white text-sm p-3.5 rounded-xl outline-none">
-                <option value="default">Varsayılan</option>
+                <option value="default">Varsayılan (Sıra/Önem)</option>
                 <option value="name-asc">İsme Göre (A-Z)</option>
-                <option value="newest">Yeni Eklenenler Önce</option>
-                <option value="debrid-free">Ücretsiz Önce</option>
+                <option value="newest">En Yeni Yıl / Eklenen</option>
             </select>
         </div>
         <div class="mb-6" id="debridFilterWrapper">
@@ -238,84 +252,85 @@
             <div class="flex flex-wrap gap-2" id="debridFilterGroup"></div>
         </div>
         <div class="mb-8">
-            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Platform</label>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Platform/Cihaz</label>
             <div class="flex flex-wrap gap-2" id="platformFilterGroup"></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
-            <button onclick="applyFilters()" class="min-h-[46px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Uygula</button>
+            <button onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
+            <button onclick="applyFilters()" class="min-h-[46px] bg-pink-600 hover:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Uygula</button>
         </div>
     </div>
 </div>
 
-<!-- DETAY MODAL -->
+<!-- DETAY MODALI (ORTAK: APK + FİLM) -->
 <div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
     <div id="modal-box" onclick="event.stopPropagation()">
         <div class="flex justify-between items-start mb-5">
             <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
-                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala" aria-label="Linki Kopyala">
+                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" id="modal-copy-icon" aria-label="Linki Kopyala">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                 </button>
-                <button onclick="closeModal()" class="modal-close-btn hover:text-white text-2xl leading-none transition" aria-label="Kapat">✕</button>
+                <button onclick="closeModal()" class="hover:text-white text-2xl leading-none transition">✕</button>
             </div>
         </div>
-        <h2 id="modal-title" class="text-3xl font-bold text-white mb-6"></h2>
         
-        <div class="mb-6">
-            <label id="modal-url-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
-            <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all shadow-inner text-center md:text-left"></div>
-            <div class="flex gap-3">
-                <button id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] hover:bg-[#2f3342] active:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
-                <button id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 hover:bg-blue-500 active:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">Kaynağa Git ↗</button>
+        <h2 id="modal-title" class="text-2xl font-bold text-white mb-2"></h2>
+        <div id="modal-subtitle" class="text-xs text-slate-400 mb-6 font-semibold"></div>
+
+        <!-- BÖLÜM 1: APK / EKLENTİ BİLGİLERİ -->
+        <div id="modal-apk-info" class="hidden">
+            <div class="mb-6">
+                <label id="modal-url-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
+                <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 text-center md:text-left"></div>
+                <div class="flex gap-3">
+                    <button id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] text-white font-semibold text-sm py-3 rounded-xl border border-white/5">Kopyala</button>
+                    <button id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 text-white font-semibold text-sm py-3 rounded-xl flex justify-center items-center gap-1">Kaynağa Git ↗</button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">PUANINIZ</label>
+                <div class="flex gap-1 text-2xl" id="modal-rating" onmouseleave="resetStarHover()">
+                    <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)">★</button>
+                    <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)">★</button>
+                    <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)">★</button>
+                    <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)">★</button>
+                    <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)">★</button>
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM (SADECE SİZ GÖRÜRSÜNÜZ)</label>
+                <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 resize-y mb-4" placeholder="Kişisel bir not bırak..."></textarea>
+                <div class="flex gap-3">
+                    <button onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl border border-white/5">Notu Kaydet</button>
+                    <button onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2">🚩 Bildir</button>
+                </div>
             </div>
         </div>
 
-        <div class="mb-6">
-            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">PUANINIZ</label>
-            <div class="flex gap-1 text-2xl" id="modal-rating" onmouseleave="resetStarHover()">
-                <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)" aria-label="1 yıldız">★</button>
-                <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)" aria-label="2 yıldız">★</button>
-                <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)" aria-label="3 yıldız">★</button>
-                <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)" aria-label="4 yıldız">★</button>
-                <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)" aria-label="5 yıldız">★</button>
-            </div>
-        </div>
-        <div class="mb-8">
-            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
-            <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu içerik hakkında bir not bırak..."></textarea>
-            <div class="flex gap-3">
-                <button onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">Notu Kaydet</button>
-                <button onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 hover:bg-rose-600/20 active:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">🚩 Bildir</button>
+        <!-- BÖLÜM 2: FİLM BİLGİLERİ & HERKESE AÇIK NOTLAR -->
+        <div id="modal-movie-info" class="hidden">
+            <div id="modal-movie-hint" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-4 py-3 rounded-xl italic mb-6 hidden"></div>
+            
+            <div class="border-t border-white/10 pt-5">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">💬 Herkese Açık Notlar <span id="modal-public-note-count" class="text-blue-400"></span></p>
+                
+                <div id="public-notes-list" class="flex flex-col gap-2 max-h-[30vh] overflow-y-auto pr-2 mb-4">
+                    <div class="text-xs text-slate-500">Yükleniyor...</div>
+                </div>
+                
+                <div class="mt-4">
+                    <textarea id="public-note-input" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 resize-y min-h-[70px]" placeholder="Bu film hakkında herkese açık bir not bırak (örn: Hangi sahnede bas çok iyi?)" maxlength="300"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-[10px] text-slate-500" id="public-char-count">0/300</span>
+                        <button id="submit-public-note-btn" onclick="submitPublicNote()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition">Notu Paylaş</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="modal-stremio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
-            <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</h3>
-            <ul class="text-sm text-slate-300 space-y-4">
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span><b>Hızlı Kurulum</b> butonuna tıklayın — Stremio yüklüyse otomatik açılır.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Otomatik açılmazsa <b>Kopyala</b> ile manifest linkini kopyalayın.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Stremio içinde <b>Eklentiler</b> sekmesine gidip arama kutusuna linki yapıştırın.</span></li>
-            </ul>
-        </div>
-        <div id="modal-nuvio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
-            <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</h3>
-            <ul class="text-sm text-slate-300 space-y-4">
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
-            </ul>
-        </div>
-        <div id="modal-downloader-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
-            <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📥 TV'ye Nasıl Kurulur? (Downloader)</h3>
-            <ul class="text-sm text-slate-300 space-y-4">
-                <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>TV'nizin mağazasından <b>Downloader</b> uygulamasını indirin.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Arama çubuğuna yukarıdaki <b class="text-emerald-400">Kodu</b> yazıp Go tuşuna basın.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>İndirme bittikten sonra "Yükle" diyerek işlemi tamamlayın.</span></li>
-            </ul>
-        </div>
     </div>
 </div>
 
@@ -324,45 +339,15 @@
     <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-white">Verilerini Senkronize Et</h3>
-            <button onclick="closeSyncModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
         </div>
-        <p class="text-xs text-slate-400 mb-4">Favori, puan ve notların bu cihaza özel kaydedilir. Başka bir cihazdan erişmek için bir kod oluştur ya da mevcut kodunu gir.</p>
+        <p class="text-xs text-slate-400 mb-4">Favori ve kişisel notların bu cihaza özel kaydedilir. Başka bir cihazdan erişmek için kod oluştur.</p>
         <div class="flex gap-2 mb-3">
             <input id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 min-h-[44px] bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest">
         </div>
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="syncPush()" class="min-h-[46px] bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Kaydet</button>
-            <button onclick="syncPull()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Getir</button>
-        </div>
-    </div>
-</div>
-
-<!-- ZAR VE FİLM MODALI -->
-<div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-    <div class="text-7xl rolling-dice mb-6">🎲</div>
-    <p class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
-</div>
-
-<div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-    <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative">
-        <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
-        <div class="md:w-5/12 relative shrink-0">
-            <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-56 sm:h-64 md:h-full md:absolute md:inset-0 object-cover">
-            <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5 z-10">
-                <span class="text-lg leading-none">★</span>
-                <span id="movie-imdb"></span>
-            </div>
-        </div>
-        <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
-            <div class="mb-3 flex items-center gap-2 flex-wrap mt-2 md:mt-0">
-                <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
-                <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-genre"></span>
-            </div>
-            <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
-            <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
-            <button onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
-                <span class="text-xl">🎲</span> Başka Bir Film Öner
-            </button>
+            <button onclick="syncPush()" class="min-h-[46px] bg-indigo-600 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Kaydet</button>
+            <button onclick="syncPull()" class="min-h-[46px] bg-slate-800 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Getir</button>
         </div>
     </div>
 </div>
@@ -373,11 +358,12 @@ const DATA_SOURCES = {
     'eklentiler': 'plugins.json',
     'tvapk': 'tvapk.json',
     'mobilapk': 'mobilapk.json',
-    'sporapk': 'sporapk.json'
+    'sporapk': 'sporapk.json',
+    'atmos': 'atmos.json',
+    'imax': 'imax.json'
 };
 const cachedData = {};
 let currentMainCategory = 'eklentiler';
-
 let plugins = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
 let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
@@ -395,6 +381,9 @@ let scrollLockCount = 0;
 let newestDate = null;
 let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
 
+// Public Notes State
+let publicNotesCache = {};
+
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -409,9 +398,23 @@ function showToast(msg, isError) {
     showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// Güçlendirilmiş Anahtar Fonksiyonu (Hem APK hem Filmler İçin)
 function pluginKey(p) {
-    const appStr = Array.isArray(p.app) ? p.app.join('-') : p.app;
-    return `${appStr}|${p.name}`; 
+    if (p.app) { 
+        const appStr = Array.isArray(p.app) ? p.app.join('-') : p.app;
+        return `${appStr}|${p.name}`;
+    } else {
+        return `movie|${p.name}|${p.year || ''}`;
+    }
+}
+
+function getOwnerId() {
+    let id = localStorage.getItem('ph_owner_id');
+    if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : 'oid-' + Math.random().toString(36).slice(2) + Date.now());
+        localStorage.setItem('ph_owner_id', id);
+    }
+    return id;
 }
 
 function extractUrl(desc) {
@@ -429,29 +432,13 @@ async function copyToClipboard(text, emptyMsg) {
     }
 }
 
-function exportFavorites() {
-    if(favorites.length === 0) { showToast('Favori listeniz boş.', true); return; }
-    let exportText = "Favori Linklerim:\n\n";
-    let foundCount = 0;
-    favorites.forEach(favKey => {
-        const p = plugins.find(pl => pluginKey(pl) === favKey);
-        if(p) {
-            const val = p.code || extractUrl(p.desc) || p.sourceUrl;
-            if(val) { exportText += `- ${p.name}: ${val}\n`; foundCount++; }
-        }
-    });
-    if(foundCount > 0) { copyToClipboard(exportText); showToast(`📋 ${foundCount} favori kopyalandı!`); } 
-    else { showToast('Kopyalanacak link bulunamadı.', true); }
-    closeMenuModal();
-}
-
 function lockBodyScroll() { scrollLockCount++; document.body.style.overflow = 'hidden'; }
 function unlockBodyScroll() { scrollLockCount = Math.max(0, scrollLockCount - 1); if (scrollLockCount === 0) document.body.style.overflow = ''; }
 function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); }; }
 const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
-// ÜST ANA KATEGORİ GEÇİŞLERİ (SPA)
+// SPA Kategori Geçişi
 async function switchMainCategory(key, btnEl) {
     document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
         b.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
@@ -462,82 +449,69 @@ async function switchMainCategory(key, btnEl) {
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
-    if(key !== 'eklentiler') {
-        document.getElementById('debridFilterWrapper').style.display = 'none';
-        document.getElementById('heroSection').style.display = 'none';
-    } else {
-        document.getElementById('debridFilterWrapper').style.display = 'block';
-        document.getElementById('heroSection').style.display = 'block';
-    }
+    const isMovie = (key === 'atmos' || key === 'imax');
+    
+    document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
+    document.getElementById('heroSection').style.display = (key === 'eklentiler') ? 'block' : 'none';
 
     await loadCategoryData(key);
 }
 
-// CACHE DESTEKLİ VERİ YÜKLEME
 async function loadCategoryData(key) {
     if (cachedData[key]) {
         plugins = cachedData[key];
         postLoadSetup();
         return;
     }
-
     renderSkeletons();
     try {
         const res = await fetch(DATA_SOURCES[key]);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        
         cachedData[key] = data;
         plugins = data;
         postLoadSetup();
     } catch (err) {
         showToast(key + ' verisi yüklenemedi.', true);
-        document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri yüklenemedi. İlgili .json dosyasının sunucuda olduğundan emin olun.</div>';
+        document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri yüklenemedi.</div>';
     }
 }
 
 function postLoadSetup() {
     computeNewestDate();
-    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code'], threshold: 0.4 });
+    // Arama motorunu güçlendiriyoruz
+    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code', 'year', 'genre', 'platform', 'studio'], threshold: 0.35 });
     buildTabs();
+    buildFilterOptions();
     filterData();
     if(currentMainCategory === 'eklentiler') updateDailyFeatured();
 }
 
-// DOCK YÖNETİMİ
+// ---------------- UI & DOCK ----------------
 function moveIndicator(activeEl) {
     const indicator = document.getElementById('dockIndicator');
-    if (indicator && activeEl) {
-        indicator.style.transform = `translateX(${activeEl.offsetLeft}px)`;
-    }
+    if (indicator && activeEl) indicator.style.transform = `translateX(${activeEl.offsetLeft}px)`;
 }
 function setActiveDock(id) {
     document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
     const el = document.getElementById(`dock-${id}`);
-    if (el) {
-        el.classList.add('active');
-        moveIndicator(el);
-    }
+    if (el) { el.classList.add('active'); moveIndicator(el); }
 }
 
-// EVENT DELEGATION INITIALIZATION
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const activeEl = document.querySelector('.dock-btn.active');
         if (activeEl) moveIndicator(activeEl);
     }, 100);
 
-    // Kart Etkileşimleri (Favori Tıklaması vs. Kart Tıklaması) - Madde 1 Çözümü
     const resultsGrid = document.getElementById('resultsGrid');
     resultsGrid.addEventListener('click', (e) => {
         const favBtn = e.target.closest('.fav-btn');
         if (favBtn) {
             e.stopPropagation();
-            const key = favBtn.dataset.key;
-            if (key) toggleFav(key);
+            if (favBtn.dataset.key) toggleFav(favBtn.dataset.key);
             return;
         }
-
         const card = e.target.closest('.stream-card');
         if (card && card.dataset.key) {
             const item = plugins.find(p => pluginKey(p) === card.dataset.key);
@@ -545,7 +519,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Alt Kategori Sekme Tıklaması - Madde 1 Çözümü
     const categoryTabs = document.getElementById('categoryTabs');
     categoryTabs.addEventListener('click', (e) => {
         const btn = e.target.closest('.pill-tab');
@@ -559,7 +532,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     loadCategoryData('eklentiler');
 });
-
 window.addEventListener('resize', () => {
     const activeEl = document.querySelector('.dock-btn.active');
     if (activeEl) moveIndicator(activeEl);
@@ -567,146 +539,9 @@ window.addEventListener('resize', () => {
 
 function goHome() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (showFavsOnly) {
-        showFavsOnly = false;
-        const favBtn = document.getElementById('favBtn');
-        favBtn.style.background = '';
-        favBtn.style.color = '';
-        filterData();
-    }
+    if (showFavsOnly) { showFavsOnly = false; filterData(); }
     setActiveDock('home');
 }
-
-function openMenuModal() {
-    const overlay = document.getElementById('menu-modal-overlay');
-    const box = document.getElementById('menu-modal-box');
-    overlay.classList.remove('opacity-0', 'pointer-events-none');
-    lockBodyScroll(); setActiveDock('menu');
-    setTimeout(() => box.classList.remove('translate-y-full'), 10);
-}
-function closeMenuModal(e) {
-    if (e && e.target !== document.getElementById('menu-modal-overlay')) return;
-    document.getElementById('menu-modal-box').classList.add('translate-y-full');
-    setActiveDock(showFavsOnly ? 'fav' : 'home');
-    setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
-}
-
-function saveNoteFromTextarea() {
-    if (!currentModalItem) return;
-    const key = pluginKey(currentModalItem);
-    const text = document.getElementById('modal-note-textarea').value.trim();
-    if (text === '') { delete userNotes[key]; showToast('📝 Not silindi.'); } 
-    else { userNotes[key] = text; showToast('📝 Not kaydedildi!'); }
-    localStorage.setItem('ph_notes', JSON.stringify(userNotes));
-}
-
-async function reportCurrentPlugin() {
-    if (!currentModalItem) return;
-    const btn = document.getElementById('report-btn');
-    const originalText = btn.textContent;
-    btn.disabled = true; btn.textContent = '⏳...';
-    const appStr = Array.isArray(currentModalItem.app) ? currentModalItem.app.join(', ') : currentModalItem.app;
-    try {
-        const res = await fetch(REPORT_ENDPOINT, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pluginName: currentModalItem.name, app: appStr, type: currentModalItem.type || '' })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showToast(`🚩 ${currentModalItem.name} başarıyla raporlandı!`);
-    } catch (err) {
-        showToast('Rapor gönderilemedi.', true);
-    } finally { btn.disabled = false; btn.textContent = originalText; }
-}
-
-function openSyncModal() {
-    document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
-    lockBodyScroll();
-    document.getElementById('sync-code-input').value = localStorage.getItem('ph_sync_code') || '';
-}
-function closeSyncModal() { document.getElementById('sync-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }
-function closeSyncModalOnBackdrop(e) { if (e.target.id === 'sync-modal-overlay') closeSyncModal(); }
-function getOrCreateSyncCode() {
-    let code = document.getElementById('sync-code-input').value.trim().toUpperCase();
-    if (!code) { code = Math.random().toString(36).substring(2, 8).toUpperCase(); document.getElementById('sync-code-input').value = code; }
-    return code;
-}
-async function syncPush() {
-    const code = getOrCreateSyncCode();
-    try {
-        const res = await fetch(`${REPORT_ENDPOINT}/sync`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, data: { favorites, userRatings, userNotes } })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        localStorage.setItem('ph_sync_code', code);
-        showToast(`✅ Verilerin "${code}" koduyla kaydedildi.`);
-        closeSyncModal();
-    } catch (err) { showToast('Senkronizasyon şu an kullanılamıyor.', true); }
-}
-async function syncPull() {
-    const code = document.getElementById('sync-code-input').value.trim().toUpperCase();
-    if (!code) { showToast('Lütfen bir kod girin.', true); return; }
-    try {
-        const res = await fetch(`${REPORT_ENDPOINT}/sync?code=${encodeURIComponent(code)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const payload = await res.json();
-        if (!payload || !payload.data) throw new Error('Kod bulunamadı');
-
-        favorites = payload.data.favorites || [];
-        userRatings = payload.data.userRatings || {};
-        userNotes = payload.data.userNotes || {};
-        localStorage.setItem('ph_favs', JSON.stringify(favorites));
-        localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
-        localStorage.setItem('ph_notes', JSON.stringify(userNotes));
-        localStorage.setItem('ph_sync_code', code);
-
-        filterData(); showToast('✅ Veriler bu cihaza aktarıldı.'); closeSyncModal();
-    } catch (err) { showToast('Kod bulunamadı veya sunucuya ulaşılamadı.', true); }
-}
-
-function updateDailyFeatured() {
-    if (!plugins || plugins.length === 0 || currentMainCategory !== 'eklentiler') return;
-    const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-    const featured = plugins[daysSinceEpoch % plugins.length];
-    const appNames = Array.isArray(featured.app) ? featured.app.join(' & ') : featured.app;
-    document.getElementById('heroTitle').textContent = featured.name;
-    document.getElementById('heroDesc').textContent = `${appNames} platformu için günün seçilen ${featured.type || 'eklentisi'}.`;
-    
-    const url = extractUrl(featured.desc);
-    document.getElementById('hero-install-btn').onclick = () => {
-        if (url) {
-            let installUrl = url;
-            const apps = Array.isArray(featured.app) ? featured.app.map(a => a.toLowerCase()) : [(featured.app || '').toLowerCase()];
-            if (apps.includes('stremio') || (featured.installGuide || '').toLowerCase() === 'stremio') installUrl = url.replace(/^https?:\/\//i, 'stremio://');
-            window.location.href = installUrl;
-            showToast(`🚀 ${featured.name} başlatılıyor...`);
-        } else { showToast('Kurulum linki bulunamadı.', true); }
-    };
-    document.getElementById('hero-copy-btn').onclick = () => copyToClipboard(url, 'Kopyalanacak bağlantı yok.');
-}
-
-function toggleSearchModal() {
-    const modal = document.getElementById('search-modal');
-    if (modal.classList.contains('opacity-0')) {
-        modal.classList.remove('opacity-0', 'pointer-events-none'); lockBodyScroll(); setActiveDock('search');
-        setTimeout(() => document.getElementById('expandedSearchInput').focus(), 100);
-    } else {
-        modal.classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); setActiveDock(showFavsOnly ? 'fav' : 'home');
-    }
-}
-function handleExpandedSearch(val) { document.getElementById('searchInput').value = val; debouncedFilter(); }
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        if (!document.getElementById('search-modal').classList.contains('opacity-0')) toggleSearchModal();
-        if (document.getElementById('modal-overlay').classList.contains('open')) closeModal();
-        if (!document.getElementById('sync-modal-overlay').classList.contains('opacity-0')) closeSyncModal();
-        if (!document.getElementById('menu-modal-overlay').classList.contains('opacity-0')) closeMenuModal();
-        if (!document.getElementById('filter-modal-overlay').classList.contains('opacity-0')) closeFilterModal();
-        closeMovieModal();
-    }
-});
-
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
     const favBtn = document.getElementById('favBtn');
@@ -715,129 +550,129 @@ function toggleFavFilter() {
     setActiveDock(showFavsOnly ? 'fav' : 'home');
     filterData();
 }
-
 function toggleViewMode() {
     viewMode = viewMode === 'grid' ? 'list' : 'grid';
     localStorage.setItem('ph_view_mode', viewMode);
-    applyViewModeUI();
-    filterData(); 
+    applyViewModeUI(); filterData(); 
 }
-
 function applyViewModeUI() {
     const gridIcon = document.getElementById('viewIconGrid');
     const listIcon = document.getElementById('viewIconList');
     const gridContainer = document.getElementById('resultsGrid');
-    
     if (viewMode === 'list') {
-        gridIcon.classList.add('hidden');
-        listIcon.classList.remove('hidden');
+        gridIcon.classList.add('hidden'); listIcon.classList.remove('hidden');
         gridContainer.className = 'grid grid-cols-1 gap-3';
     } else {
-        listIcon.classList.add('hidden');
-        gridIcon.classList.remove('hidden');
+        listIcon.classList.add('hidden'); gridIcon.classList.remove('hidden');
         gridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
     }
 }
 
-function renderSkeletons() {
-    const grid = document.getElementById('resultsGrid');
-    grid.innerHTML = '';
-    applyViewModeUI();
-    
-    for(let i=0; i<6; i++) {
-        const card = document.createElement('div');
-        card.className = `stream-card p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} pointer-events-none`;
-        card.innerHTML = `
-            <div class="${viewMode === 'list' ? 'w-full flex items-center gap-4' : 'w-full'}">
-                <div class="skeleton-box w-16 h-6 mb-4 ${viewMode === 'list' ? 'mb-0' : ''}"></div>
-                <div class="skeleton-box w-3/4 h-6 mb-2 ${viewMode === 'list' ? 'mb-0 flex-1' : ''}"></div>
-                ${viewMode === 'grid' ? '<div class="skeleton-box w-full h-4 mb-6"></div>' : ''}
-            </div>
-        `;
-        grid.appendChild(card);
-    }
-}
+// ---------------- KART RENDER SİSTEMİ ----------------
+const genreClasses = {"Aksiyon":"b-aksiyon","Bilim Kurgu":"b-bilimkurgu","Macera":"b-macera","Savaş":"b-savas","Korku":"b-korku","Dram":"b-dram","Animasyon":"b-animasyon","Müzik":"b-muzik","Gerilim":"b-gerilim","Fantastik":"b-fantastik","Tarih":"b-tarih","Suç":"b-suc"};
+const platClasses = {"Prime":"pt-prime","Netflix":"pt-netflix","TV+":"pt-tvplus","Max":"pt-max","Disney+":"pt-disney","TOD":"pt-tod","MUBI":"pt-mubi","Bravia":"pt-bravia","UHD":"pt-uhd","Dijital":"pt-dijital"};
+const studioClasses = {"marvel":"st-marvel","sony":"st-sony","paramount":"st-paramount"};
 
-// BİRLEŞTİRİLMİŞ KART RENDER FONKSİYONU - Madde 5 Çözümü
+function getGenreClass(g) { return genreClasses[g] || 'bg-slate-700 text-slate-300'; }
+function getPlatformClass(p) { return platClasses[p] || 'bg-slate-800 text-slate-400 border border-slate-600'; }
+function getStudioClass(s) { return studioClasses[s] || 'bg-slate-800 text-slate-400'; }
+
 function buildCardHTML(item) {
     const itemKey = pluginKey(item);
     const isFav = favorites.includes(itemKey);
-    const userRating = userRatings[itemKey] || 0;
-    
-    const debridLabels = { free: '🆓 Ücretsiz', optional: '🔓 Debrid Opsiyonel', required: '⚡ Debrid Gerekli' };
-    const platformIcons = { tv: '📺', mobile: '📱', web: '💻' };
+    const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
+    const favBtnHTML = `<button class="fav-btn w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}">${isFav ? '❤️' : '♡'}</button>`;
 
-    let starsHTML = '';
-    for (let i = 1; i <= 5; i++) {
-        starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
-    }
-
-    const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
-    const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">YENİ</span>` : '';
-    const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-black tracking-widest shadow-[0_0_10px_rgba(16,185,129,0.2)]">KOD: ${item.code}</span>` : '';
-    const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">ÇALIŞMIYOR</span>` : '';
-
-    const appArray = Array.isArray(item.app) ? item.app : [item.app];
-    const appBadgesHTML = appArray.map(appName => {
-        const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
-        return `<span class="${badgeClass} px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">${escapeHtml(appName)}</span>`;
-    }).join('');
-
-    const favButtonHTML = `<button class="fav-btn w-9 h-9 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}" aria-label="Favori">${isFav ? '❤️' : '♡'}</button>`;
-
-    if (viewMode === 'list') {
-        // Liste Görünümü (Madde 2 ve Madde 5 Kapsamında Yıldız Eklendi)
-        return `
-            <div class="card-header">
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                    ${appBadgesHTML}
-                    ${codeBadgeHTML}
-                    ${deadBadgeHTML}
-                    ${newBadgeHTML}
+    if (isMovie) {
+        // --- FİLM KARTI ---
+        if (viewMode === 'list') {
+            return `
+                <div class="card-header flex items-center gap-3">
+                    ${item.rank ? `<div class="text-sm font-black text-slate-500 w-6 text-center ${item.rank <= 3 ? 'text-amber-400 text-lg' : ''}">${item.rank}</div>` : ''}
+                    <div>
+                        <h3 class="font-bold text-white text-sm">${escapeHtml(item.name)}</h3>
+                        <div class="text-[10px] text-slate-400">${item.year} · ${escapeHtml(item.genre || '')}</div>
+                    </div>
                 </div>
-                <h3 class="font-bold text-white">${escapeHtml(item.name)}</h3>
-                <span class="text-xs text-slate-400">${escapeHtml(item.type || '—')}</span>
+                <div class="card-footer flex items-center gap-3">
+                    <div class="flex gap-1">${(item.platform || []).map(p => `<span class="platform-tag ${getPlatformClass(p)} px-1.5 py-0.5 rounded text-[9px] font-bold">${escapeHtml(p)}</span>`).join('')}</div>
+                    ${favBtnHTML}
+                </div>
+            `;
+        }
+        return `
+            <div class="card-header w-full flex items-start justify-between mb-4">
+                <div class="flex items-start gap-3">
+                    ${item.rank ? `<div class="text-lg font-black text-slate-500 w-8 text-center pt-1 ${item.rank <= 3 ? 'text-amber-400 text-2xl' : ''}">${item.rank}</div>` : ''}
+                    <div>
+                        <h3 class="font-bold text-lg text-white mb-1">${escapeHtml(item.name)}</h3>
+                        <div class="text-xs text-slate-400 mb-2">${item.year}</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="badge ${getGenreClass(item.genre)} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">${escapeHtml(item.genre)}</span>
+                            ${item.studio ? `<span class="studio-tag ${getStudioClass(item.studio)} px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">${escapeHtml(item.studio)}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                ${favBtnHTML}
             </div>
-            <div class="card-footer flex items-center gap-3">
-                <div class="flex gap-0.5 text-xs md:text-sm" title="Puan: ${userRating}/5">${starsHTML}</div>
-                ${favButtonHTML}
+            ${item.hint ? `<div class="w-full text-xs italic bg-emerald-500/10 text-emerald-400 px-3 py-2 rounded-lg mb-4">💡 ${escapeHtml(item.hint)}</div>` : ''}
+            <div class="card-footer w-full mt-auto flex items-center justify-between border-t border-white/5 pt-3">
+                <div class="flex gap-1">${(item.platform || []).map(p => `<span class="platform-tag ${getPlatformClass(p)} px-2 py-1 rounded-md text-[10px] font-bold">${escapeHtml(p)}</span>`).join('')}</div>
+                <span class="text-xs font-bold text-blue-400 flex items-center gap-1">💬 Notlar</span>
+            </div>
+        `;
+    } else {
+        // --- APK / EKLENTİ KARTI ---
+        const userRating = userRatings[itemKey] || 0;
+        let starsHTML = '';
+        for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
+        
+        const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
+        const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider animate-pulse">YENİ</span>` : '';
+        const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-black">KOD: ${item.code}</span>` : '';
+        const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">ÇALIŞMIYOR</span>` : '';
+
+        const appArray = Array.isArray(item.app) ? item.app : [item.app];
+        const appBadgesHTML = appArray.map(a => `<span class="${a.toLowerCase()==='stremio'?'tag-stremio':'tag-nuvio'} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">${escapeHtml(a)}</span>`).join('');
+
+        if (viewMode === 'list') {
+            return `
+                <div class="card-header">
+                    <div class="flex items-center gap-2 flex-wrap mb-1">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
+                    <h3 class="font-bold text-white">${escapeHtml(item.name)}</h3>
+                    <span class="text-xs text-slate-400">${escapeHtml(item.type || '—')}</span>
+                </div>
+                <div class="card-footer flex items-center gap-3">
+                    <div class="flex gap-0.5 text-xs">${starsHTML}</div>
+                    ${favBtnHTML}
+                </div>
+            `;
+        }
+        return `
+            <div class="card-header w-full">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-2 flex-wrap">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
+                    ${favBtnHTML}
+                </div>
+                <h3 class="font-bold text-lg text-white mb-2">${escapeHtml(item.name)}</h3>
+                <div class="flex items-center justify-between text-[12px] text-slate-300 mb-3">
+                    <span>${escapeHtml(item.type || '—')}</span>
+                </div>
+                <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
+            </div>
+            <div class="card-footer w-full flex items-center justify-between mt-auto">
+                <div class="flex gap-1 text-lg">${starsHTML}</div>
+                <button class="bg-indigo-600/20 text-indigo-300 text-xs px-4 py-2 rounded-xl pointer-events-none">İncele</button>
             </div>
         `;
     }
-
-    // Izgara (Grid) Görünümü
-    return `
-        <div class="card-header w-full">
-            <div class="flex justify-between items-start mb-3 md:mb-4">
-                <div class="flex items-center gap-2 flex-wrap">
-                    ${appBadgesHTML}
-                    ${codeBadgeHTML}
-                    ${deadBadgeHTML}
-                    ${newBadgeHTML}
-                </div>
-                ${favButtonHTML}
-            </div>
-            <h3 class="font-bold text-lg md:text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
-            
-            <div class="flex items-center justify-between text-[12px] md:text-[13px] text-slate-300 mb-3">
-                <span>Türü: ${escapeHtml(item.type || '—')}</span>
-                <span class="text-sm opacity-80">${(item.platform || []).map(p => platformIcons[p] || '').join(' ')}</span>
-            </div>
-            <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mb-4 md:mb-6 border-b border-white/5 pb-4 md:pb-6">${currentMainCategory === 'eklentiler' ? (debridLabels[item.debrid] || '') : escapeHtml(item.desc || '')}</p>
-        </div>
-        
-        <div class="card-footer w-full flex items-center justify-between">
-            <div class="flex gap-1 text-base md:text-lg">${starsHTML}</div>
-            <button class="min-h-[40px] bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition pointer-events-none">İncele</button>
-        </div>
-    `;
 }
 
 function renderCards(data) {
     const grid = document.getElementById('resultsGrid');
     const count = document.getElementById('resultCount');
     grid.innerHTML = '';
-    count.textContent = `${data.length} İçerik Listeleniyor`;
+    count.textContent = `${data.length} İçerik Bulundu`;
     applyViewModeUI();
 
     if (data.length === 0) {
@@ -846,13 +681,20 @@ function renderCards(data) {
     }
 
     data.forEach(item => {
-        const itemKey = pluginKey(item);
         const card = document.createElement('div');
-        card.className = `stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col justify-between'} ${item.status === 'dead' ? 'opacity-60 grayscale' : ''}`;
-        card.dataset.key = itemKey; // Event delegation için veri anahtarı saklama
+        card.className = `stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} ${item.status === 'dead' ? 'opacity-60 grayscale' : ''}`;
+        card.dataset.key = pluginKey(item);
         card.innerHTML = buildCardHTML(item);
         grid.appendChild(card);
     });
+}
+
+function renderSkeletons() {
+    const grid = document.getElementById('resultsGrid');
+    grid.innerHTML = ''; applyViewModeUI();
+    for(let i=0; i<6; i++) {
+        grid.innerHTML += `<div class="stream-card p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} pointer-events-none"><div class="skeleton-box w-16 h-6 mb-4"></div><div class="skeleton-box w-3/4 h-6 mb-2"></div></div>`;
+    }
 }
 
 function toggleFav(key) {
@@ -863,43 +705,33 @@ function toggleFav(key) {
     filterData();
 }
 
+// ---------------- VERİ İŞLEME & FİLTRE ----------------
 function computeNewestDate() {
     newestDate = null;
     plugins.forEach(p => { if (p.dateAdded && (!newestDate || p.dateAdded > newestDate)) newestDate = p.dateAdded; });
 }
 
-function sortPool(pool) {
-    const arr = [...pool];
-    if (activeSort === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
-    else if (activeSort === 'newest') arr.sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || ''));
-    else if (activeSort === 'debrid-free') {
-        const rank = { free: 0, optional: 1, required: 2 };
-        arr.sort((a, b) => (rank[a.debrid] ?? 3) - (rank[b.debrid] ?? 3));
-    }
-    return arr;
-}
-
-function filterData() {
-    let pool = plugins;
-    const q = document.getElementById('searchInput').value.trim();
-    if (q && fuseIndex) pool = fuseIndex.search(q).map(r => r.item);
-    if (activeTypeFilter !== 'all') pool = pool.filter(p => p.type === activeTypeFilter);
-    if (activeDebridFilter !== 'all') pool = pool.filter(p => p.debrid === activeDebridFilter);
-    if (activePlatformFilter !== 'all') pool = pool.filter(p => Array.isArray(p.platform) && p.platform.includes(activePlatformFilter));
-    if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
-    renderCards(sortPool(pool));
+function buildTabs() {
+    const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
+    const container = document.getElementById('categoryTabs');
+    container.innerHTML = types.map((t, i) => `<button class="pill-tab ${i === 0 ? 'active' : ''}" data-type="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
 }
 
 function buildFilterOptions() {
-    const debridOptions = [ { v: 'all', l: 'Tümü' }, { v: 'free', l: '🆓 Ücretsiz' }, { v: 'optional', l: '🔓 Opsiyonel' }, { v: 'required', l: '⚡ Gerekli' } ];
-    document.getElementById('debridFilterGroup').innerHTML = debridOptions.map(o =>
-        `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`
-    ).join('');
+    const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
+    
+    // Debrid sadece eklentilerde
+    if (!isMovie) {
+        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Gerekli'}];
+        document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
+    }
 
-    const platformOptions = [ { v: 'all', l: 'Tümü' }, { v: 'mobile', l: '📱 Mobil' }, { v: 'tv', l: '📺 TV' }, { v: 'web', l: '💻 Web' } ];
-    document.getElementById('platformFilterGroup').innerHTML = platformOptions.map(o =>
-        `<button class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`
-    ).join('');
+    // Platformları dinamik alıyoruz
+    let allPlats = new Set();
+    plugins.forEach(p => { if(Array.isArray(p.platform)) p.platform.forEach(x => allPlats.add(x)); });
+    const pOpts = [{v:'all', l:'Tümü'}, ...Array.from(allPlats).map(p => ({v:p, l:p}))];
+    
+    document.getElementById('platformFilterGroup').innerHTML = pOpts.map(o => `<button class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${escapeHtml(o.v)}" onclick="selectChip(this)">${escapeHtml(o.l)}</button>`).join('');
 }
 
 function selectChip(el) {
@@ -909,113 +741,109 @@ function selectChip(el) {
     if (group === 'debrid') activeDebridFilter = el.dataset.value;
     if (group === 'platform') activePlatformFilter = el.dataset.value;
 }
-
 function setSort(v) { activeSort = v; }
 
-function updateFilterBadge() {
-    let count = 0;
-    if (activeDebridFilter !== 'all') count++;
-    if (activePlatformFilter !== 'all') count++;
-    if (activeSort !== 'default') count++;
-    const badge = document.getElementById('filterBadge');
-    badge.textContent = count;
-    badge.classList.toggle('hidden', count === 0);
-    badge.classList.toggle('flex', count > 0);
+function sortPool(pool) {
+    const arr = [...pool];
+    if (activeSort === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    else if (activeSort === 'newest') {
+        arr.sort((a, b) => {
+            if (a.dateAdded && b.dateAdded) return b.dateAdded.localeCompare(a.dateAdded);
+            if (a.year && b.year) return b.year - a.year;
+            return 0;
+        });
+    }
+    return arr;
 }
 
-function openFilterModal() {
-    const box = document.getElementById('filter-modal-box');
-    document.getElementById('sortSelect').value = activeSort;
-    buildFilterOptions();
-    document.getElementById('filter-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
-    lockBodyScroll(); setTimeout(() => box.classList.remove('translate-y-full'), 10);
+function filterData() {
+    let pool = plugins;
+    const q = document.getElementById('searchInput').value.trim();
+    if (q && fuseIndex) pool = fuseIndex.search(q).map(r => r.item);
+    if (activeTypeFilter !== 'all') pool = pool.filter(p => p.type === activeTypeFilter);
+    if (activeDebridFilter !== 'all' && currentMainCategory === 'eklentiler') pool = pool.filter(p => p.debrid === activeDebridFilter);
+    if (activePlatformFilter !== 'all') pool = pool.filter(p => Array.isArray(p.platform) && p.platform.includes(activePlatformFilter));
+    if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
+    renderCards(sortPool(pool));
 }
 
-function closeFilterModal() {
-    document.getElementById('filter-modal-box').classList.add('translate-y-full');
-    setTimeout(() => { document.getElementById('filter-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
-}
-function closeFilterModalOnBackdrop(e) { if (e.target.id === 'filter-modal-overlay') closeFilterModal(); }
-
-function applyFilters() {
-    localStorage.setItem('ph_sort', activeSort); localStorage.setItem('ph_debrid_filter', activeDebridFilter); localStorage.setItem('ph_platform_filter', activePlatformFilter);
-    updateFilterBadge(); closeFilterModal(); filterData();
-}
-
-function resetFilters() {
-    activeDebridFilter = 'all'; activePlatformFilter = 'all'; activeSort = 'default';
-    localStorage.setItem('ph_sort', 'default'); localStorage.setItem('ph_debrid_filter', 'all'); localStorage.setItem('ph_platform_filter', 'all');
-    document.getElementById('sortSelect').value = 'default';
-    buildFilterOptions(); updateFilterBadge(); filterData();
-}
-
+// ---------------- MODAL İŞLEMLERİ ----------------
 function openModalItem(item) {
     currentModalItem = item;
-    const pKey = pluginKey(item);
+    const key = pluginKey(item);
+    const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
+
     document.getElementById('modal-title').textContent = item.name;
+    document.getElementById('modal-tags').innerHTML = ''; // Temizle
+    document.getElementById('modal-copy-icon').style.display = isMovie ? 'none' : 'block';
 
-    const tagsContainer = document.getElementById('modal-tags');
-    let tagsHTML = '';
-    const appArray = Array.isArray(item.app) ? item.app : [item.app];
-    appArray.forEach(appName => {
-        const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
-        tagsHTML += `<span class="${badgeClass} px-3 py-1.5 rounded-md uppercase">${escapeHtml(appName)}</span>`;
-    });
-    
-    if(currentMainCategory === 'eklentiler') {
-        tagsHTML += `<span class="${item.debrid === 'required' ? 'tag-debrid-required' : 'tag-free'} px-3 py-1.5 rounded-md">${item.debrid === 'required' ? '⚡ Gerekli' : (item.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz')}</span>`;
-    } else if(item.status === 'dead') {
-        tagsHTML += `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-md uppercase">ÇALIŞMIYOR</span>`;
-    }
-    
-    tagsHTML += `<span class="tag-type px-3 py-1.5 rounded-md uppercase tracking-wider">🏷️ ${escapeHtml(item.type || '')}</span>`;
-    tagsContainer.innerHTML = tagsHTML;
+    if (isMovie) {
+        // --- FİLM MODALI ---
+        document.getElementById('modal-apk-info').classList.add('hidden');
+        document.getElementById('modal-movie-info').classList.remove('hidden');
+        
+        document.getElementById('modal-subtitle').textContent = `${item.year} · ${item.genre || ''}`;
+        
+        let tagsHTML = `<span class="badge ${getGenreClass(item.genre)} px-2 py-1 rounded">${escapeHtml(item.genre)}</span>`;
+        if(item.studio) tagsHTML += `<span class="studio-tag ${getStudioClass(item.studio)} px-2 py-1 rounded ml-2">${escapeHtml(item.studio)}</span>`;
+        document.getElementById('modal-tags').innerHTML = tagsHTML;
 
-    const code = item.code;
-    const manifestUrl = extractUrl(item.desc) || item.sourceUrl;
-    
-    const urlLabel = document.getElementById('modal-url-label');
-    const urlBox = document.getElementById('modal-url-box');
-    const copyBtn = document.getElementById('modal-copy-btn');
-    const goBtn = document.getElementById('modal-go-btn');
-    
-    if(code) {
-        urlLabel.textContent = "DOWNLOADER KODU";
-        urlBox.innerHTML = `<span class="text-emerald-400 text-3xl font-black">${code}</span>`;
-        copyBtn.onclick = () => copyToClipboard(code, 'Kopyalanacak kod yok.');
-        goBtn.style.display = 'none';
+        const hintEl = document.getElementById('modal-movie-hint');
+        if (item.hint) { hintEl.textContent = `💡 ${item.hint}`; hintEl.classList.remove('hidden'); } 
+        else { hintEl.classList.add('hidden'); }
+
+        // Cloudflare Public Notes Yükle
+        document.getElementById('public-note-input').value = '';
+        document.getElementById('public-char-count').textContent = '0/300';
+        document.getElementById('public-notes-list').innerHTML = `<div class="text-xs text-slate-500">Yükleniyor...</div>`;
+        
+        fetchPublicNotes(key);
+
     } else {
-        urlLabel.textContent = "BAĞLANTI";
-        urlBox.textContent = manifestUrl || item.desc || 'Bağlantı bulunamadı';
-        copyBtn.onclick = () => copyToClipboard(manifestUrl || item.desc, 'Kopyalanacak veri yok.');
-        goBtn.style.display = 'flex';
-        goBtn.onclick = () => {
-            if (manifestUrl && manifestUrl.startsWith('http')) window.open(manifestUrl, '_blank', 'noopener,noreferrer');
-            else showToast('Geçerli bir site bağlantısı bulunamadı.', true);
-        };
+        // --- APK MODALI ---
+        document.getElementById('modal-movie-info').classList.add('hidden');
+        document.getElementById('modal-apk-info').classList.remove('hidden');
+        
+        document.getElementById('modal-subtitle').textContent = item.type || 'Uygulama';
+
+        const code = item.code;
+        const urlBox = document.getElementById('modal-url-box');
+        const copyBtn = document.getElementById('modal-copy-btn');
+        const goBtn = document.getElementById('modal-go-btn');
+        const urlStr = extractUrl(item.desc) || item.sourceUrl;
+
+        if (code) {
+            document.getElementById('modal-url-label').textContent = "DOWNLOADER KODU";
+            urlBox.innerHTML = `<span class="text-emerald-400 text-3xl font-black">${code}</span>`;
+            copyBtn.onclick = () => copyToClipboard(code);
+            goBtn.style.display = 'none';
+        } else {
+            document.getElementById('modal-url-label').textContent = "BAĞLANTI";
+            urlBox.textContent = urlStr || 'Bağlantı bulunamadı';
+            copyBtn.onclick = () => copyToClipboard(urlStr);
+            goBtn.style.display = 'flex';
+            goBtn.onclick = () => { if(urlStr) window.open(urlStr, '_blank'); };
+        }
+
+        const savedRating = userRatings[key] || 0;
+        currentRatingDisplay = savedRating; updateStarsUI(savedRating);
+        document.getElementById('modal-note-textarea').value = userNotes[key] || '';
     }
 
-    const appsLower = appArray.map(a => a.toLowerCase());
-    const isAPK = currentMainCategory !== 'eklentiler';
-    
-    document.getElementById('modal-nuvio-guide').classList.toggle('hidden', isAPK || (!appsLower.includes('nuvio') && item.installGuide !== 'nuvio'));
-    document.getElementById('modal-stremio-guide').classList.toggle('hidden', isAPK || (!appsLower.includes('stremio') && item.installGuide !== 'stremio'));
-    
-    const downloaderGuide = document.getElementById('modal-downloader-guide');
-    if(downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
-
-    const savedRating = userRatings[pKey] || 0;
-    currentRatingDisplay = savedRating; updateStarsUI(savedRating);
-    document.getElementById('modal-note-textarea').value = userNotes[pKey] || '';
-
-    document.getElementById('modal-overlay').classList.add('open'); lockBodyScroll();
+    document.getElementById('modal-overlay').classList.add('open');
+    lockBodyScroll();
 }
 
-function copyCurrentLink() { copyToClipboard(document.getElementById('modal-url-box').innerText, 'Kopyalanacak veri yok.'); }
+function copyCurrentLink() {
+    const el = document.getElementById('modal-url-box');
+    if(el) copyToClipboard(el.innerText);
+}
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); unlockBodyScroll(); }
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-function hoverStars(index) { updateStarsUI(index, true); }
+// APK Kişisel Not & Puan
+function hoverStars(i) { updateStarsUI(i, true); }
 function resetStarHover() { updateStarsUI(currentRatingDisplay); }
 function ratePlugin(index) {
     if (!currentModalItem) return;
@@ -1027,46 +855,125 @@ function updateStarsUI(count) {
     const stars = document.getElementById('modal-rating').children;
     for (let i = 0; i < 5; i++) stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
 }
-
-function buildTabs() {
-    const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
-    const container = document.getElementById('categoryTabs');
-    container.innerHTML = types.map((t, i) => {
-        return `<button class="pill-tab ${i === 0 ? 'active' : ''}" data-type="${escapeHtml(t)}">${escapeHtml(t)}</button>`;
-    }).join('');
+function saveNoteFromTextarea() {
+    if (!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const text = document.getElementById('modal-note-textarea').value.trim();
+    if (text === '') { delete userNotes[key]; showToast('📝 Not silindi.'); } 
+    else { userNotes[key] = text; showToast('📝 Not kaydedildi!'); }
+    localStorage.setItem('ph_notes', JSON.stringify(userNotes));
 }
 
-function closeMovieModal(e) { if (!e || e.target.id === 'movie-modal-overlay') document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); }
-
-buildFilterOptions();
-updateFilterBadge();
-
-function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-async function suggestRandomMovie() {
-    document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
-    const loadingOverlay = document.getElementById('dice-loading-overlay');
-    loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
-    const randomPage = Math.floor(Math.random() * 50) + 1;
+// ---------------- PUBLIC NOTES (FİLMLER İÇİN) ----------------
+async function fetchPublicNotes(key) {
     try {
-        const [data] = await Promise.all([ fetchPopularMovies(randomPage), wait(900) ]);
-        const movies = data.results || [];
-        if (movies.length === 0) throw new Error('Film listesi boş');
-        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
-        document.getElementById('movie-title').textContent = randomMovie.title;
-        document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
-        document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
-        document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
-        document.getElementById('movie-poster').src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
-        document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
-    } catch (err) {
-        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
-        showToast("Film önerisi alınamadı.", true);
+        const res = await fetch(`${NOTES_ENDPOINT}?movie=${encodeURIComponent(key)}`);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        publicNotesCache[key] = data.notes || [];
+        renderPublicNotesList(publicNotesCache[key]);
+    } catch {
+        document.getElementById('public-notes-list').innerHTML = `<div class="text-xs text-rose-400">Bulut notlarına erişilemiyor.</div>`;
     }
 }
-async function fetchPopularMovies(page) {
-    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}&language=tr-TR`);
-    if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); return res.json();
+async function submitPublicNote() {
+    if (!currentModalItem) return;
+    const input = document.getElementById('public-note-input');
+    const text = input.value.trim();
+    if (!text) { showToast('Boş not gönderemezsin', true); return; }
+    
+    const btn = document.getElementById('submit-public-note-btn');
+    btn.disabled = true; btn.textContent = '...';
+    
+    try {
+        const key = pluginKey(currentModalItem);
+        const res = await fetch(NOTES_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ movie: key, text, ownerId: getOwnerId() })
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        publicNotesCache[key] = data.notes || [];
+        renderPublicNotesList(publicNotesCache[key]);
+        input.value = ''; document.getElementById('public-char-count').textContent = '0/300';
+        showToast('💬 Notun paylaşıldı!');
+    } catch (err) {
+        showToast('Not gönderilemedi.', true);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Notu Paylaş';
+    }
+}
+async function deletePublicNote(id) {
+    if(!confirm('Bu notu silmek istediğine emin misin?')) return;
+    try {
+        const key = pluginKey(currentModalItem);
+        const res = await fetch(NOTES_ENDPOINT, {
+            method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ movie: key, id, ownerId: getOwnerId() })
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        publicNotesCache[key] = data.notes || [];
+        renderPublicNotesList(publicNotesCache[key]);
+        showToast('🗑️ Not silindi');
+    } catch { showToast('Silinemedi.', true); }
+}
+
+function renderPublicNotesList(notes) {
+    const el = document.getElementById('public-notes-list');
+    document.getElementById('modal-public-note-count').textContent = notes.length ? `(${notes.length})` : '';
+    const myId = getOwnerId();
+
+    if (!notes.length) {
+        el.innerHTML = `<div class="text-xs text-slate-500">Henüz not yok. İlk notu sen bırak!</div>`;
+        return;
+    }
+
+    el.innerHTML = notes.slice().reverse().map(n => {
+        const mine = n.ownerId === myId;
+        return `
+            <div class="note-item ${mine ? 'mine' : ''}">
+                <div class="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(n.text)}</div>
+                <div class="flex justify-between items-center mt-2">
+                    <div class="text-[10px] text-slate-500">${new Date(n.ts).toLocaleString('tr-TR')}</div>
+                    ${mine ? `<button onclick="deletePublicNote('${n.id}')" class="text-[10px] font-bold text-rose-400 hover:text-rose-300">Sil</button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+document.getElementById('public-note-input').addEventListener('input', function() {
+    document.getElementById('public-char-count').textContent = `${this.value.length}/300`;
+});
+
+// ---------------- DİĞER MODALLAR (FİLTRE, ARAMA, MENÜ) ----------------
+function openFilterModal() {
+    document.getElementById('filter-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('filter-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeFilterModal() {
+    document.getElementById('filter-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('filter-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeFilterModalOnBackdrop(e) { if (e.target.id === 'filter-modal-overlay') closeFilterModal(); }
+function applyFilters() { closeFilterModal(); filterData(); }
+function resetFilters() { activeDebridFilter='all'; activePlatformFilter='all'; activeSort='default'; buildFilterOptions(); document.getElementById('sortSelect').value='default'; filterData(); }
+
+function toggleSearchModal() {
+    const m = document.getElementById('search-modal');
+    if (m.classList.contains('opacity-0')) { m.classList.remove('opacity-0','pointer-events-none'); lockBodyScroll(); setTimeout(()=>document.getElementById('expandedSearchInput').focus(),100); }
+    else { m.classList.add('opacity-0','pointer-events-none'); unlockBodyScroll(); }
+}
+function handleExpandedSearch(v) { document.getElementById('searchInput').value = v; debouncedFilter(); }
+
+function openMenuModal() {
+    document.getElementById('menu-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('menu-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeMenuModal(e) {
+    if(e && e.target!==document.getElementById('menu-modal-overlay')) return;
+    document.getElementById('menu-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
 }
 </script>
 </body>
