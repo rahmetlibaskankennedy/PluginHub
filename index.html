@@ -191,11 +191,11 @@
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     
     <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 25px;">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 24px;">
     </button>
       
     <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 21px;">
     </button>
 
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
@@ -1133,11 +1133,11 @@ async function suggestRandomMovie() {
         document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
+
         const posterEl = document.getElementById('movie-poster');
-posterEl.onerror = () => { posterEl.src = 'https://via.placeholder.com/500x750/151333/8c89b4?text=Poster+Yok'; };
-posterEl.src = randomMovie.poster_path 
-    ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` 
-    : 'https://via.placeholder.com/500x750/151333/8c89b4?text=Poster+Yok';
+        const FALLBACK_POSTER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750"><rect width="500" height="750" fill="%23151333"/><text x="50%" y="50%" fill="%238c89b4" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Poster Yok</text></svg>`);
+        posterEl.onerror = () => { posterEl.onerror = null; posterEl.src = FALLBACK_POSTER; };
+        posterEl.src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : FALLBACK_POSTER;
         
         // TMDB ID eşleştirme - Boş tür kutucuğu engelleme
         const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
