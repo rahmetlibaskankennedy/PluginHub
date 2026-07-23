@@ -1086,7 +1086,11 @@ async function suggestRandomMovie() {
         document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
-        document.getElementById('movie-poster').src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
+        const posterEl = document.getElementById('movie-poster');
+posterEl.onerror = () => { posterEl.src = 'https://via.placeholder.com/500x750/151333/8c89b4?text=Poster+Yok'; };
+posterEl.src = randomMovie.poster_path 
+    ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` 
+    : 'https://via.placeholder.com/500x750/151333/8c89b4?text=Poster+Yok';
         
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     } catch (err) {
