@@ -1,9 +1,11 @@
 [
   {
     "app": [
-      "Android TV"
+      "Android TV",
+      "webOS",
+      "Tizen"
     ],
-    "type": "APK",
+    "type": "Stream",
     "name": "Stremio",
     "desc": "Tüm torrent ve streaming servislerini tek çatı altında toplayan modern medya merkezi. Eklenti desteği ile sınırsız içerik sunar. Kurulum: https://www.stremio.com/downloads",
     "code": "71893",
@@ -27,9 +29,10 @@
   },
   {
     "app": [
-      "Android TV"
+      "Android TV",
+      "webOS"
     ],
-    "type": "APK",
+    "type": "Stream",
     "name": "Nuvio",
     "desc": "Stremio benzeri, daha hafif ve hızlı bir alternatif. Özellikle TV box cihazlarında yüksek performans sergiler. Kurulum: https://github.com/tapframe/NuvioTV/releases",
     "code": "9231168",
@@ -40,9 +43,10 @@
   },
   {
     "app": [
-      "Android TV"
+      "Android TV",
+      "FireOS"
     ],
-    "type": "APK",
+    "type": "YouTube İstemcisi",
     "name": "SmartTube",
     "desc": "Reklamsız, SponsorBlock destekli açık kaynaklı YouTube istemcisi. 4K/8K, HDR, 60fps desteği. Google hesabı gerekmez. Kurulum: https://github.com/yuliskov/SmartTube",
     "code": "79040",
@@ -55,7 +59,7 @@
     "app": [
       "Android TV"
     ],
-    "type": "APK",
+    "type": "Stream",
     "name": "WuPlay",
     "desc": "Gizlilik odaklı, hesap gerektirmeyen Android TV streaming uygulaması. Stremio eklentileriyle uyumlu. Kurulum: github.com/wuplayapp/wuplay-releases",
     "code": "5781040",
@@ -94,7 +98,7 @@
     "app": [
       "Android TV"
     ],
-    "type": "VOD",
+    "type": "VOD & Canlı",
     "name": "Flix Vision",
     "desc": "Zengin kütüphanesi ve sürekli güncellenen kaynakları ile kesintisiz izleme imkanı. VOD + canlı kanal desteği.",
     "code": "8799666",
