@@ -45,7 +45,7 @@
 
         .hero-media-box { background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%); border-radius: 24px; border: 1px solid rgba(255, 42, 95, 0.2); position: relative; overflow: hidden; }
 
-        .stream-dock { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 40px; padding: 10px 24px; display: flex; align-items: center; gap: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); z-index: 1000; }
+        .stream-dock { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 40px; padding: 10px 18px; display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3.5vw, 24px); box-shadow: 0 20px 40px rgba(0,0,0,0.8); z-index: 1000; white-space: nowrap; width: max-content; max-width: 95%; margin: 0 auto; }
         .dock-indicator { position: absolute; top: 10px; left: 0; width: 44px; height: 44px; background: var(--accent-pink); border-radius: 50%; filter: blur(12px); opacity: 0.35; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; pointer-events: none; }
         .dock-btn { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 20px; transition: all 0.3s ease; cursor: pointer; z-index: 10; }
         .dock-btn:active { transform: scale(0.9); }
@@ -111,14 +111,6 @@
         #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
 
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
-
-        .main-tab-btn { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; white-space: nowrap; background: #1a173d; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; flex-shrink: 0; min-height: 48px; }
-        .main-tab-btn.active { background: var(--accent-pink); color: #fff; box-shadow: 0 8px 20px rgba(255,42,95,0.3); }
-        .icon-tab-btn { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #1a173d; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; flex-shrink: 0; }
-        .icon-tab-btn.active { background: var(--accent-pink); box-shadow: 0 8px 20px rgba(255,42,95,0.3); }
-        .icon-tab-btn img { height: 20px; width: auto; filter: brightness(0) invert(1); opacity: 0.55; transition: opacity 0.2s; }
-        .icon-tab-btn.active img { opacity: 1; }
-        .tab-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.1); flex-shrink: 0; margin: 0 2px; }
     </style>
 </head>
 <body>
@@ -139,29 +131,25 @@
 
 <main class="max-w-7xl mx-auto px-6 py-4">
     
-   <!-- ANA KATEGORİLER (SPA SEKMELERİ) -->
-    <div class="flex items-center gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
-        <button class="main-tab-btn active" data-cat="eklentiler" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
-        <button class="main-tab-btn" data-cat="tvapk" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
-        <button class="main-tab-btn" data-cat="mobilapk" onclick="switchMainCategory('mobilapk', this)">📱 Telefon APK</button>
-        <button class="main-tab-btn" data-cat="sporapk" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
-        <div class="tab-divider"></div>
-        <button class="icon-tab-btn" data-cat="atmos" onclick="switchMainCategory('atmos', this)" aria-label="Dolby Atmos">
-            <img src="assets/logos/dolby-atmos.png" alt="Dolby Atmos">
-        </button>
-        <button class="icon-tab-btn" data-cat="imax" onclick="switchMainCategory('imax', this)" aria-label="IMAX Enhanced">
-            <img src="assets/logos/imax-enhanced.png" alt="IMAX Enhanced">
-        </button>
+   <!-- ANA KATEGORİLER (Artık sadece APK/Eklenti var, Atmos/IMAX Dock'ta) -->
+    <div class="flex gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
+        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
+        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
+        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('mobilapk', this)">📱 Telefon APK</button>
+        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
     </div>
 
-    <!-- HERO FEATURED MEDIA (Sadece Eklentilerde Görünür) -->
+    <!-- HERO FEATURED MEDIA (Mobil Şablon Bozulması Düzeltildi) -->
     <div class="hero-media-box p-6 md:p-8 mb-8 transition-all" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="max-w-xl">
+            <div class="max-w-xl w-full">
                 <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Günün Öne Çıkanı</span>
-                <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Yükleniyor...</h1>
-                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
-                <div class="flex gap-3">
+                <h1 class="text-2xl md:text-4xl font-black text-white mb-2 break-words" id="heroTitle">Yükleniyor...</h1>
+                
+                <!-- MOBİLDE URL BOZULMASINI ENGELLEYEN KURAL (break-all eklendi) -->
+                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6 break-all" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
+                
+                <div class="flex flex-wrap gap-3">
                     <button id="hero-install-btn" class="min-h-[44px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
                         <span>🚀</span> Hızlı Kurulum
                     </button>
@@ -197,11 +185,20 @@
     <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </main>
 
-<!-- MOBİL DOCK NAVIGATION -->
+<!-- MOBİL DOCK NAVIGATION (GÜNCELLENDİ) -->
 <div class="stream-dock">
     <div class="dock-indicator" id="dockIndicator"></div>
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
+    
+    <!-- YENİ: Dolby Atmos Butonu -->
+    <button class="dock-btn text-xl" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">🎧</button>
+    
+    <!-- Rastgele (Zar) Butonu -->
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
+    
+    <!-- YENİ: IMAX Enhanced Butonu -->
+    <button class="dock-btn text-xl" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">🎬</button>
+    
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
 
@@ -288,7 +285,7 @@
             </div>
         </div>
         
-        <h2 id="modal-title" class="text-2xl font-bold text-white mb-2"></h2>
+        <h2 id="modal-title" class="text-2xl font-bold text-white mb-2 break-words"></h2>
         <div id="modal-subtitle" class="text-xs text-slate-400 mb-6 font-semibold"></div>
 
         <!-- BÖLÜM 1: APK / EKLENTİ BİLGİLERİ -->
@@ -366,6 +363,7 @@
 </div>
 
 <script>
+// SPA Veri Altyapısı
 const DATA_SOURCES = {
     'eklentiler': 'plugins.json',
     'tvapk': 'tvapk.json',
@@ -448,20 +446,39 @@ function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = 
 const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
+// ---------------- KATEGORİ DEĞİŞTİRME & DOCK SEÇİMİ ----------------
 async function switchMainCategory(key, btnEl) {
-    document.querySelectorAll('#mainCategoryTabs button').forEach(b => b.classList.remove('active'));
-    btnEl.classList.add('active');
+    // Üst sekmeleri sıfırla
+    document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
+        b.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
+    });
+    
+    // Eğer tıklanan yer üst sekmelerden biriyse (eklentiler, apk vs.) onu aktif yap
+    if (btnEl && btnEl.parentElement && btnEl.parentElement.id === 'mainCategoryTabs') {
+        btnEl.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30";
+    }
+
+    // Dock (Orta Menü) aktifliğini senkronize et
+    if (['eklentiler', 'tvapk', 'mobilapk', 'sporapk'].includes(key)) {
+        setActiveDock('home');
+    } else if (key === 'atmos') {
+        setActiveDock('atmos');
+    } else if (key === 'imax') {
+        setActiveDock('imax');
+    }
 
     currentMainCategory = key;
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
+    const isMovie = (key === 'atmos' || key === 'imax');
     document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
     document.getElementById('heroSection').style.display = (key === 'eklentiler') ? 'block' : 'none';
 
     await loadCategoryData(key);
 }
 
+// ---------------- GELİŞMİŞ JSON HATA YAKALAYICI ----------------
 async function loadCategoryData(key) {
     if (cachedData[key]) {
         plugins = cachedData[key];
@@ -471,14 +488,20 @@ async function loadCategoryData(key) {
     renderSkeletons();
     try {
         const res = await fetch(DATA_SOURCES[key]);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status} - Dosya bulunamadı`);
         const data = await res.json();
         cachedData[key] = data;
         plugins = data;
         postLoadSetup();
     } catch (err) {
-        showToast(key + ' verisi yüklenemedi.', true);
-        document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri yüklenemedi.</div>';
+        console.error(`[Veri Yükleme Hatası - ${key}]:`, err);
+        showToast(`${key} verisi yüklenemedi.`, true);
+        document.getElementById('resultsGrid').innerHTML = `
+            <div class="col-span-full text-center py-10">
+                <div class="text-rose-500 font-bold mb-2">Veri Yüklenemedi</div>
+                <div class="text-xs text-slate-400 break-all bg-black/20 p-3 rounded-lg inline-block border border-white/5">${err.message}</div>
+                <div class="text-xs text-slate-500 mt-4">Lütfen "${DATA_SOURCES[key]}" dosyasının sunucuda tam bu isimle var olduğundan emin olun (Büyük/küçük harf duyarlıdır). Ayrıca JSON sözdizimini (syntax) kontrol edin.</div>
+            </div>`;
     }
 }
 
@@ -493,8 +516,7 @@ function postLoadSetup() {
 
 function updateDailyFeatured() {
     if (!plugins.length) return;
-    const seed = new Date().toISOString().slice(0, 10)
-        .split('-').reduce((a, b) => a + parseInt(b), 0);
+    const seed = new Date().toISOString().slice(0, 10).split('-').reduce((a, b) => a + parseInt(b), 0);
     const item = plugins[seed % plugins.length];
 
     document.getElementById('heroTitle').textContent = item.name;
@@ -552,8 +574,10 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    loadCategoryData('eklentiler');
+    // İlk açılışta eklentileri yükle
+    switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
 });
+
 window.addEventListener('resize', () => {
     const activeEl = document.querySelector('.dock-btn.active');
     if (activeEl) moveIndicator(activeEl);
@@ -562,7 +586,13 @@ window.addEventListener('resize', () => {
 function goHome() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (showFavsOnly) { showFavsOnly = false; filterData(); }
-    setActiveDock('home');
+    
+    // Eğer film sayfalarındaysak eklentilere dön, değilse sadece yukarı çık
+    if (currentMainCategory === 'atmos' || currentMainCategory === 'imax') {
+        switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
+    } else {
+        setActiveDock('home');
+    }
 }
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
@@ -623,8 +653,8 @@ function buildCardHTML(item) {
             <div class="card-header w-full flex items-start justify-between mb-4">
                 <div class="flex items-start gap-3">
                     ${item.rank ? `<div class="text-lg font-black text-slate-500 w-8 text-center pt-1 ${item.rank <= 3 ? 'text-amber-400 text-2xl' : ''}">${item.rank}</div>` : ''}
-                    <div>
-                        <h3 class="font-bold text-lg text-white mb-1">${escapeHtml(item.name)}</h3>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-lg text-white mb-1 truncate">${escapeHtml(item.name)}</h3>
                         <div class="text-xs text-slate-400 mb-2">${item.year}</div>
                         <div class="flex flex-wrap gap-2">
                             <span class="badge ${getGenreClass(item.genre)} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">${escapeHtml(item.genre)}</span>
@@ -636,8 +666,8 @@ function buildCardHTML(item) {
             </div>
             ${item.hint ? `<div class="w-full text-xs italic bg-emerald-500/10 text-emerald-400 px-3 py-2 rounded-lg mb-4">💡 ${escapeHtml(item.hint)}</div>` : ''}
             <div class="card-footer w-full mt-auto flex items-center justify-between border-t border-white/5 pt-3">
-                <div class="flex gap-1">${(item.platform || []).map(p => `<span class="platform-tag ${getPlatformClass(p)} px-2 py-1 rounded-md text-[10px] font-bold">${escapeHtml(p)}</span>`).join('')}</div>
-                <span class="text-xs font-bold text-blue-400 flex items-center gap-1">💬 Notlar</span>
+                <div class="flex gap-1 flex-wrap">${(item.platform || []).map(p => `<span class="platform-tag ${getPlatformClass(p)} px-2 py-1 rounded-md text-[10px] font-bold">${escapeHtml(p)}</span>`).join('')}</div>
+                <span class="text-xs font-bold text-blue-400 flex items-center gap-1 shrink-0">💬 Notlar</span>
             </div>
         `;
     } else {
@@ -651,13 +681,23 @@ function buildCardHTML(item) {
         const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">ÇALIŞMIYOR</span>` : '';
 
         const appArray = Array.isArray(item.app) ? item.app : [item.app];
-        const appBadgesHTML = appArray.map(a => `<span class="${a.toLowerCase()==='stremio'?'tag-stremio':'tag-nuvio'} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">${escapeHtml(a)}</span>`).join('');
+        const appBadgesHTML = appArray.map(a => {
+            const name = a.toLowerCase();
+            if (name.includes('android')) {
+                return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase inline-flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 576 512"><path d="M420.22 175.76l44.68-77.34a10.92 10.92 0 0 0-3.95-15 10.87 10.87 0 0 0-14.92 4l-45.28 78.36A284.14 284.14 0 0 0 288 141.44a284.14 284.14 0 0 0-112.75 24.34l-45.28-78.36a10.88 10.88 0 0 0-14.94-4 10.92 10.92 0 0 0-3.95 15l44.68 77.34C93.42 229.47 21.05 328.72 0 448h576c-21.05-119.28-93.42-218.53-155.78-272.24zM160 352a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm256 0a32 32 0 1 1 32-32 32 32 0 0 1-32 32z"/></svg>${escapeHtml(a)}</span>`;
+            }
+            if (name.includes('ios') || name.includes('apple')) {
+                return `<span class="bg-slate-100/10 text-slate-300 border border-slate-100/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase inline-flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>${escapeHtml(a)}</span>`;
+            }
+            const badgeClass = name.includes('stremio') ? 'tag-stremio' : 'tag-nuvio';
+            return `<span class="${badgeClass} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase inline-block">${escapeHtml(a)}</span>`;
+        }).join('');
 
         if (viewMode === 'list') {
             return `
                 <div class="card-header">
                     <div class="flex items-center gap-2 flex-wrap mb-1">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
-                    <h3 class="font-bold text-white">${escapeHtml(item.name)}</h3>
+                    <h3 class="font-bold text-white truncate">${escapeHtml(item.name)}</h3>
                     <span class="text-xs text-slate-400">${escapeHtml(item.type || '—')}</span>
                 </div>
                 <div class="card-footer flex items-center gap-3">
@@ -672,11 +712,11 @@ function buildCardHTML(item) {
                     <div class="flex items-center gap-2 flex-wrap">${appBadgesHTML}${codeBadgeHTML}${deadBadgeHTML}${newBadgeHTML}</div>
                     ${favBtnHTML}
                 </div>
-                <h3 class="font-bold text-lg text-white mb-2">${escapeHtml(item.name)}</h3>
+                <h3 class="font-bold text-lg text-white mb-2 truncate">${escapeHtml(item.name)}</h3>
                 <div class="flex items-center justify-between text-[12px] text-slate-300 mb-3">
                     <span>${escapeHtml(item.type || '—')}</span>
                 </div>
-                <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
+                <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4 break-words">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
             </div>
             <div class="card-footer w-full flex items-center justify-between mt-auto">
                 <div class="flex gap-1 text-lg">${starsHTML}</div>
