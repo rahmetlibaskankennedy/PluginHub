@@ -292,6 +292,7 @@
 
         <!-- BÖLÜM 1: APK / EKLENTİ BİLGİLERİ (Kurulum Rehberleri Geri Eklendi) -->
         <div id="modal-apk-info" class="hidden">
+            <div id="modal-debrid-badge" class="hidden"></div>
             <div class="mb-6">
                 <label id="modal-url-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
                 <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 text-center md:text-left"></div>
@@ -920,6 +921,23 @@ function openModalItem(item) {
         document.getElementById('modal-apk-info').classList.remove('hidden');
         
         document.getElementById('modal-subtitle').textContent = item.type || 'Uygulama';
+
+        const debridBadge = document.getElementById('modal-debrid-badge');
+        if (debridBadge) {
+            const debridStyles = {
+                required: { text: '⚡ Debrid Gerekli', cls: 'bg-pink-500/10 text-pink-400 border border-pink-500/20' },
+                optional: { text: '🔓 Debrid Opsiyonel', cls: 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20' },
+                free: { text: '🆓 Ücretsiz Kullanım', cls: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' }
+            };
+            const info = debridStyles[item.debrid];
+            if (info) {
+                debridBadge.textContent = info.text;
+                debridBadge.className = `inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-xl text-xs font-bold ${info.cls}`;
+            } else {
+                debridBadge.textContent = '';
+                debridBadge.className = 'hidden';
+            }
+        }
 
         const code = item.code;
         const urlBox = document.getElementById('modal-url-box');
