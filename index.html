@@ -478,7 +478,25 @@ async function loadCategoryData(key) {
         document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri yüklenemedi.</div>';
     }
 }
+function updateDailyFeatured() {
+    if (!plugins.length) return;
+    // Tarihe göre deterministik "günün eklentisi" seçimi
+    const seed = new Date().toISOString().slice(0, 10)
+        .split('-').reduce((a, b) => a + parseInt(b), 0);
+    const item = plugins[seed % plugins.length];
 
+    document.getElementById('heroTitle').textContent = item.name;
+    document.getElementById('heroDesc').textContent = item.desc || '';
+
+    const url = extractUrl(item.desc);
+    document.getElementById('hero-install-btn').onclick = () => {
+        if (item.code) copyToClipboard(item.code);
+        else if (url) window.open(url, '_blank');
+    };
+    document.getElementById('hero-copy-btn').onclick = () => {
+        copyToClipboard(item.code || url);
+    };
+}
 function postLoadSetup() {
     computeNewestDate();
     // Arama motorunu güçlendiriyoruz
