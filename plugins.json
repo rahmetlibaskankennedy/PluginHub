@@ -947,11 +947,11 @@
       "web"
     ]
   },
- {
+   {
     "app": "Nuvio",
     "type": "4K",
-    "name": "deneme",
-    "desc": "Bağlantı Linki: drnrmr",
+    "name": "deneme 2",
+    "desc": "Bağlantı Linki: drnrmrasfs",
     "isNew": false,
     "installGuide": "nuvio",
     "debrid": "free",
