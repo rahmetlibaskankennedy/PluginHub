@@ -1204,7 +1204,7 @@ async function suggestRandomMovie() {
 
 // Popüler Filmleri Worker Üzerinden Güvenli Çekme Fonksiyonu
 async function fetchPopularMovies(page) {
-    const res = await fetch(`${REPORT_ENDPOINT}/tmdb-popular?page=${page}`);
+    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}`);
     if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); 
     return res.json();
 }
