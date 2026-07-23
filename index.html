@@ -45,11 +45,16 @@
 
         .hero-media-box { background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%); border-radius: 24px; border: 1px solid rgba(255, 42, 95, 0.2); position: relative; overflow: hidden; }
 
-        .stream-dock { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 40px; padding: 10px 18px; display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3.5vw, 24px); box-shadow: 0 20px 40px rgba(0,0,0,0.8); z-index: 1000; white-space: nowrap; width: max-content; max-width: 95%; margin: 0 auto; }
+        /* MOBİL DOCK GÜNCELLEMESİ (Esnek genişlik ve hizalama) */
+        .stream-dock { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: rgba(15, 13, 35, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; justify-content: center; gap: clamp(6px, 2.5vw, 24px); box-shadow: 0 20px 40px rgba(0,0,0,0.8); z-index: 1000; white-space: nowrap; width: max-content; max-width: 95%; margin: 0 auto; }
         .dock-indicator { position: absolute; top: 10px; left: 0; width: 44px; height: 44px; background: var(--accent-pink); border-radius: 50%; filter: blur(12px); opacity: 0.35; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; pointer-events: none; }
-        .dock-btn { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 20px; transition: all 0.3s ease; cursor: pointer; z-index: 10; }
+        .dock-btn { position: relative; min-width: 44px; padding: 0 6px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 20px; transition: all 0.3s ease; cursor: pointer; z-index: 10; }
         .dock-btn:active { transform: scale(0.9); }
-        .dock-btn.active { font-size: 24px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+        .dock-btn.active { font-size: 24px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); color: #fff; }
+        
+        /* ÖZEL LOGO SINIFI */
+        .dock-logo { height: 18px; width: auto; object-fit: contain; opacity: 0.5; transition: all 0.3s ease; }
+        .dock-btn.active .dock-logo { opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)); transform: scale(1.15); }
 
         .pill-tab { background: rgba(255,255,255,0.06); border-radius: 20px; padding: 8px 16px; font-size: 13px; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; min-height: 38px; display: flex; align-items: center; }
         .pill-tab.active { background: var(--accent-purple); color: #fff; font-weight: bold; }
@@ -131,7 +136,7 @@
 
 <main class="max-w-7xl mx-auto px-6 py-4">
     
-   <!-- ANA KATEGORİLER (Artık sadece APK/Eklenti var, Atmos/IMAX Dock'ta) -->
+   <!-- ANA KATEGORİLER (Sadece Eklenti ve APK'lar var) -->
     <div class="flex gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
         <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
@@ -145,10 +150,7 @@
             <div class="max-w-xl w-full">
                 <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Günün Öne Çıkanı</span>
                 <h1 class="text-2xl md:text-4xl font-black text-white mb-2 break-words" id="heroTitle">Yükleniyor...</h1>
-                
-                <!-- MOBİLDE URL BOZULMASINI ENGELLEYEN KURAL (break-all eklendi) -->
                 <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6 break-all" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
-                
                 <div class="flex flex-wrap gap-3">
                     <button id="hero-install-btn" class="min-h-[44px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
                         <span>🚀</span> Hızlı Kurulum
@@ -190,14 +192,18 @@
     <div class="dock-indicator" id="dockIndicator"></div>
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
     
-    <!-- YENİ: Dolby Atmos Butonu -->
-    <button class="dock-btn text-xl" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png</button>
+    <!-- YENİ: Dolby Atmos Butonu (Resim Eklendi) -->
+    <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 16px;">
+    </button>
     
     <!-- Rastgele (Zar) Butonu -->
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
     
-    <!-- YENİ: IMAX Enhanced Butonu -->
-    <button class="dock-btn text-xl" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler"><img src"https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="İmax"></button>
+    <!-- YENİ: IMAX Enhanced Butonu (Resim Eklendi) -->
+    <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 12px;">
+    </button>
     
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
@@ -448,17 +454,14 @@ function onSearchInput() { debouncedFilter(); }
 
 // ---------------- KATEGORİ DEĞİŞTİRME & DOCK SEÇİMİ ----------------
 async function switchMainCategory(key, btnEl) {
-    // Üst sekmeleri sıfırla
     document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
         b.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
     });
     
-    // Eğer tıklanan yer üst sekmelerden biriyse (eklentiler, apk vs.) onu aktif yap
     if (btnEl && btnEl.parentElement && btnEl.parentElement.id === 'mainCategoryTabs') {
         btnEl.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30";
     }
 
-    // Dock (Orta Menü) aktifliğini senkronize et
     if (['eklentiler', 'tvapk', 'mobilapk', 'sporapk'].includes(key)) {
         setActiveDock('home');
     } else if (key === 'atmos') {
@@ -532,9 +535,14 @@ function updateDailyFeatured() {
     };
 }
 
+// DOCK İNDİKATÖR (IŞIK) MATEMATİKSEL HİZALAMASI 
 function moveIndicator(activeEl) {
     const indicator = document.getElementById('dockIndicator');
-    if (indicator && activeEl) indicator.style.transform = `translateX(${activeEl.offsetLeft}px)`;
+    if (indicator && activeEl) {
+        // İndikatörün tam ortalanması: Butonun solu + Buton Genişliği/2 - İndikatör Genişliği/2
+        const leftPos = activeEl.offsetLeft + (activeEl.offsetWidth / 2) - 22;
+        indicator.style.transform = `translateX(${leftPos}px)`;
+    }
 }
 function setActiveDock(id) {
     document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
@@ -574,7 +582,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // İlk açılışta eklentileri yükle
     switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
 });
 
@@ -587,7 +594,6 @@ function goHome() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (showFavsOnly) { showFavsOnly = false; filterData(); }
     
-    // Eğer film sayfalarındaysak eklentilere dön, değilse sadece yukarı çık
     if (currentMainCategory === 'atmos' || currentMainCategory === 'imax') {
         switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
     } else {
