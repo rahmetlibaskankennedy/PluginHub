@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0a1f">
+    <title>Uygulama Merkezi | PluginHub</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #0b0a1f;
+            --bg-card: #151333;
+            --bg-card-hover: #1c1a42;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent-pink: #ff2a5f;
+            --accent-purple: #6c5ce7;
+            --text-main: #ffffff;
+            --text-muted: #8c89b4;
+        }
+
+        * { box-sizing: border-box; }
+        html { -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        }
+
+        /* Orijinal PluginHub Kart Stilleri */
+        .stream-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stream-card:hover {
+            transform: translateY(-4px);
+            background: var(--bg-card-hover);
+            border-color: rgba(108, 92, 231, 0.5);
+            box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2);
+        }
+
+        /* Neon Dock Stilleri (Orijinal) */
+        .stream-dock {
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            left: 50%; transform: translateX(-50%);
+            background: rgba(15, 13, 35, 0.85); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 40px;
+            padding: 10px 24px;
+            display: flex; align-items: center; gap: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        .dock-indicator {
+            position: absolute; top: 10px; left: 0;
+            width: 44px; height: 44px;
+            background: var(--accent-pink);
+            border-radius: 50%; filter: blur(12px);
+            opacity: 0.35; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1; pointer-events: none;
+        }
+        .dock-btn {
+            position: relative; width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); font-size: 20px; text-decoration: none;
+            transition: all 0.3s ease; z-index: 10;
+        }
+        .dock-btn:active { transform: scale(0.9); }
+        .dock-btn.active { font-size: 24px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); color: var(--accent-pink); }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center font-black text-indigo-400">P</div>
+        <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-4">
+    <!-- Hero Bölümü -->
+    <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full mb-4">📱 Uygulama Merkezi</span>
+        <h1 class="text-3xl md:text-4xl font-black text-white mb-3">TV ve Mobil <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400">Uygulamalar</span></h1>
+        <p class="text-xs md:text-sm text-slate-400 leading-relaxed">İhtiyacınız olan tüm medya araçları ve doğrudan TV'ye kurulum kodları.</p>
+    </div>
+
+    <!-- Arama ve Filtreleme -->
+    <div class="flex flex-col md:flex-row gap-3 mb-8 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
+        <div class="flex-1 relative">
+            <input type="text" id="searchInput" oninput="filterApps()" placeholder="Uygulama ara..." class="w-full min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none focus:border-indigo-500 transition-colors">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-50">🔍</span>
+        </div>
+        <select id="statusFilter" onchange="filterApps()" class="shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-slate-300 p-3.5 rounded-xl outline-none focus:border-indigo-500">
+            <option value="all">Tüm Durumlar</option>
+            <option value="ok">✅ Aktif</option>
+            <option value="warn">⚠️ Kararsız</option>
+            <option value="dead">❌ Çalışmıyor</option>
+        </select>
+    </div>
+
+    <div class="flex justify-between items-center text-xs text-slate-400 mb-4">
+        <span id="resultCount">Yükleniyor...</span>
+    </div>
+
+    <!-- Uygulama Kartları Grid -->
+    <div id="appGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</main>
+
+<!-- Alt Menü (Neon Dock) -->
+<!-- NOT: Menüde index.html ve uygulamalar.html arası geçiş için a etiketleri kullanıldı -->
+<div class="stream-dock">
+    <div class="dock-indicator" id="dockIndicator"></div>
+    
+    <!-- Eklentiler (Ana Sayfa) Linki -->
+    <a href="index.html" class="dock-btn" id="dock-home" aria-label="Eklentiler">🧩</a>
+    
+    <!-- Uygulamalar (Aktif Sayfa) -->
+    <a href="uygulamalar.html" class="dock-btn active" id="dock-apps" aria-label="Uygulamalar">📱</a>
+    
+    <button class="dock-btn" aria-label="Arama" onclick="document.getElementById('searchInput').focus()">🔍</button>
+</div>
+
+<script>
+const APPS = [
+  { n:"Stremio", icon:"S", grad:"from-indigo-600 to-blue-700", desc:"Tüm torrent ve streaming servislerini tek çatı altında toplayan modern medya merkezi. Eklenti desteği ile sınırsız içerik sunar.", code:"71893", status:"ok", btn:"İndir ↗", btnUrl:"https://www.stremio.com/downloads" },
+  { n:"CloudStream", icon:"C", grad:"from-emerald-500 to-teal-700", desc:"Android tabanlı, reklam barındırmayan ve tamamen modüler dizi/film izleme uygulaması. Repolar ile özelleştirilebilir.", code:"7264432", status:"ok", btn:"GitHub ↗", btnUrl:"https://github.com/recloudstream/cloudstream/releases" },
+  { n:"Nuvio", icon:"N", grad:"from-purple-500 to-fuchsia-700", desc:"Stremio benzeri, daha hafif ve hızlı bir alternatif. Özellikle TV box cihazlarında yüksek performans sergiler.", code:"9231168", status:"ok", btn:"GitHub ↗", btnUrl:"https://github.com/tapframe/NuvioTV/releases" },
+  { n:"SmartTube", icon:"▶", grad:"from-red-500 to-red-800", desc:"Reklamsız, SponsorBlock destekli açık kaynaklı YouTube istemcisi. 4K/8K, HDR, 60fps desteği. Google hesabı gerekmez.", code:"79040", status:"ok", btn:"GitHub ↗", btnUrl:"https://github.com/yuliskov/SmartTube" },
+  { n:"WuPlay", icon:"W", grad:"from-sky-400 to-cyan-600", desc:"Gizlilik odaklı, hesap gerektirmeyen Android TV streaming uygulaması. Stremio eklentileriyle uyumlu.", code:"5781040", status:"ok", btn:"İndir ↗", btnUrl:"https://github.com/wuplayapp/wuplay-releases/releases/latest/download/wuplay-androidtv.apk" },
+  { n:"FilmPlus", icon:"F", grad:"from-emerald-400 to-green-700", desc:"En popüler yerli ve yabancı yapımlara kolayca ulaşmanızı sağlayan kullanıcı dostu bir araç.", code:"52193", status:"ok" },
+  { n:"Tea TV", icon:"T", grad:"from-amber-500 to-yellow-700", desc:"Geniş VOD arşivi ve M3U desteğiyle köklü streaming platformu.", code:"9829464", status:"warn", warnText:"Yükleme her zaman başarılı olmayabilir." },
+  { n:"Cinema HD", icon:"C", grad:"from-amber-600 to-yellow-800", desc:"Yıllarca en çok tercih edilen film arşivi uygulaması.", code:"5726169", codeStrike:true, status:"dead", warnText:"Aktif geliştirme durdu. Alternatif: Cinema HQ (6989332)." }
+];
+
+const STATUS_HTML = {
+    ok: `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-md text-[9px] font-black tracking-widest uppercase">Aktif</span>`,
+    warn: `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-md text-[9px] font-black tracking-widest uppercase">Kararsız</span>`,
+    dead: `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-md text-[9px] font-black tracking-widest uppercase">Çalışmıyor</span>`
+};
+
+let fuse = new Fuse(APPS, { keys: ['n', 'desc', 'code'], threshold: 0.3 });
+
+function renderApps(list) {
+    const grid = document.getElementById('appGrid');
+    document.getElementById('resultCount').textContent = `${list.length} Uygulama Listeleniyor`;
+    grid.innerHTML = '';
+
+    if (list.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-500 text-sm py-16">Eşleşen uygulama bulunamadı.</div>`;
+        return;
+    }
+
+    list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `stream-card p-5 flex flex-col justify-between ${item.status === 'dead' ? 'opacity-60 grayscale' : ''}`;
+        
+        card.innerHTML = `
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${item.grad} flex items-center justify-center text-xl font-bold text-white shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
+                        ${item.icon}
+                    </div>
+                    ${STATUS_HTML[item.status]}
+                </div>
+                <h3 class="font-bold text-xl text-white mb-2">${item.n}</h3>
+                <p class="text-xs text-slate-400 leading-relaxed mb-3">${item.desc}</p>
+                ${item.warnText ? `<p class="text-[10px] font-semibold text-amber-400 mb-3 bg-amber-500/10 p-2 rounded-lg">${item.warnText}</p>` : ''}
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-white/5">
+                ${item.code ? `
+                    <div class="bg-[#0b0a1f] border border-white/10 rounded-xl p-3 text-center mb-3">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Downloader Kodu</span>
+                        <span class="text-xl font-mono font-black ${item.codeStrike ? 'text-slate-500 line-through' : 'text-emerald-400'}">${item.code}</span>
+                    </div>
+                ` : ''}
+                
+                ${item.btnUrl ? `
+                    <a href="${item.btnUrl}" target="_blank" class="block w-full text-center bg-indigo-600/20 hover:bg-indigo-600 active:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-sm py-3 rounded-xl transition">
+                        ${item.btn}
+                    </a>
+                ` : ''}
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function filterApps() {
+    const q = document.getElementById('searchInput').value.trim();
+    const status = document.getElementById('statusFilter').value;
+    
+    let pool = APPS;
+    if (q) pool = fuse.search(q).map(r => r.item);
+    if (status !== 'all') pool = pool.filter(a => a.status === status);
+    
+    renderApps(pool);
+}
+
+// Dock (Alt Menü) kayma animasyonu
+window.addEventListener('DOMContentLoaded', () => {
+    const indicator = document.getElementById('dockIndicator');
+    const activeEl = document.querySelector('.dock-btn.active');
+    if (indicator && activeEl) {
+        indicator.style.transform = `translateX(${activeEl.offsetLeft}px)`;
+    }
+    renderApps(APPS);
+});
+</script>
+</body>
+</html>
