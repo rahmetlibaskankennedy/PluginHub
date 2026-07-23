@@ -290,15 +290,17 @@
     🎲
 </button>
 
-<!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
-    <!-- Hareket edecek neon zemin -->
     <div class="dock-indicator" id="dockIndicator"></div>
     
-    <button id="dock-home" class="dock-btn active" onclick="goHome()" aria-label="Başa dön">🏠</button>
-    <button id="dock-search" class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
-    <button id="dock-fav" class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
-    <button id="dock-menu" class="dock-btn" onclick="openMenuModal()" aria-label="Menü">☰</button>
+    <!-- Aktif olan: Eklentiler (Ana Sayfa) -->
+    <a href="index.html" class="dock-btn active" id="dock-home" aria-label="Eklentiler">🧩</a>
+    
+    <!-- Uygulamalar Sayfasına Gider -->
+    <a href="tvapk.html" class="dock-btn" id="dock-apps" aria-label="TV Uygulamaları">📱</a>
+    
+    <button class="dock-btn" aria-label="Arama" onclick="toggleSearchModal()">🔍</button>
+    <button class="dock-btn" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
 
 <!-- MENÜ MODALI -->
