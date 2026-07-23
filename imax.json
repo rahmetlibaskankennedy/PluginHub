@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Iron Man",
+    "year": 2008,
+    "genre": "Aksiyon",
+    "studio": "marvel",
+    "platform": ["Disney+"],
+    "type": "Marvel & Disney+"
+  },
+  {
+    "name": "Thor: Ragnarok",
+    "year": 2017,
+    "genre": "Fantastik",
+    "studio": "marvel",
+    "platform": ["Disney+"],
+    "type": "Marvel & Disney+",
+    "hint": "Tüm film boyunca 1.90:1 genişletilmiş oran"
+  },
+  {
+    "name": "Spider-Man: Far From Home",
+    "year": 2019,
+    "genre": "Aksiyon",
+    "studio": "sony",
+    "platform": ["Dijital"],
+    "type": "Sony Pictures",
+    "hint": "Bazı sahnelerde 1.90:1 genişletilmiş oran"
+  },
+  {
+    "name": "Top Gun",
+    "year": 1986,
+    "genre": "Aksiyon",
+    "studio": "paramount",
+    "platform": ["Dijital"],
+    "type": "Paramount Pictures"
+  }
+]
