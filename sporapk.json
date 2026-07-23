@@ -1,0 +1,11 @@
+[
+  {
+    "app": ["Android TV", "Mobil"],
+    "type": "Canlı",
+    "name": "Sports Fire",
+    "desc": "Global canlı spor karşılaşmalarını HD yayınlayan popüler araç.",
+    "code": "12345",
+    "status": "warn",
+    "platform": ["tv", "mobile"]
+  }
+]
