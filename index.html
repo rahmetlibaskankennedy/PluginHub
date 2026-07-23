@@ -1058,6 +1058,48 @@ function closeMenuModal(e) {
     document.getElementById('menu-modal-box').classList.add('translate-y-full');
     setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
 }
+    function closeMovieModal(e) { 
+    if (!e || e.target.id === 'movie-modal-overlay') {
+        document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); 
+    }
+}
+
+function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+async function suggestRandomMovie() {
+    document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    const loadingOverlay = document.getElementById('dice-loading-overlay');
+    loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+    
+    // Cloudflare TMDB API'den rastgele bir sayfa çek
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+    
+    try {
+        const [data] = await Promise.all([ fetchPopularMovies(randomPage), wait(900) ]);
+        const movies = data.results || [];
+        if (movies.length === 0) throw new Error('Film listesi boş');
+        
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+        
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        document.getElementById('movie-title').textContent = randomMovie.title;
+        document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
+        document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
+        document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
+        document.getElementById('movie-poster').src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : '';
+        
+        document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    } catch (err) {
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        showToast("Film önerisi alınamadı.", true);
+    }
+}
+
+async function fetchPopularMovies(page) {
+    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}&language=tr-TR`);
+    if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); 
+    return res.json();
+}
 </script>
 </body>
 </html>
