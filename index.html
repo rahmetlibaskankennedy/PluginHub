@@ -1137,9 +1137,10 @@ async function suggestRandomMovie() {
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
     
     // Eski verileri ve videoyu sıfırla
-    document.getElementById('movie-trailer').src = '';
-    document.getElementById('movie-trailer').classList.add('hidden');
-    document.getElementById('movie-poster').classList.remove('hidden');
+    const trailerEl = document.getElementById('movie-trailer');
+    const posterEl = document.getElementById('movie-poster');
+    if(trailerEl) { trailerEl.src = ''; trailerEl.classList.add('hidden'); }
+    if(posterEl) posterEl.classList.remove('hidden');
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -1156,8 +1157,6 @@ async function suggestRandomMovie() {
         // --- 1. ADIM: FRAGMANI ÇEK ---
         let youtubeKey = null;
         try {
-            // NOT: Buraya ücretsiz alabileceğin kendi TMDB API KEY'ini yazmalısın.
-            // Veya Cloudflare Worker dosyana fragmanları çeken yeni bir route ekleyip onu çağırabilirsin.
             const TMDB_API_KEY = "e9e9d8da18ae29fc430845952232787c"; 
             const vidRes = await fetch(`https://api.themoviedb.org/3/movie/${randomMovie.id}/videos?api_key=${TMDB_API_KEY}`);
             
@@ -1176,10 +1175,7 @@ async function suggestRandomMovie() {
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
 
         // --- 2. ADIM: EKRANA BAS (FRAGMAN VEYA POSTER) ---
-        const posterEl = document.getElementById('movie-poster');
-        const trailerEl = document.getElementById('movie-trailer');
-
-        if (youtubeKey) {
+        if (youtubeKey && trailerEl) {
             // Fragman bulunduysa: Posteri gizle, YouTube videosunu otomatik (autoplay) ve sessiz (mute) başlat
             posterEl.classList.add('hidden');
             trailerEl.src = `https://www.youtube.com/embed/${youtubeKey}?autoplay=1&mute=1&controls=1&loop=1&playlist=${youtubeKey}&modestbranding=1`;
@@ -1205,9 +1201,18 @@ async function suggestRandomMovie() {
         
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     } catch (err) {
+        console.error("Zar Hatası: ", err);
         loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
         showToast("Film önerisi alınamadı.", true);
     }
+}
+
+// ARTIK WORKER YERİNE DOĞRUDAN TMDB API KULLANILIYOR
+async function fetchPopularMovies(page) {
+    const TMDB_API_KEY = "e9e9d8da18ae29fc430845952232787c"; 
+    const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=${page}`);
+    if (!res.ok) throw new Error(`TMDB API Hatası: ${res.status}`); 
+    return res.json();
 }
 </script>
 </body>
