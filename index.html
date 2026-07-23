@@ -65,29 +65,57 @@
             overflow: hidden;
         }
 
+      /* ŞEFFAF NEON DOCK STİLLERİ */
         .stream-dock {
             position: fixed;
             bottom: calc(20px + env(safe-area-inset-bottom));
-            left: 50%; transform: translateX(-50%);
-            background: #141230;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 40px;
-            padding: 8px 20px;
-            display: flex; align-items: center; gap: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            left: 50%; 
+            transform: translateX(-50%);
+            background: transparent; /* Tamamen şeffaf zemin */
+            display: flex; 
+            align-items: center; 
+            gap: 24px;
             z-index: 1000;
         }
+
         .dock-btn {
-            width: 48px; height: 48px; border-radius: 50%;
+            position: relative;
+            width: 48px; height: 48px;
             display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); font-size: 19px; transition: all 0.2s;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
             cursor: pointer;
         }
+        
+        .dock-btn svg {
+            width: 24px; height: 24px;
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s ease;
+    /* Kartların üzerinden geçerken şeffaf ikonların görünür kalmasını sağlar */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); 
+        }
+
         .dock-btn:active { transform: scale(0.9); }
-        .dock-btn.active {
-            background: var(--accent-yellow);
-            color: #000;
-            box-shadow: 0 0 15px rgba(255, 184, 0, 0.5);
+        .dock-btn:hover { color: #ffffff; }
+
+/* Aktif Buton Efektleri */
+        .dock-btn.active { color: var(--accent-pink); }
+        .dock-btn.active svg { width: 28px; height: 28px; }
+
+/* Neon Parlama (Glow) Efekti */
+        .dock-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent-pink);
+            border-radius: 50%;
+            filter: blur(12px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .dock-btn.active::before { 
+            opacity: 0.35; 
         }
 
         .pill-tab {
