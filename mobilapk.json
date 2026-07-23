@@ -1,0 +1,11 @@
+[
+  {
+    "app": ["Android Mobil"],
+    "type": "Mobil Uygulama",
+    "name": "CloudStream",
+    "desc": "Android tabanlı, tamamen modüler dizi/film izleme uygulaması.",
+    "sourceUrl": "https://github.com/recloudstream/cloudstream/releases",
+    "status": "ok",
+    "platform": ["mobile"]
+  }
+]
