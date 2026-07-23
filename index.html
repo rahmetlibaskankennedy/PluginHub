@@ -10,9 +10,6 @@
     <title>PluginHub — Streaming Media Portal</title>
     <meta name="description" content="TCLTVTÜRK topluluğu için Stremio ve Nuvio eklenti rehberi.">
     
-    <!-- YENİ: Web App Manifest (PWA için temel, sonradan site.webmanifest dosyası eklenebilir) -->
-    <link rel="manifest" href="site.webmanifest" onerror="this.remove()">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -44,13 +41,6 @@
             padding-bottom: calc(100px + env(safe-area-inset-bottom));
         }
 
-        /* YENİ: TV D-Pad ve Kumanda Odak (Focus) Efektleri */
-        *:focus-visible {
-            outline: 3px solid var(--accent-pink) !important;
-            outline-offset: 4px !important;
-            border-radius: inherit;
-        }
-
         .stream-card {
             background: var(--bg-card);
             border-radius: 16px;
@@ -59,27 +49,13 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
-        .stream-card:hover, .stream-card:focus-visible {
+        .stream-card:hover {
             transform: translateY(-4px);
             background: var(--bg-card-hover);
             border-color: rgba(108, 92, 231, 0.5);
             box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2);
         }
         .stream-card:active { transform: scale(0.98); }
-
-        /* YENİ: Liste Görünümü Kart Stili */
-        .stream-card.list-view {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 12px 16px;
-            gap: 16px;
-        }
-        .stream-card.list-view .card-header { margin-bottom: 0; width: auto; flex-shrink: 0; }
-        .stream-card.list-view .card-body { flex: 1; min-width: 0; }
-        .stream-card.list-view .card-footer { display: none; }
-        .stream-card.list-view h3 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-        .stream-card.list-view p { border: none; padding: 0; margin: 0; display: inline-block; }
 
         .hero-media-box {
             background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%);
@@ -88,18 +64,6 @@
             position: relative;
             overflow: hidden;
         }
-
-        .play-btn-circle {
-            width: 56px; height: 56px;
-            border-radius: 50%;
-            background: var(--accent-pink);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-        .play-btn-circle:hover, .play-btn-circle:focus-visible { transform: scale(1.1); }
-        .play-btn-circle:active { transform: scale(0.95); }
 
         .stream-dock {
             position: fixed;
@@ -130,7 +94,7 @@
             background: rgba(255,255,255,0.06);
             border-radius: 20px;
             padding: 8px 16px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             cursor: pointer;
             white-space: nowrap;
@@ -138,9 +102,7 @@
             min-height: 38px;
             display: flex;
             align-items: center;
-            gap: 6px;
         }
-        .pill-tab:hover, .pill-tab:focus-visible { background: rgba(255,255,255,0.1); }
         .pill-tab.active {
             background: var(--accent-purple);
             color: #fff;
@@ -176,12 +138,12 @@
         #modal-overlay.open { opacity: 1; pointer-events: all; }
         #modal-box {
             background: #0b0a1f; border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; width: 90%; max-width: 600px; padding: 28px;
+            border-radius: 20px; width: 90%; max-width: 560px; padding: 28px;
             max-height: 90vh; overflow-y: auto;
         }
 
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; padding: 6px; }
-        .star:hover, .star:focus-visible { color: #ffb800; }
+        .star:hover { color: #ffb800; }
 
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-stremio { background: rgba(192, 132, 252, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
@@ -189,7 +151,6 @@
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
         .tag-debrid-required { background: rgba(255, 184, 0, 0.1); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
 
-        /* YENİ: Skeleton Animasyonu */
         @keyframes pulse-bg {
             0% { background-color: rgba(255, 255, 255, 0.05); }
             50% { background-color: rgba(255, 255, 255, 0.1); }
@@ -247,7 +208,7 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
-        <button tabindex="0" onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
+        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
     </div>
 </header>
 
@@ -260,14 +221,11 @@
                 <h1 class="text-2xl md:text-4xl font-black text-white mb-2" id="heroTitle">Yükleniyor...</h1>
                 <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
                 <div class="flex gap-3">
-                    <button tabindex="0" id="hero-install-btn" class="min-h-[44px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
+                    <button id="hero-install-btn" class="min-h-[44px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
                         <span>🚀</span> Hızlı Kurulum
                     </button>
-                    <button tabindex="0" id="hero-copy-btn" class="min-h-[44px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 active:bg-slate-700 transition">📋 Manifest Kopyala</button>
+                    <button id="hero-copy-btn" class="min-h-[44px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 active:bg-slate-700 transition">📋 Manifest Kopyala</button>
                 </div>
-            </div>
-            <div tabindex="0" class="play-btn-circle" id="hero-play-btn" role="button" aria-label="Öne çıkanı kur">
-                <span class="text-white text-xl">▶</span>
             </div>
         </div>
     </div>
@@ -275,17 +233,11 @@
     <!-- KATEGORİ SEKMELERİ -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
 
-    <!-- ARAMA + FİLTRELE + GÖRÜNÜM -->
+    <!-- ARAMA + FİLTRELE -->
     <div class="flex gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Eklenti veya içerik ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Eklenti veya içerik ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
         
-        <!-- YENİ: Görünüm Değiştirici Buton -->
-        <button tabindex="0" onclick="toggleViewMode()" id="viewToggleBtn" class="shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-slate-300 hover:text-white px-3 py-3 rounded-xl flex items-center justify-center transition" aria-label="Görünümü Değiştir">
-            <svg id="viewIconGrid" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <svg id="viewIconList" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-        </button>
-
-        <button tabindex="0" onclick="openFilterModal()" id="filterOpenBtn" class="relative shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-white text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition" aria-label="Filtrele ve sırala">
+        <button onclick="openFilterModal()" id="filterOpenBtn" class="relative shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-white text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition" aria-label="Filtrele ve sırala">
             <span>⚙️</span><span class="hidden sm:inline">Filtrele</span>
             <span id="filterBadge" class="hidden absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center">0</span>
         </button>
@@ -300,16 +252,16 @@
 </main>
 
 <!-- FİLM ÖNER FAB -->
-<button tabindex="0" onclick="suggestRandomMovie()" class="fixed bottom-[100px] right-6 md:bottom-10 md:right-10 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_10px_25px_rgba(37,99,235,0.6)] hover:bg-blue-500 hover:scale-110 transition-all z-[1500]" aria-label="Rastgele film öner">
+<button onclick="suggestRandomMovie()" class="fixed bottom-[100px] right-6 md:bottom-10 md:right-10 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-[0_10px_25px_rgba(37,99,235,0.6)] hover:bg-blue-500 hover:scale-110 transition-all z-[1500]" aria-label="Rastgele film öner">
     🎲
 </button>
 
 <!-- MOBİL DOCK NAVIGATION -->
 <div class="stream-dock">
-    <button tabindex="0" id="dock-home" class="dock-btn active" onclick="goHome()" aria-label="Başa dön">🏠</button>
-    <button tabindex="0" id="dock-search" class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
-    <button tabindex="0" id="dock-fav" class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
-    <button tabindex="0" id="dock-menu" class="dock-btn" onclick="openMenuModal()" aria-label="Menü">☰</button>
+    <button id="dock-home" class="dock-btn active" onclick="goHome()" aria-label="Başa dön">🏠</button>
+    <button id="dock-search" class="dock-btn" onclick="toggleSearchModal()" aria-label="Ara">🔍</button>
+    <button id="dock-fav" class="dock-btn" onclick="toggleFavFilter()" aria-label="Favoriler">♡</button>
+    <button id="dock-menu" class="dock-btn" onclick="openMenuModal()" aria-label="Menü">☰</button>
 </div>
 
 <!-- MENÜ MODALI -->
@@ -318,11 +270,11 @@
         <div class="sheet-handle md:hidden"></div>
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold text-white">Menü</h3>
-            <button tabindex="0" onclick="closeMenuModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeMenuModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
         </div>
 
         <div class="flex flex-col gap-3">
-            <button tabindex="0" onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">🔄</span>
                 <div>
                     <div class="text-sm font-bold text-white">Senkronizasyon</div>
@@ -330,8 +282,7 @@
                 </div>
             </button>
             
-            <!-- YENİ: Toplu Favori Dışa Aktarma -->
-            <button tabindex="0" onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">📋</span>
                 <div>
                     <div class="text-sm font-bold text-white">Favorileri Toplu Kopyala</div>
@@ -339,14 +290,14 @@
                 </div>
             </button>
 
-            <button tabindex="0" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+            <button class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] active:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">ℹ️</span>
                 <div>
                     <div class="text-sm font-bold text-white">Hakkında & Topluluk</div>
                     <div class="text-xs text-slate-400">Sürüm bilgileri ve destek linkleri</div>
                 </div>
             </button>
-            <button tabindex="0" class="flex items-center gap-4 bg-rose-900/20 hover:bg-rose-900/40 active:bg-rose-900/40 p-4 rounded-xl transition text-left border border-rose-500/10 mt-2">
+            <button class="flex items-center gap-4 bg-rose-900/20 hover:bg-rose-900/40 active:bg-rose-900/40 p-4 rounded-xl transition text-left border border-rose-500/10 mt-2">
                 <span class="text-2xl">🚩</span>
                 <div>
                     <div class="text-sm font-bold text-rose-400">Geri Bildirim</div>
@@ -362,10 +313,10 @@
     <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
         <div class="flex justify-between items-center mb-2">
             <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
-            <button tabindex="0" onclick="toggleSearchModal()" class="modal-close-btn text-slate-400 hover:text-white text-3xl leading-none" aria-label="Kapat">&times;</button>
+            <button onclick="toggleSearchModal()" class="modal-close-btn text-slate-400 hover:text-white text-3xl leading-none" aria-label="Kapat">&times;</button>
         </div>
         <div class="relative">
-            <input type="text" id="expandedSearchInput" placeholder="Eklenti, içerik veya platform ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none focus:border-pink-500 transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
+            <input type="text" id="expandedSearchInput" placeholder="Eklenti, içerik veya platform ara..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none transition-colors placeholder:text-slate-600 font-black" oninput="handleExpandedSearch(this.value)">
             <span class="absolute right-2 top-1/2 -translate-y-1/2 text-3xl opacity-50">🔍</span>
         </div>
         <p class="text-xs text-slate-500 mt-2">Arama sonuçları arka planda anlık olarak listelenir. Kapatmak için çarpıya veya dışarı tıklayın.</p>
@@ -378,12 +329,12 @@
         <div class="sheet-handle md:hidden"></div>
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg font-bold text-white">Filtrele & Sırala</h3>
-            <button tabindex="0" onclick="closeFilterModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeFilterModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
         </div>
 
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sıralama</label>
-            <select tabindex="0" id="sortSelect" onchange="setSort(this.value)" class="w-full min-h-[44px] bg-[#1a173d] border border-white/10 text-white text-sm p-3.5 rounded-xl outline-none focus-visible:outline-pink-500">
+            <select id="sortSelect" onchange="setSort(this.value)" class="w-full min-h-[44px] bg-[#1a173d] border border-white/10 text-white text-sm p-3.5 rounded-xl outline-none">
                 <option value="default">Varsayılan</option>
                 <option value="name-asc">İsme Göre (A-Z)</option>
                 <option value="newest">Yeni Eklenenler Önce</option>
@@ -402,8 +353,8 @@
         </div>
 
         <div class="grid grid-cols-2 gap-3">
-            <button tabindex="0" onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
-            <button tabindex="0" onclick="applyFilters()" class="min-h-[46px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Uygula</button>
+            <button onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
+            <button onclick="applyFilters()" class="min-h-[46px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Uygula</button>
         </div>
     </div>
 </div>
@@ -415,57 +366,47 @@
         <div class="flex justify-between items-start mb-5">
             <div class="flex flex-wrap gap-2 text-[10px] font-black tracking-wide" id="modal-tags"></div>
             <div class="flex gap-4 items-center text-slate-400">
-                <button tabindex="0" onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala" aria-label="Linki Kopyala">
+                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" title="Linki Kopyala" aria-label="Linki Kopyala">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                 </button>
-                <button tabindex="0" onclick="closeModal()" class="modal-close-btn hover:text-white text-2xl leading-none transition" aria-label="Kapat">✕</button>
+                <button onclick="closeModal()" class="modal-close-btn hover:text-white text-2xl leading-none transition" aria-label="Kapat">✕</button>
             </div>
         </div>
 
         <h2 id="modal-title" class="text-3xl font-bold text-white mb-6"></h2>
 
-        <!-- YENİ: QR Kod ve Link Kutusu Yan Yana -->
-        <div class="mb-6 flex flex-col md:flex-row gap-4">
-            <div class="flex-1">
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI & KURULUM</label>
-                <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-xs font-mono text-indigo-300 break-all mb-4 select-all shadow-inner h-24 overflow-y-auto"></div>
-                
-                <div class="flex gap-3">
-                    <button tabindex="0" id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] hover:bg-[#2f3342] active:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
-                    <button tabindex="0" id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 hover:bg-blue-500 active:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">
-                        Kaynağa Git ↗
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Dinamik QR Kod Alanı -->
-            <div class="shrink-0 flex flex-col items-center justify-center bg-[#1a173d] border border-white/10 rounded-xl p-4">
-                <p class="text-[10px] text-slate-400 mb-2 uppercase font-bold tracking-widest">NUVIO İÇİN OKUT</p>
-                <img id="modal-qr-img" src="" alt="QR Kod" class="w-24 h-24 rounded bg-white p-1">
+        <div class="mb-6">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
+            <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm font-mono text-indigo-300 break-all mb-4 select-all shadow-inner"></div>
+
+            <div class="flex gap-3">
+                <button id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] hover:bg-[#2f3342] active:bg-[#2f3342] text-white font-semibold text-sm py-3 rounded-xl transition border border-white/5">Kopyala</button>
+                <button id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 hover:bg-blue-500 active:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-1">
+                    Kaynağa Git ↗
+                </button>
             </div>
         </div>
 
         <div class="mb-6">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">PUANINIZ</label>
             <div class="flex gap-1 text-2xl" id="modal-rating" onmouseleave="resetStarHover()">
-                <button tabindex="0" class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)" aria-label="1 yıldız">★</button>
-                <button tabindex="0" class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)" aria-label="2 yıldız">★</button>
-                <button tabindex="0" class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)" aria-label="3 yıldız">★</button>
-                <button tabindex="0" class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)" aria-label="4 yıldız">★</button>
-                <button tabindex="0" class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)" aria-label="5 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)" aria-label="1 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)" aria-label="2 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)" aria-label="3 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)" aria-label="4 yıldız">★</button>
+                <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)" aria-label="5 yıldız">★</button>
             </div>
         </div>
 
         <div class="mb-8">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM</label>
-            <textarea tabindex="0" id="modal-note-textarea" rows="2" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 focus-visible:outline-pink-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
+            <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition-colors resize-y mb-4 shadow-inner" placeholder="Bu eklenti hakkında bir not bırak..."></textarea>
             <div class="flex gap-3">
-                <button tabindex="0" onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">Notu Kaydet</button>
-                <button tabindex="0" onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 hover:bg-rose-600/20 active:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">🚩 Bildir</button>
+                <button onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl transition border border-white/5">Notu Kaydet</button>
+                <button onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 hover:bg-rose-600/20 active:bg-rose-600/20 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl transition flex items-center gap-2">🚩 Bildir</button>
             </div>
         </div>
 
-        <!-- Rehberler aynı... -->
         <div id="modal-stremio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
             <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</h3>
             <ul class="text-sm text-slate-300 space-y-4">
@@ -477,33 +418,36 @@
         <div id="modal-nuvio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
             <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</h3>
             <ul class="text-sm text-slate-300 space-y-4">
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki QR kodu telefonunuzun kamerasıyla okutun veya URL'yi kopyalayın.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons > Manage from phone</b> bölümüne gidin.</span></li>
-                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
+                <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">6</span><span><b>Save Changes</b>'e basın ve TV'ye gelen bildirimi onaylayın.</span></li>
             </ul>
         </div>
     </div>
 </div>
 
-<!-- SENKRON MODALI (Aynı) -->
+<!-- SENKRON MODALI -->
 <div id="sync-modal-overlay" onclick="closeSyncModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-white">Verilerini Senkronize Et</h3>
-            <button tabindex="0" onclick="closeSyncModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
+            <button onclick="closeSyncModal()" class="modal-close-btn text-slate-400 hover:text-white text-2xl leading-none" aria-label="Kapat">✕</button>
         </div>
         <p class="text-xs text-slate-400 mb-4">Favori, puan ve notların bu cihaza özel kaydedilir. Başka bir cihazdan erişmek için bir kod oluştur ya da mevcut kodunu gir.</p>
         <div class="flex gap-2 mb-3">
-            <input tabindex="0" id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 min-h-[44px] bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest focus-visible:outline-pink-500">
+            <input id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 min-h-[44px] bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest">
         </div>
         <div class="grid grid-cols-2 gap-3">
-            <button tabindex="0" onclick="syncPush()" class="min-h-[46px] bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Kaydet</button>
-            <button tabindex="0" onclick="syncPull()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Getir</button>
+            <button onclick="syncPush()" class="min-h-[46px] bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Kaydet</button>
+            <button onclick="syncPull()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 active:bg-slate-700 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Getir</button>
         </div>
     </div>
 </div>
 
-<!-- ZAR VE FİLM MODALI (Aynı) -->
+<!-- ZAR VE FİLM MODALI -->
 <div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div class="text-7xl rolling-dice mb-6">🎲</div>
     <p class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
@@ -511,7 +455,7 @@
 
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative">
-        <button tabindex="0" onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
+        <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
         <div class="md:w-5/12 relative shrink-0">
             <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-56 sm:h-64 md:h-full md:absolute md:inset-0 object-cover">
             <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5 z-10">
@@ -526,7 +470,7 @@
             </div>
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
-            <button tabindex="0" onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
+            <button onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
                 <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
         </div>
@@ -550,24 +494,9 @@ let fuseIndex = null;
 let scrollLockCount = 0;
 let newestDate = null;
 
-// YENİ: Görünüm Modu State
-let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
-
-// YENİ: Kategori Emojileri
-const typeIcons = {
-    '4K': '🎬', 'Altyazı': '📝', 'Katalog': '📚', 
-    'Repo': '📦', 'Dublaj': '🇹🇷', 'Film': '🎞️', 
-    'Canlı': '📡', 'Spor': '⚽', 'Tümü': '🔥'
-};
-
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function showToast(msg, isError) {
@@ -595,38 +524,23 @@ async function copyToClipboard(text, emptyMsg) {
         await navigator.clipboard.writeText(text);
         showToast('📋 Kopyalandı!');
     } catch (err) {
-        console.error('Kopyalama hatası:', err);
         showToast('Kopyalama başarısız, elle seçin.', true);
     }
 }
 
-// YENİ: Favorileri Toplu Kopyalama Fonksiyonu
 function exportFavorites() {
-    if(favorites.length === 0) {
-        showToast('Favori listeniz boş.', true);
-        return;
-    }
-    
+    if(favorites.length === 0) { showToast('Favori listeniz boş.', true); return; }
     let exportText = "Favori Eklenti Linklerim:\n\n";
     let foundCount = 0;
-    
     favorites.forEach(favKey => {
         const p = plugins.find(pl => pluginKey(pl) === favKey);
         if(p) {
             const url = extractUrl(p.desc);
-            if(url) {
-                exportText += `- ${p.name}: ${url}\n`;
-                foundCount++;
-            }
+            if(url) { exportText += `- ${p.name}: ${url}\n`; foundCount++; }
         }
     });
-
-    if(foundCount > 0) {
-        copyToClipboard(exportText);
-        showToast(`📋 ${foundCount} favori linki kopyalandı!`);
-    } else {
-        showToast('Kopyalanacak link bulunamadı.', true);
-    }
+    if(foundCount > 0) { copyToClipboard(exportText); showToast(`📋 ${foundCount} favori linki kopyalandı!`); } 
+    else { showToast('Kopyalanacak link bulunamadı.', true); }
     closeMenuModal();
 }
 
@@ -634,8 +548,7 @@ function lockBodyScroll() { scrollLockCount++; document.body.style.overflow = 'h
 function unlockBodyScroll() { scrollLockCount = Math.max(0, scrollLockCount - 1); if (scrollLockCount === 0) document.body.style.overflow = ''; }
 
 function debounce(fn, wait) {
-    let t;
-    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
 }
 const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
@@ -658,7 +571,6 @@ function goHome() {
     setActiveDock('home');
 }
 
-/* Modallar... (Kodun kalanı aynı) */
 function openMenuModal() {
     const overlay = document.getElementById('menu-modal-overlay');
     const box = document.getElementById('menu-modal-box');
@@ -682,7 +594,23 @@ function saveNoteFromTextarea() {
     localStorage.setItem('ph_notes', JSON.stringify(userNotes));
 }
 
-async function reportCurrentPlugin() { /* Mevcut Kod */ }
+async function reportCurrentPlugin() {
+    if (!currentModalItem) return;
+    const btn = document.getElementById('report-btn');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.textContent = '⏳...';
+    const appStr = Array.isArray(currentModalItem.app) ? currentModalItem.app.join(', ') : currentModalItem.app;
+    try {
+        const res = await fetch(REPORT_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pluginName: currentModalItem.name, app: appStr, type: currentModalItem.type || '' })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast(`🚩 ${currentModalItem.name} başarıyla raporlandı!`);
+    } catch (err) {
+        showToast('Rapor gönderilemedi.', true);
+    } finally { btn.disabled = false; btn.textContent = originalText; }
+}
 
 function openSyncModal() {
     document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
@@ -696,8 +624,39 @@ function getOrCreateSyncCode() {
     if (!code) { code = Math.random().toString(36).substring(2, 8).toUpperCase(); document.getElementById('sync-code-input').value = code; }
     return code;
 }
-async function syncPush() { /* Mevcut Kod */ }
-async function syncPull() { /* Mevcut Kod */ }
+async function syncPush() {
+    const code = getOrCreateSyncCode();
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/sync`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, data: { favorites, userRatings, userNotes } })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        localStorage.setItem('ph_sync_code', code);
+        showToast(`✅ Verilerin "${code}" koduyla kaydedildi.`);
+        closeSyncModal();
+    } catch (err) { showToast('Senkronizasyon şu an kullanılamıyor.', true); }
+}
+async function syncPull() {
+    const code = document.getElementById('sync-code-input').value.trim().toUpperCase();
+    if (!code) { showToast('Lütfen bir kod girin.', true); return; }
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/sync?code=${encodeURIComponent(code)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const payload = await res.json();
+        if (!payload || !payload.data) throw new Error('Kod bulunamadı');
+
+        favorites = payload.data.favorites || [];
+        userRatings = payload.data.userRatings || {};
+        userNotes = payload.data.userNotes || {};
+        localStorage.setItem('ph_favs', JSON.stringify(favorites));
+        localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
+        localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+        localStorage.setItem('ph_sync_code', code);
+
+        filterData(); showToast('✅ Veriler bu cihaza aktarıldı.'); closeSyncModal();
+    } catch (err) { showToast('Kod bulunamadı veya sunucuya ulaşılamadı.', true); }
+}
 
 function updateDailyFeatured() {
     if (!plugins || plugins.length === 0) return;
@@ -718,7 +677,6 @@ function updateDailyFeatured() {
         } else { showToast('Kurulum linki bulunamadı.', true); }
     };
     document.getElementById('hero-copy-btn').onclick = () => copyToClipboard(url, 'Kopyalanacak bağlantı yok.');
-    document.getElementById('hero-play-btn').onclick = document.getElementById('hero-install-btn').onclick;
 }
 
 function toggleSearchModal() {
@@ -752,57 +710,29 @@ function toggleFavFilter() {
     filterData();
 }
 
-// YENİ: Görünüm Değiştirici Fonksiyon (Grid <-> List)
-function toggleViewMode() {
-    viewMode = viewMode === 'grid' ? 'list' : 'grid';
-    localStorage.setItem('ph_view_mode', viewMode);
-    applyViewModeUI();
-    filterData(); // Kartları yeniden render et
-}
-
-function applyViewModeUI() {
-    const gridIcon = document.getElementById('viewIconGrid');
-    const listIcon = document.getElementById('viewIconList');
-    const gridContainer = document.getElementById('resultsGrid');
-    
-    if (viewMode === 'list') {
-        gridIcon.classList.add('hidden');
-        listIcon.classList.remove('hidden');
-        gridContainer.className = 'grid grid-cols-1 gap-3'; // Tek kolon
-    } else {
-        listIcon.classList.add('hidden');
-        gridIcon.classList.remove('hidden');
-        gridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'; // Çok kolon
-    }
-}
-
-// YENİ: Skeleton (İskelet) Yükleme Ekranı
 function renderSkeletons() {
     const grid = document.getElementById('resultsGrid');
     grid.innerHTML = '';
-    applyViewModeUI();
     
     for(let i=0; i<6; i++) {
         const card = document.createElement('div');
-        card.className = `stream-card p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} pointer-events-none`;
+        card.className = `stream-card p-5 flex flex-col pointer-events-none`;
         card.innerHTML = `
-            <div class="${viewMode === 'list' ? 'w-full flex items-center gap-4' : 'w-full'}">
-                <div class="skeleton-box w-16 h-6 mb-4 ${viewMode === 'list' ? 'mb-0' : ''}"></div>
-                <div class="skeleton-box w-3/4 h-6 mb-2 ${viewMode === 'list' ? 'mb-0 flex-1' : ''}"></div>
-                ${viewMode === 'grid' ? '<div class="skeleton-box w-full h-4 mb-6"></div>' : ''}
+            <div class="w-full">
+                <div class="skeleton-box w-16 h-6 mb-4"></div>
+                <div class="skeleton-box w-3/4 h-6 mb-2"></div>
+                <div class="skeleton-box w-full h-4 mb-6"></div>
             </div>
         `;
         grid.appendChild(card);
     }
 }
 
-// GÜNCELLENDİ: Kart Render Fonksiyonu (Liste/Grid Mantığı ve Klavye Erişilebilirliği)
 function renderCards(data) {
     const grid = document.getElementById('resultsGrid');
     const count = document.getElementById('resultCount');
     grid.innerHTML = '';
     count.textContent = `${data.length} Eklenti Listeleniyor`;
-    applyViewModeUI();
 
     if (data.length === 0) {
         grid.innerHTML = `<div class="col-span-full text-center text-slate-500 text-sm py-16">Aramanızla eşleşen eklenti bulunamadı.</div>`;
@@ -825,49 +755,31 @@ function renderCards(data) {
         const appArray = Array.isArray(item.app) ? item.app : [item.app];
         const appBadgesHTML = appArray.map(appName => {
             const badgeClass = appName.toLowerCase() === 'stremio' ? 'tag-stremio' : 'tag-nuvio';
-            return `<span class="${badgeClass} px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">${escapeHtml(appName)}</span>`;
+            return `<span class="${badgeClass} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${escapeHtml(appName)}</span>`;
         }).join('');
 
         const card = document.createElement('div');
-        card.className = `stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col justify-between'}`;
-        card.setAttribute('tabindex', '0'); // TV Kumandası için odaklanabilir
-
-        // Klavye ile açılabilmesi için (Enter tuşu)
-        card.addEventListener('keydown', (e) => {
-            if(e.key === 'Enter') openModalItem(item);
-        });
-
+        card.className = `stream-card p-5 flex flex-col justify-between`;
         card.innerHTML = `
             <div class="card-header w-full">
-                <div class="flex justify-between items-start mb-3 md:mb-4">
+                <div class="flex justify-between items-start mb-4">
                     <div class="flex items-center gap-2 flex-wrap">
                         ${appBadgesHTML}
                         ${newBadgeHTML}
                     </div>
-                    ${viewMode === 'grid' ? `<button tabindex="0" class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')">${isFav ? '❤️' : '♡'}</button>` : ''}
+                    <button class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')">${isFav ? '❤️' : '♡'}</button>
                 </div>
-                <h3 class="font-bold text-lg md:text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
-                
-                ${viewMode === 'grid' ? `
-                <div class="flex items-center justify-between text-[12px] md:text-[13px] text-slate-300 mb-3">
+                <h3 class="font-bold text-xl text-white mb-2">${escapeHtml(item.name)}</h3>
+                <div class="flex items-center justify-between text-[13px] text-slate-300 mb-3">
                     <span>Türü: ${escapeHtml(item.type || '—')}</span>
                     <span class="text-sm opacity-80">${(item.platform || []).map(p => platformIcons[p] || '').join(' ')}</span>
                 </div>
-                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mb-4 md:mb-6 border-b border-white/5 pb-4 md:pb-6">${debridLabels[item.debrid] || ''}</p>
-                ` : ''}
+                <p class="text-[11px] font-bold text-slate-400 mb-6 border-b border-white/5 pb-6">${debridLabels[item.debrid] || ''}</p>
             </div>
-            
             <div class="card-footer w-full flex items-center justify-between">
-                <div class="flex gap-1 text-base md:text-lg">${starsHTML}</div>
-                <button tabindex="-1" class="min-h-[40px] bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition pointer-events-none">İncele</button>
+                <div class="flex gap-1 text-lg">${starsHTML}</div>
+                <button class="min-h-[44px] bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition pointer-events-none">İncele</button>
             </div>
-
-            ${viewMode === 'list' ? `
-                <div class="flex-1 text-right">
-                    <span class="text-xs text-slate-400 block">${escapeHtml(item.type || '—')}</span>
-                </div>
-                <button tabindex="0" class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" onclick="event.stopPropagation(); toggleFav('${escapeHtml(pluginKey(item))}')">${isFav ? '❤️' : '♡'}</button>
-            ` : ''}
         `;
         card.onclick = () => openModalItem(item);
         grid.appendChild(card);
@@ -912,12 +824,12 @@ function filterData() {
 function buildFilterOptions() {
     const debridOptions = [ { v: 'all', l: 'Tümü' }, { v: 'free', l: '🆓 Ücretsiz' }, { v: 'optional', l: '🔓 Opsiyonel' }, { v: 'required', l: '⚡ Gerekli' } ];
     document.getElementById('debridFilterGroup').innerHTML = debridOptions.map(o =>
-        `<button tabindex="0" class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`
+        `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`
     ).join('');
 
     const platformOptions = [ { v: 'all', l: 'Tümü' }, { v: 'mobile', l: '📱 Mobil' }, { v: 'tv', l: '📺 TV' }, { v: 'web', l: '💻 Web' } ];
     document.getElementById('platformFilterGroup').innerHTML = platformOptions.map(o =>
-        `<button tabindex="0" class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`
+        `<button class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`
     ).join('');
 }
 
@@ -988,15 +900,6 @@ function openModalItem(item) {
     const goUrl = item.sourceUrl || manifestUrl;
     document.getElementById('modal-url-box').textContent = manifestUrl || 'Bağlantı bulunamadı';
 
-    // YENİ: Dinamik QR Kod Oluşturma
-    const qrImg = document.getElementById('modal-qr-img');
-    if(manifestUrl) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(manifestUrl)}`;
-        qrImg.parentElement.style.display = 'flex';
-    } else {
-        qrImg.parentElement.style.display = 'none';
-    }
-
     document.getElementById('modal-copy-btn').onclick = () => copyToClipboard(manifestUrl, 'Kopyalanacak bağlantı yok.');
     document.getElementById('modal-go-btn').onclick = () => {
         if (goUrl && goUrl.startsWith('http')) window.open(goUrl, '_blank', 'noopener,noreferrer');
@@ -1012,9 +915,6 @@ function openModalItem(item) {
     document.getElementById('modal-note-textarea').value = userNotes[pKey] || '';
 
     document.getElementById('modal-overlay').classList.add('open'); lockBodyScroll();
-    
-    // Açıldığında doğrudan kopyala butonuna odaklan (TV Kumanda kolaylığı)
-    setTimeout(() => document.getElementById('modal-copy-btn').focus(), 100);
 }
 
 function copyCurrentLink() { copyToClipboard(document.getElementById('modal-url-box').textContent, 'Kopyalanacak bağlantı yok.'); }
@@ -1034,13 +934,11 @@ function updateStarsUI(count) {
     for (let i = 0; i < 5; i++) stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
 }
 
-// YENİ: Kategori Emojilerini Ekleme
 function buildTabs() {
     const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
     const container = document.getElementById('categoryTabs');
     container.innerHTML = types.map((t, i) => {
-        const icon = typeIcons[t] || '📌';
-        return `<button tabindex="0" class="pill-tab ${i === 0 ? 'active' : ''}" onclick="filterTab('${escapeHtml(t)}', this)">${icon} ${escapeHtml(t)}</button>`;
+        return `<button class="pill-tab ${i === 0 ? 'active' : ''}" onclick="filterTab('${escapeHtml(t)}', this)">${escapeHtml(t)}</button>`;
     }).join('');
 }
 
@@ -1055,7 +953,7 @@ function closeMovieModal(e) { if (!e || e.target.id === 'movie-modal-overlay') d
 
 buildFilterOptions();
 updateFilterBadge();
-renderSkeletons(); // JSON Yüklenirken İskelet Ekranı Göster
+renderSkeletons();
 
 fetch('plugins.json')
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
@@ -1065,14 +963,13 @@ fetch('plugins.json')
         buildTabs(); filterData(); updateDailyFeatured();
     })
     .catch((err) => {
-        console.warn('Yüklenemedi:', err);
         showToast('Eklenti listesi yüklenemedi.', true);
         document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri bağlantısı kurulamadı.</div>';
     });
 
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-async function suggestRandomMovie() { /* Film Kodu Aynı... */
+async function suggestRandomMovie() {
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
