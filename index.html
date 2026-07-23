@@ -64,7 +64,6 @@
         .star { color: #2d2a54; transition: color 0.2s; cursor: pointer; padding: 6px; }
         .star:hover { color: #ffb800; }
 
-        /* Film & Platform CSS'leri */
         .b-aksiyon{background:rgba(59,130,246,0.15);color:#93c5fd}
         .b-bilimkurgu{background:rgba(139,92,246,0.15);color:#c4b5fd}
         .b-macera{background:rgba(34,197,94,0.15);color:#86efac}
@@ -93,7 +92,6 @@
         .st-sony{background:rgba(0,168,225,0.12);color:#38bdf8;border:1px solid rgba(0,168,225,0.25)}
         .st-paramount{background:rgba(148,101,224,0.14);color:#c4b5fd;border:1px solid rgba(148,101,224,0.28)}
 
-        /* Genel Bileşenler */
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-stremio { background: rgba(192, 132, 252, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
@@ -113,6 +111,14 @@
         #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
 
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
+
+        .main-tab-btn { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; white-space: nowrap; background: #1a173d; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; flex-shrink: 0; min-height: 48px; }
+        .main-tab-btn.active { background: var(--accent-pink); color: #fff; box-shadow: 0 8px 20px rgba(255,42,95,0.3); }
+        .icon-tab-btn { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #1a173d; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; flex-shrink: 0; }
+        .icon-tab-btn.active { background: var(--accent-pink); box-shadow: 0 8px 20px rgba(255,42,95,0.3); }
+        .icon-tab-btn img { height: 20px; width: auto; filter: brightness(0) invert(1); opacity: 0.55; transition: opacity 0.2s; }
+        .icon-tab-btn.active img { opacity: 1; }
+        .tab-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.1); flex-shrink: 0; margin: 0 2px; }
     </style>
 </head>
 <body>
@@ -126,6 +132,7 @@
         <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
     </div>
     <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
+        <button onclick="toggleSearchModal()" id="headerSearchBtn" aria-label="Ara" class="min-h-[40px] min-w-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition flex items-center justify-center">🔍</button>
         <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
     </div>
 </header>
@@ -133,13 +140,18 @@
 <main class="max-w-7xl mx-auto px-6 py-4">
     
    <!-- ANA KATEGORİLER (SPA SEKMELERİ) -->
-    <div class="flex gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('mobilapk', this)">📱 Telefon APK</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('atmos', this)">🎧 Dolby Atmos</button>
-        <button class="px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('imax', this)">🎬 IMAX Enhanced</button>
+    <div class="flex items-center gap-3 overflow-x-auto pb-6 mb-2" id="mainCategoryTabs">
+        <button class="main-tab-btn active" data-cat="eklentiler" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
+        <button class="main-tab-btn" data-cat="tvapk" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
+        <button class="main-tab-btn" data-cat="mobilapk" onclick="switchMainCategory('mobilapk', this)">📱 Telefon APK</button>
+        <button class="main-tab-btn" data-cat="sporapk" onclick="switchMainCategory('sporapk', this)">⚽ Spor APK</button>
+        <div class="tab-divider"></div>
+        <button class="icon-tab-btn" data-cat="atmos" onclick="switchMainCategory('atmos', this)" aria-label="Dolby Atmos">
+            <img src="assets/dolby-atmos.png" alt="Dolby Atmos">
+        </button>
+        <button class="icon-tab-btn" data-cat="imax" onclick="switchMainCategory('imax', this)" aria-label="IMAX Enhanced">
+            <img src="assets/imax-enhanced.png" alt="IMAX Enhanced">
+        </button>
     </div>
 
     <!-- HERO FEATURED MEDIA (Sadece Eklentilerde Görünür) -->
@@ -189,7 +201,6 @@
 <div class="stream-dock">
     <div class="dock-indicator" id="dockIndicator"></div>
     <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
-    <button class="dock-btn" id="dock-search" aria-label="Arama" onclick="toggleSearchModal()">🔍</button>
     <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
@@ -355,7 +366,6 @@
 </div>
 
 <script>
-// SPA Veri Altyapısı
 const DATA_SOURCES = {
     'eklentiler': 'plugins.json',
     'tvapk': 'tvapk.json',
@@ -383,7 +393,6 @@ let scrollLockCount = 0;
 let newestDate = null;
 let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
 
-// Public Notes State
 let publicNotesCache = {};
 
 function escapeHtml(str) {
@@ -400,7 +409,6 @@ function showToast(msg, isError) {
     showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// Güçlendirilmiş Anahtar Fonksiyonu (Hem APK hem Filmler İçin)
 function pluginKey(p) {
     if (p.app) { 
         const appStr = Array.isArray(p.app) ? p.app.join('-') : p.app;
@@ -440,19 +448,14 @@ function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = 
 const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
-// SPA Kategori Geçişi
 async function switchMainCategory(key, btnEl) {
-    document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
-        b.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
-    });
-    btnEl.className = "px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30";
-    
+    document.querySelectorAll('#mainCategoryTabs button').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+
     currentMainCategory = key;
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
-    const isMovie = (key === 'atmos' || key === 'imax');
-    
     document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
     document.getElementById('heroSection').style.display = (key === 'eklentiler') ? 'block' : 'none';
 
@@ -478,9 +481,18 @@ async function loadCategoryData(key) {
         document.getElementById('resultsGrid').innerHTML = '<div class="col-span-full text-center text-rose-500 py-10">Veri yüklenemedi.</div>';
     }
 }
+
+function postLoadSetup() {
+    computeNewestDate();
+    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code', 'year', 'genre', 'platform', 'studio'], threshold: 0.35 });
+    buildTabs();
+    buildFilterOptions();
+    filterData();
+    if(currentMainCategory === 'eklentiler') updateDailyFeatured();
+}
+
 function updateDailyFeatured() {
     if (!plugins.length) return;
-    // Tarihe göre deterministik "günün eklentisi" seçimi
     const seed = new Date().toISOString().slice(0, 10)
         .split('-').reduce((a, b) => a + parseInt(b), 0);
     const item = plugins[seed % plugins.length];
@@ -497,17 +509,7 @@ function updateDailyFeatured() {
         copyToClipboard(item.code || url);
     };
 }
-function postLoadSetup() {
-    computeNewestDate();
-    // Arama motorunu güçlendiriyoruz
-    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code', 'year', 'genre', 'platform', 'studio'], threshold: 0.35 });
-    buildTabs();
-    buildFilterOptions();
-    filterData();
-    if(currentMainCategory === 'eklentiler') updateDailyFeatured();
-}
 
-// ---------------- UI & DOCK ----------------
 function moveIndicator(activeEl) {
     const indicator = document.getElementById('dockIndicator');
     if (indicator && activeEl) indicator.style.transform = `translateX(${activeEl.offsetLeft}px)`;
@@ -567,7 +569,6 @@ function toggleFavFilter() {
     const favBtn = document.getElementById('favBtn');
     favBtn.style.background = showFavsOnly ? 'var(--accent-pink)' : '';
     favBtn.style.color = showFavsOnly ? '#fff' : '';
-    setActiveDock(showFavsOnly ? 'fav' : 'home');
     filterData();
 }
 function toggleViewMode() {
@@ -588,7 +589,6 @@ function applyViewModeUI() {
     }
 }
 
-// ---------------- KART RENDER SİSTEMİ ----------------
 const genreClasses = {"Aksiyon":"b-aksiyon","Bilim Kurgu":"b-bilimkurgu","Macera":"b-macera","Savaş":"b-savas","Korku":"b-korku","Dram":"b-dram","Animasyon":"b-animasyon","Müzik":"b-muzik","Gerilim":"b-gerilim","Fantastik":"b-fantastik","Tarih":"b-tarih","Suç":"b-suc"};
 const platClasses = {"Prime":"pt-prime","Netflix":"pt-netflix","TV+":"pt-tvplus","Max":"pt-max","Disney+":"pt-disney","TOD":"pt-tod","MUBI":"pt-mubi","Bravia":"pt-bravia","UHD":"pt-uhd","Dijital":"pt-dijital"};
 const studioClasses = {"marvel":"st-marvel","sony":"st-sony","paramount":"st-paramount"};
@@ -604,7 +604,6 @@ function buildCardHTML(item) {
     const favBtnHTML = `<button class="fav-btn w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}">${isFav ? '❤️' : '♡'}</button>`;
 
     if (isMovie) {
-        // --- FİLM KARTI ---
         if (viewMode === 'list') {
             return `
                 <div class="card-header flex items-center gap-3">
@@ -642,7 +641,6 @@ function buildCardHTML(item) {
             </div>
         `;
     } else {
-        // --- APK / EKLENTİ KARTI ---
         const userRating = userRatings[itemKey] || 0;
         let starsHTML = '';
         for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
@@ -725,7 +723,6 @@ function toggleFav(key) {
     filterData();
 }
 
-// ---------------- VERİ İŞLEME & FİLTRE ----------------
 function computeNewestDate() {
     newestDate = null;
     plugins.forEach(p => { if (p.dateAdded && (!newestDate || p.dateAdded > newestDate)) newestDate = p.dateAdded; });
@@ -740,13 +737,11 @@ function buildTabs() {
 function buildFilterOptions() {
     const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
     
-    // Debrid sadece eklentilerde
     if (!isMovie) {
         const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Gerekli'}];
         document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
     }
 
-    // Platformları dinamik alıyoruz
     let allPlats = new Set();
     plugins.forEach(p => { if(Array.isArray(p.platform)) p.platform.forEach(x => allPlats.add(x)); });
     const pOpts = [{v:'all', l:'Tümü'}, ...Array.from(allPlats).map(p => ({v:p, l:p}))];
@@ -787,18 +782,16 @@ function filterData() {
     renderCards(sortPool(pool));
 }
 
-// ---------------- MODAL İŞLEMLERİ ----------------
 function openModalItem(item) {
     currentModalItem = item;
     const key = pluginKey(item);
     const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
 
     document.getElementById('modal-title').textContent = item.name;
-    document.getElementById('modal-tags').innerHTML = ''; // Temizle
+    document.getElementById('modal-tags').innerHTML = '';
     document.getElementById('modal-copy-icon').style.display = isMovie ? 'none' : 'block';
 
     if (isMovie) {
-        // --- FİLM MODALI ---
         document.getElementById('modal-apk-info').classList.add('hidden');
         document.getElementById('modal-movie-info').classList.remove('hidden');
         
@@ -812,7 +805,6 @@ function openModalItem(item) {
         if (item.hint) { hintEl.textContent = `💡 ${item.hint}`; hintEl.classList.remove('hidden'); } 
         else { hintEl.classList.add('hidden'); }
 
-        // Cloudflare Public Notes Yükle
         document.getElementById('public-note-input').value = '';
         document.getElementById('public-char-count').textContent = '0/300';
         document.getElementById('public-notes-list').innerHTML = `<div class="text-xs text-slate-500">Yükleniyor...</div>`;
@@ -820,7 +812,6 @@ function openModalItem(item) {
         fetchPublicNotes(key);
 
     } else {
-        // --- APK MODALI ---
         document.getElementById('modal-movie-info').classList.add('hidden');
         document.getElementById('modal-apk-info').classList.remove('hidden');
         
@@ -862,7 +853,6 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// APK Kişisel Not & Puan
 function hoverStars(i) { updateStarsUI(i, true); }
 function resetStarHover() { updateStarsUI(currentRatingDisplay); }
 function ratePlugin(index) {
@@ -884,7 +874,6 @@ function saveNoteFromTextarea() {
     localStorage.setItem('ph_notes', JSON.stringify(userNotes));
 }
 
-// ---------------- PUBLIC NOTES (FİLMLER İÇİN) ----------------
 async function fetchPublicNotes(key) {
     try {
         const res = await fetch(`${NOTES_ENDPOINT}?movie=${encodeURIComponent(key)}`);
@@ -966,7 +955,6 @@ document.getElementById('public-note-input').addEventListener('input', function(
     document.getElementById('public-char-count').textContent = `${this.value.length}/300`;
 });
 
-// ---------------- DİĞER MODALLAR (FİLTRE, ARAMA, MENÜ) ----------------
 function openFilterModal() {
     document.getElementById('filter-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     lockBodyScroll(); setTimeout(() => document.getElementById('filter-modal-box').classList.remove('translate-y-full'), 10);
