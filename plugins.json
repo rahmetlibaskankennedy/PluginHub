@@ -1,783 +1,1290 @@
 [
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "WebStreamr",
     "desc": "Bağlantı Linki: https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "OpenSubtitles",
     "desc": "Bağlantı Linki: https://opensubtitles-v3.strem.io/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "OpenSubtitles Pro",
     "desc": "Bağlantı Linki: https://opensubtitlesv3-pro.dexter21767.com/eyJsYW5ncyI6WyJ0dXJraXNoIl0sInNvdXJjZSI6ImFsbCIsImFpVHJhbnNsYXRlZCI6dHJ1ZSwiYXV0b0FkanVzdG1lbnQiOmZhbHNlfQ==/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "SubSource Subtitles",
     "desc": "Bağlantı Linki: https://subsource.strem.top/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "SubDL Subtitles",
     "desc": "Bağlantı Linki: https://subdl.strem.top/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "TurkceAltyazi.org",
     "desc": "Bağlantı Linki: https://turkcealtyaziorg-stremio-addon.mycodelab.com.tr/addon/manifest.json",
     "installGuide": "stremio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "SubMaker",
     "desc": "Bağlantı Linki: https://submaker.elfhosted.com/addon/3f3cbe5143cb0c0c9223ecaa5b55da70/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Streaming Catalogs",
     "desc": "Bağlantı Linki: https://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club/ZG5wLGFtcCxhdHAsbmZ4LGhibSxuZmssY3RzLGNydSxtYmk6OnRyOjE3NTY2NDQ0MTU1MzM6dHJ1ZTowOg%3D%3D/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Torrentio",
     "desc": "Bağlantı Linki: https://torrentio.strem.fun/configure",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Comet",
     "desc": "Bağlantı Linki: https://comet.elfhosted.com/configure",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "MediaFusion",
     "desc": "Bağlantı Linki: https://mediafusion.elfhosted.com/configure",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Nuvio",
     "desc": "Bağlantı Linki: https://nuviostreams.hayd.uk/",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Jackettio",
     "desc": "Bağlantı Linki: https://jackettio.elfhosted.com/configure",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "StremThruTorz",
     "desc": "Bağlantı Linki: https://stremthru.elfhosted.com/stremio/torz/configure",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Watchly",
     "desc": "Bağlantı Linki: https://watchly.elfhosted.com/",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Top Streaming TR",
     "desc": "Bağlantı Linki: https://top-streaming.stream/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio"],
+    "app": [
+      "Nuvio"
+    ],
     "type": "Plugin",
     "name": "Yoru's Repo",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/yoruix/nuvio-providers/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio"],
+    "app": [
+      "Nuvio"
+    ],
     "type": "Plugin",
     "name": "Phisher's Repo",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/phisher98/phisher-nuvio-providers/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio"],
+    "app": [
+      "Nuvio"
+    ],
     "type": "Plugin",
     "name": "Spidey's Providers",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/Abinanthankv/NuvioRepo/refs/heads/master/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Dublaj",
     "name": "SineWix",
     "desc": "Bağlantı Linki: https://sine-wix.vercel.app/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "NebulaStreams",
     "desc": "Bağlantı Linki: https://nebulastreams.onrender.com/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Meteor",
     "desc": "Bağlantı Linki: https://meteorfortheweebs.midnightignite.me/configure",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Film",
     "name": "ZeusTV",
     "desc": "Bağlantı Linki: https://zeust.onrender.com/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "TorrentsDB",
     "desc": "Bağlantı Linki: https://torrentsdb.com/manifest.json",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "HdHub",
     "desc": "Bağlantı Linki: https://hdhub.thevolecitor.qzz.io",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Sootio",
     "desc": "Bağlantı Linki: https://sooti.info/configure",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Dublaj",
     "name": "MoonCrown (Plug-in)",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/mooncrown04/nuviotr/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio"],
+    "app": [
+      "Nuvio"
+    ],
     "type": "Plugin",
     "name": "Wekmed",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/Wekmed/nuvio/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "WatchNow",
     "desc": "Bağlantı Linki: https://sword-watch.vercel.app/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio"],
+    "app": [
+      "Nuvio"
+    ],
     "type": "Plugin",
     "name": "D3adlyRocket",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/D3adlyRocket/All-in-One-Nuvio/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Tenies.Site",
     "desc": "Bağlantı Linki: https://nuvio-addon.onrender.com/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Flix-Streams",
     "desc": "Bağlantı Linki: https://flixnest.app/flix-streams/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Dublaj",
     "name": "Streailer",
     "desc": "Bağlantı Linki: https://streailer.elfhosted.com/%7B%22language%22%3A%22tr-TR%22%2C%22externalLink%22%3Afalse%2C%22showRecap%22%3Afalse%2C%22onlyRecaps%22%3Afalse%7D/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "StreamPeak",
     "desc": "Bağlantı Linki: https://addon.streampeak.workers.dev/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Flixoo",
     "desc": "Bağlantı Linki: https://flixo-o.vercel.app/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Watcho",
     "desc": "Bağlantı Linki: https://watcho3.rafaelzioneverest.workers.dev/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "TorrentClaw",
     "desc": "Bağlantı Linki: https://torrentclaw.com/api/stremio/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "YukiStreams",
     "desc": "Bağlantı Linki: https://stremio.yukistreams.xyz/configure",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Cinemeta",
     "desc": "Bağlantı Linki: https://v3-cinemeta.strem.io/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Altyazı",
     "name": "AltyaziDB",
     "desc": "Bağlantı Linki: https://altyazidb.online/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Scary Only",
     "desc": "Bağlantı Linki: https://cinemaratona-br.vercel.app/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Intelligent Debrid Search",
     "desc": "Bağlantı Linki: https://stremio-addons.net/addons/intell-debridsearch",
     "installGuide": "nuvio",
     "debrid": "required",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Film",
     "name": "YouTubio",
     "desc": "Bağlantı Linki: https://youtubio.elfhosted.com/%7B%7D/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "TheBeginning",
     "desc": "Bağlantı Linki: https://thebeginningjuststarted.xyz/",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "CIN",
     "desc": "Bağlantı Linki: https://cinnn.vercel.app/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "By Murph Streams",
     "desc": "Bağlantı Linki: https://badboysxs-morpheus.hf.space/bWIsbm0sZGYsaGgsa2gsa20sYXcsaG0/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Canlı",
     "name": "NexoTV",
     "desc": "Bağlantı Linki: https://263f84288ddb-nexotv.baby-beamup.club/",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Sitcom Shuffle",
     "desc": "Bağlantı Linki: https://typical-noel-sitcom-shuffle-752348e5.koyeb.app/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Dublaj",
     "name": "TCLTurko",
     "desc": "Bağlantı Linki: https://tclbot-1.onrender.com/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Nexus",
     "desc": "Bağlantı Linki: https://nexuszen.vercel.app/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Dublaj",
     "name": "Patr0n (Plug-in)",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/patr0nq/nuvioaddons/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "TILL",
     "desc": "Bağlantı Linki: https://till-8b4w.onrender.com/configure",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Torrin",
     "desc": "Bağlantı Linki: https://addon.torrin.app/configure",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Cinescrape",
     "desc": "Bağlantı Linki: https://bc48e59c61df-cinescrape-docker.baby-beamup.club/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "PEZZHUB AIO",
     "desc": "Bağlantı Linki: https://pezz8io.dpdns.org/configure",
     "installGuide": "nuvio",
     "debrid": "optional",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "NTL Movie Collections",
     "desc": "Bağlantı Linki: https://ntl-collections-en.vercel.app/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Stremio Stinger Pro",
     "desc": "Bağlantı Linki: https://stremio-stinger-pro.up.railway.app/",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Spor",
     "name": "Live Sports Streams",
     "desc": "Bağlantı Linki: https://sports.highfly.dev/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Spor",
     "name": "WorldCup 4K",
     "desc": "Bağlantı Linki: https://worldcup-ns10.onrender.com/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "PenguPlay",
     "desc": "Bağlantı Linki: https://pengu.uk/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Katalog",
     "name": "Movie Leaks",
     "desc": "Bağlantı Linki: https://steamddon.dedyn.io/movieleaks/rpdb_api_key=t0-free-rpdb-rounded-blocks/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "SK/CZ Torrents",
     "desc": "Bağlantı Linki: https://61ab9c85a149-skcz-torrents.baby-beamup.club/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Filtorrent",
     "desc": "Bağlantı Linki: https://ce8c71dcef3b-filtorrent.baby-beamup.club/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Bamabin",
     "desc": "Bağlantı Linki: https://bamabin.zarg.ir/tokenanddettings/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Spor",
     "name": "Maximum Sports",
     "desc": "Bağlantı Linki: https://1fe84bc728af-maxsport.baby-beamup.club/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Spor",
     "name": "Sports Streams",
     "desc": "Bağlantı Linki: https://sports.highfly.dev/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Canlı",
     "name": "StremTV",
     "desc": "Bağlantı Linki: https://stremtv.vercel.app/",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "Spor",
     "name": "Motorsport Hub",
     "desc": "Bağlantı Linki: https://stream.prototipo.nl/%7B%7D/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "Magnetio",
     "desc": "Bağlantı Linki: https://magnetio.peterdsp.dev/configure",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["Nuvio", "Stremio"],
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
     "type": "4K",
     "name": "deneme",
     "desc": "Bağlantı Linki: sdfsddsbdfbdfb",
     "installGuide": "nuvio",
     "debrid": "free",
-    "platform": ["tv", "mobile", "web"],
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
     "dateAdded": "2026-07-23"
   },
   {
-    "app": ["CloudStream"],
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "Gizlikeyif",
     "desc": "!Gizlikeyif",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": "",
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24",
     "ageRestricted": true
-},
-{
-    "app": ["CloudStream"],
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "Kraptor",
     "desc": "!Kraptor",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-},
-{
-    "app": ["CloudStream"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "Cskarma",
     "desc": "!Cskarma",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-},
-{
-    "app": ["CloudStream"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "Feroxxcs3",
     "desc": "!Feroxxcs3",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-},
-{
-    "app": ["CloudStream"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "Makoto2",
     "desc": "!Makoto2",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-},
-{
-    "app": ["CloudStream"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "AyzenCS3",
     "desc": "!AyzenCS3",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-},
-{
-    "app": ["CloudStream"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "Sarapcanagii",
     "desc": "!Sarapcanagii",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-},
-{
-    "app": ["CloudStream"],
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  },
+  {
+    "app": [
+      "CloudStream"
+    ],
     "type": "Repo",
     "name": "MegaTurk",
     "desc": "!MegaTurk",
     "installGuide": "cloudstream",
     "debrid": "free",
-    "platform": ["tv", "mobile"],
-    "dateAdded": ""
-}
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-24"
+  }
 ]
