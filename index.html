@@ -44,11 +44,8 @@
         .stream-card:active { transform: scale(0.98); }
 
         .age-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 28px;
-            height: 28px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: rgba(220, 38, 38, 0.9);
             border: 1px solid rgba(255,255,255,0.2);
@@ -58,7 +55,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 5;
             box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
         }
 
@@ -901,7 +897,7 @@ function buildCardHTML(item) {
                 <div class="card-header flex items-center gap-3 flex-1 min-w-0">
                     ${item.rank ? `<div class="text-sm font-black text-slate-500 w-6 shrink-0 text-center ${item.rank <= 3 ? 'text-amber-400 text-lg' : ''}">${item.rank}</div>` : ''}
                     <div class="min-w-0 flex-1">
-                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
                         <div class="text-[10px] text-slate-400">${item.year} · ${escapeHtml(item.genre || '')}</div>
                     </div>
                 </div>
@@ -947,10 +943,10 @@ function buildCardHTML(item) {
 
         if (viewMode === 'list') {
             return `
-                ${ageBadgeHTML}
+                
                 <div class="card-header flex items-center gap-2 flex-1 min-w-0">
                     <div class="min-w-0 flex-1">
-                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
                         <div class="flex items-center gap-1 flex-wrap mt-1">${appBadgesHTML}${statusBadgesHTML}</div>
                     </div>
                 </div>
@@ -961,10 +957,10 @@ function buildCardHTML(item) {
             `;
         }
         return `
-            ${ageBadgeHTML}
+            
             <div class="card-header w-full flex flex-col min-w-0">
                 <div class="flex justify-between items-start gap-2 mb-2">
-                    <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
+                    <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
                     ${favBtnHTML}
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap mb-3">
