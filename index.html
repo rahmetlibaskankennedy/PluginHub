@@ -421,8 +421,8 @@
             </div>
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
-            <button onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
-                <span class="text-xl">🎲</span> Başka Bir Film Öner
+            <button id="movie-modal-suggest-btn" onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
+            <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
         </div>
     </div>
@@ -1339,7 +1339,7 @@ async function suggestRandomMovie() {
         } else {
             genreEl.classList.add('hidden');
         }
-        
+        document.getElementById('movie-modal-suggest-btn').classList.remove('hidden');
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     } catch (err) {
         console.error("Zar Hatası: ", err);
@@ -1397,6 +1397,7 @@ async function playTrailerForItem(item) {
             if (!youtubeKey) showToast('Bu film için fragman bulunamadı.', true);
         }
 
+        document.getElementById('movie-modal-suggest-btn').classList.add('hidden');
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     } catch (err) {
         console.error('Fragman arama hatası:', err);
