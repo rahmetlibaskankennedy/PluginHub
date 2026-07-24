@@ -44,15 +44,15 @@
         .stream-card:active { transform: scale(0.98); }
 
         .age-badge {
-            width: 18px;
-            height: 18px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: rgba(220, 38, 38, 0.9);
             border: 1px solid rgba(255,255,255,0.2);
             color: #fff;
             font-size: 9px;
             font-weight: 900;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
@@ -935,7 +935,7 @@ function buildCardHTML(item) {
         let starsHTML = '';
         for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
 
-        const ageBadgeHTML = item.ageRestricted ? `<div class="age-badge">18+</div>` : '';
+        const ageBadgeHTML = item.ageRestricted ? `<span class="age-badge">18+</span>` : '';
 
         const appBadgesHTML = buildAppBadges(item);
         const osBadgesHTML = buildOsBadges(item);
