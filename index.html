@@ -1107,10 +1107,9 @@ function openModalItem(item) {
         document.getElementById('modal-movie-info').classList.add('hidden');
         document.getElementById('modal-apk-info').classList.remove('hidden');
         
-        document.getElementById('modal-subtitle').textContent = item.type || 'Uygulama';
 
         // Rozetleri modalda da göster (uygulama, işletim sistemi, kod, durum, +18)
-        document.getElementById('modal-subtitle').textContent = item.type || 'Uygulama';
+        document.getElementById('modal-subtitle').textContent = '';
         const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase">${escapeHtml(item.type)}</span>` : '';
         const modalAgeBadge = item.ageRestricted ? `<span class="bg-rose-600/90 text-white border border-white/20 px-2 py-1 rounded-full text-[9px] font-black">18+</span>` : '';
         const modalBadgesHTML = typeBadgeHTML + buildAppBadges(item) + buildOsBadges(item) + buildStatusBadges(item) + modalAgeBadge;
