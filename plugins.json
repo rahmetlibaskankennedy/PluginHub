@@ -1151,28 +1151,11 @@
   },
   {
     "app": [
-      "Nuvio",
-      "Stremio"
-    ],
-    "type": "4K",
-    "name": "deneme",
-    "desc": "Bağlantı Linki: sdfsddsbdfbdfb",
-    "installGuide": "nuvio",
-    "debrid": "free",
-    "platform": [
-      "tv",
-      "mobile",
-      "web"
-    ],
-    "dateAdded": "2026-07-23"
-  },
-  {
-    "app": [
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "Gizlikeyif",
-    "desc": "!Gizlikeyif",
+    "name": "!Gizlikeyif",
+    "desc": "https://raw.githubusercontent.com/Kraptor123/Cs-GizliKeyif/refs/heads/master/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": [
@@ -1187,8 +1170,8 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "Kraptor",
-    "desc": "!Kraptor",
+    "name": "!Kraptor",
+    "desc": "https://raw.githubusercontent.com/Kraptor123/cs-kraptor/refs/heads/master/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": [
@@ -1202,8 +1185,8 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "Cskarma",
-    "desc": "!Cskarma",
+    "name": "!Cskarma",
+    "desc": "https://raw.githubusercontent.com/Kraptor123/cs-Karma/refs/heads/master/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": [
@@ -1217,7 +1200,7 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "Feroxxcs3",
+    "name": "!Feroxxcs3",
     "desc": "!Feroxxcs3",
     "installGuide": "cloudstream",
     "debrid": "free",
@@ -1232,7 +1215,7 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "Makoto2",
+    "name": "!Makoto2",
     "desc": "!Makoto2",
     "installGuide": "cloudstream",
     "debrid": "free",
@@ -1247,8 +1230,8 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "AyzenCS3",
-    "desc": "!AyzenCS3",
+    "name": "!AyzenCS3",
+    "desc": "https://raw.githubusercontent.com/ByAyzen/AyzenCS3/refs/heads/builds/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": [
@@ -1262,7 +1245,7 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "Sarapcanagii",
+    "name": "!sarapcanagii",
     "desc": "!Sarapcanagii",
     "installGuide": "cloudstream",
     "debrid": "free",
@@ -1277,8 +1260,8 @@
       "CloudStream"
     ],
     "type": "Repo",
-    "name": "MegaTurk",
-    "desc": "!MegaTurk",
+    "name": "!MegaTurk",
+    "desc": "https://raw.githubusercontent.com/Kraptor123/TurkMegaRepo/refs/heads/master/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": [
