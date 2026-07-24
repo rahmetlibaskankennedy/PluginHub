@@ -39,9 +39,28 @@
         .stream-card.list-view .card-footer { margin-top: 0; width: auto; flex-shrink: 0; }
         .stream-card.list-view h3 { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 
-        .stream-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .stream-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; }
         .stream-card:hover { transform: translateY(-4px); background: var(--bg-card-hover); border-color: rgba(108, 92, 231, 0.5); box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2); }
         .stream-card:active { transform: scale(0.98); }
+
+        .age-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(220, 38, 38, 0.9);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        }
 
         .hero-media-box { background: linear-gradient(135deg, #1d1a4d 0%, #110e2b 100%); border-radius: 24px; border: 1px solid rgba(255, 42, 95, 0.2); position: relative; overflow: hidden; }
 
@@ -848,11 +867,25 @@ function buildOsBadges(item) {
 }
 
 function buildStatusBadges(item) {
-    const isNew = !!(item.dateAdded && newestDate && item.dateAdded === newestDate);
+    const isNew = isRecentlyAdded(item.dateAdded);
     const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider animate-pulse">YENİ</span>` : '';
     const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] font-black">KOD: ${item.code}</span>` : '';
     const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase">ÇALIŞMIYOR</span>` : '';
     return codeBadgeHTML + deadBadgeHTML + newBadgeHTML;
+}
+
+// "YENİ" rozeti artık veri kümesindeki en yeni tarihe göre değil,
+// gerçek takvim tarihine göre hesaplanır: son 3 gün içinde eklenenler YENİ sayılır.
+// Böylece yeni bir eklenti eklendiğinde eski eklentiler otomatik olarak rozetini kaybeder.
+const NEW_BADGE_WINDOW_DAYS = 3;
+function isRecentlyAdded(dateAddedStr) {
+    if (!dateAddedStr) return false;
+    const added = new Date(dateAddedStr + 'T00:00:00');
+    if (isNaN(added.getTime())) return false;
+    const now = new Date();
+    const todayUTC = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.floor((todayUTC - added) / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays < NEW_BADGE_WINDOW_DAYS;
 }
 
 function buildCardHTML(item) {
@@ -906,12 +939,15 @@ function buildCardHTML(item) {
         let starsHTML = '';
         for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
 
+        const ageBadgeHTML = item.ageRestricted ? `<div class="age-badge">18+</div>` : '';
+
         const appBadgesHTML = buildAppBadges(item);
         const osBadgesHTML = buildOsBadges(item);
         const statusBadgesHTML = buildStatusBadges(item);
 
         if (viewMode === 'list') {
             return `
+                ${ageBadgeHTML}
                 <div class="card-header flex items-center gap-2 flex-1 min-w-0">
                     <div class="min-w-0 flex-1">
                         <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
@@ -925,6 +961,7 @@ function buildCardHTML(item) {
             `;
         }
         return `
+            ${ageBadgeHTML}
             <div class="card-header w-full flex flex-col min-w-0">
                 <div class="flex justify-between items-start gap-2 mb-2">
                     <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
@@ -1074,8 +1111,9 @@ function openModalItem(item) {
         
         document.getElementById('modal-subtitle').textContent = item.type || 'Uygulama';
 
-        // Rozetleri modalda da göster (uygulama, işletim sistemi, kod, durum)
-        const modalBadgesHTML = buildAppBadges(item) + buildOsBadges(item) + buildStatusBadges(item);
+        // Rozetleri modalda da göster (uygulama, işletim sistemi, kod, durum, +18)
+        const modalAgeBadge = item.ageRestricted ? `<span class="bg-rose-600/90 text-white border border-white/20 px-2 py-1 rounded-full text-[9px] font-black">18+</span>` : '';
+        const modalBadgesHTML = buildAppBadges(item) + buildOsBadges(item) + buildStatusBadges(item) + modalAgeBadge;
         document.getElementById('modal-tags').innerHTML = modalBadgesHTML;
 
         const code = item.code;
