@@ -98,6 +98,8 @@
         .tag-nuvio { background: rgba(224, 231, 255, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
         .tag-stremio { background: rgba(192, 132, 252, 0.1); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
         .tag-type { background: rgba(244, 114, 182, 0.1); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
+        .tag-compat { background: rgba(250, 204, 21, 0.1); color: #fde047; border: 1px solid rgba(250, 204, 21, 0.3); }
+        .tag-cloudstream { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         
         .note-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
         .note-item.mine { border-color: rgba(59,130,246,0.35); }
@@ -114,6 +116,14 @@
         #toast.error { background: #dc2626; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); }
 
         ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #3f3c64; border-radius: 10px; }
+
+        /* Accordion install guides */
+        details.install-guide summary { list-style: none; cursor: pointer; }
+        details.install-guide summary::-webkit-details-marker { display: none; }
+        details.install-guide summary::marker { content: ''; }
+        details.install-guide .chevron { transition: transform 0.25s ease; display: inline-block; }
+        details.install-guide[open] .chevron { transform: rotate(180deg); }
+        details.install-guide .guide-body { padding: 0 24px 24px 24px; }
     </style>
 </head>
 <body>
@@ -367,32 +377,78 @@
                 </div>
             </div>
 
-            <!-- Kurulum Kılavuzları -->
-            <div id="modal-stremio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
-                <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</h3>
-                <ul class="text-sm text-slate-300 space-y-4">
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span><b>Hızlı Kurulum</b> butonuna tıklayın — Stremio yüklüyse otomatik açılır.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Otomatik açılmazsa <b>Kopyala</b> ile manifest linkini kopyalayın.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Stremio içinde <b>Eklentiler</b> sekmesine gidip arama kutusuna linki yapıştırın.</span></li>
-                </ul>
-            </div>
-            <div id="modal-nuvio-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
-                <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</h3>
-                <ul class="text-sm text-slate-300 space-y-4">
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
-                </ul>
-            </div>
-            <div id="modal-downloader-guide" class="mb-4 bg-[#151333] rounded-2xl p-6 border border-white/5 hidden">
-                <h3 class="text-sm font-bold text-white mb-5 flex items-center gap-2">📥 TV'ye Nasıl Kurulur? (Downloader)</h3>
-                <ul class="text-sm text-slate-300 space-y-4">
-                    <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>TV'nizin mağazasından <b>Downloader</b> uygulamasını indirin.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Arama çubuğuna yukarıdaki <b class="text-emerald-400">Kodu</b> yazıp Go tuşuna basın.</span></li>
-                    <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>İndirme bittikten sonra "Yükle" diyerek işlemi tamamlayın.</span></li>
-                </ul>
+            <!-- Kurulum Kılavuzları (açılır/kapanır) -->
+            <div class="flex flex-col gap-3 mb-4">
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-stremio-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span><b>Hızlı Kurulum</b> butonuna tıklayın — Stremio yüklüyse otomatik açılır.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Otomatik açılmazsa <b>Kopyala</b> ile manifest linkini kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Stremio içinde <b>Eklentiler</b> sekmesine gidip arama kutusuna linki yapıştırın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-nuvio-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-wuplay-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">🟡 WuPlay / Arvio'ya Nasıl Kurulur?</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <p class="text-xs text-slate-400 italic mb-4">Bu eklenti Nuvio formatında olduğu için WuPlay ve Arvio gibi Nuvio tabanlı uygulamalarda da aynı şekilde çalışır.</p>
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>WuPlay veya Arvio uygulamasını açın, <b>Ayarlar → Eklentiler / Addons</b> bölümüne gidin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>+ Eklenti Ekle</b> (Add Addon) seçeneğine dokunun.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Kopyaladığınız URL'yi yapıştırıp onaylayın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-downloader-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">📥 TV'ye Nasıl Kurulur? (Downloader)</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>TV'nizin mağazasından <b>Downloader</b> uygulamasını indirin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Arama çubuğuna yukarıdaki <b class="text-emerald-400">Kodu</b> yazıp Go tuşuna basın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>İndirme bittikten sonra "Yükle" diyerek işlemi tamamlayın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-cloudstream-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">🟢 CloudStream'e Nasıl Kurulur?</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak repo URL'sini kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>CloudStream uygulamasında <b>Ayarlar → Eklentiler (Extensions)</b> bölümüne girin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>+ Repository Ekle</b> seçeneğine dokunup URL'yi yapıştırın, bir isim verip onaylayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Repo eklendikten sonra içindeki eklentileri (extension) tek tek indirip etkinleştirin.</span></li>
+                        </ul>
+                    </div>
+                </details>
             </div>
         </div>
 
@@ -755,7 +811,8 @@ function getTypeClass(t) {
 
 function buildAppBadges(item) {
     const appArray = Array.isArray(item.app) ? item.app : [item.app];
-    return appArray.filter(Boolean).map(a => {
+    const appsLower = appArray.filter(Boolean).map(a => String(a).toLowerCase());
+    let html = appArray.filter(Boolean).map(a => {
         const name = String(a).toLowerCase();
         if (name.includes('android')) {
             return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 576 512"><path d="M420.22 175.76l44.68-77.34a10.92 10.92 0 0 0-3.95-15 10.87 10.87 0 0 0-14.92 4l-45.28 78.36A284.14 284.14 0 0 0 288 141.44a284.14 284.14 0 0 0-112.75 24.34l-45.28-78.36a10.88 10.88 0 0 0-14.94-4 10.92 10.92 0 0 0-3.95 15l44.68 77.34C93.42 229.47 21.05 328.72 0 448h576c-21.05-119.28-93.42-218.53-155.78-272.24zM160 352a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm256 0a32 32 0 1 1 32-32 32 32 0 0 1-32 32z"/></svg>${escapeHtml(a)}</span>`;
@@ -763,9 +820,18 @@ function buildAppBadges(item) {
         if (name.includes('ios') || name.includes('apple')) {
             return `<span class="bg-slate-100/10 text-slate-300 border border-slate-100/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>${escapeHtml(a)}</span>`;
         }
+        if (name.includes('cloudstream')) {
+            return `<span class="tag-cloudstream px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-block">${escapeHtml(a)}</span>`;
+        }
         const badgeClass = name.includes('stremio') ? 'tag-stremio' : 'tag-nuvio';
         return `<span class="${badgeClass} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-block">${escapeHtml(a)}</span>`;
     }).join('');
+
+    // Nuvio formatındaki eklentiler WuPlay ve Arvio gibi uygulamalarda da çalışır
+    if (appsLower.includes('nuvio')) {
+        html += `<span class="tag-compat px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1" title="Bu eklenti Nuvio formatında olduğu için WuPlay ve Arvio uygulamalarında da çalışır">🔗 WuPlay · Arvio</span>`;
+    }
+    return html;
 }
 
 function buildOsBadges(item) {
@@ -839,7 +905,6 @@ function buildCardHTML(item) {
         let starsHTML = '';
         for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
 
-        const typeBadgeHTML = `<span class="type-badge ${getTypeClass(item.type)} px-2 py-0.5 rounded-full text-[9px] font-black uppercase shrink-0">${escapeHtml(item.type || '—')}</span>`;
         const appBadgesHTML = buildAppBadges(item);
         const osBadgesHTML = buildOsBadges(item);
         const statusBadgesHTML = buildStatusBadges(item);
@@ -847,7 +912,6 @@ function buildCardHTML(item) {
         if (viewMode === 'list') {
             return `
                 <div class="card-header flex items-center gap-2 flex-1 min-w-0">
-                    ${typeBadgeHTML}
                     <div class="min-w-0 flex-1">
                         <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
                         <div class="flex items-center gap-1 flex-wrap mt-1">${appBadgesHTML}${statusBadgesHTML}</div>
@@ -866,7 +930,7 @@ function buildCardHTML(item) {
                     ${favBtnHTML}
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap mb-3">
-                    ${typeBadgeHTML}${appBadgesHTML}${osBadgesHTML}${statusBadgesHTML}
+                    ${appBadgesHTML}${osBadgesHTML}${statusBadgesHTML}
                 </div>
                 <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4 break-words">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
             </div>
@@ -1009,9 +1073,8 @@ function openModalItem(item) {
         
         document.getElementById('modal-subtitle').textContent = item.type || 'Uygulama';
 
-        // Rozetleri modalda da göster (tür, uygulama, işletim sistemi, kod, durum)
-        const modalBadgesHTML = `<span class="type-badge ${getTypeClass(item.type)} px-2 py-1 rounded-md text-[10px] font-black uppercase">${escapeHtml(item.type || '—')}</span>` +
-            buildAppBadges(item) + buildOsBadges(item) + buildStatusBadges(item);
+        // Rozetleri modalda da göster (uygulama, işletim sistemi, kod, durum)
+        const modalBadgesHTML = buildAppBadges(item) + buildOsBadges(item) + buildStatusBadges(item);
         document.getElementById('modal-tags').innerHTML = modalBadgesHTML;
 
         const code = item.code;
@@ -1033,18 +1096,28 @@ function openModalItem(item) {
             goBtn.onclick = () => { if(urlStr) window.open(urlStr, '_blank'); };
         }
 
-        // --- KURULUM REHBERLERİ GÖRÜNÜRLÜK MANTIĞI ---
+        // --- KURULUM REHBERLERİ GÖRÜNÜRLÜK MANTIĞI (açılır/kapanır <details>) ---
         const appArray = Array.isArray(item.app) ? item.app : [item.app];
         const appsLower = appArray.map(a => String(a).toLowerCase());
         const isAPK = currentMainCategory !== 'eklentiler';
+        const hasNuvio = appsLower.some(a => a.includes('nuvio')) || item.installGuide === 'nuvio';
+        const hasStremio = appsLower.some(a => a.includes('stremio')) || item.installGuide === 'stremio';
+        const hasCloudstream = appsLower.some(a => a.includes('cloudstream')) || item.installGuide === 'cloudstream';
 
         const nuvioGuide = document.getElementById('modal-nuvio-guide');
         const stremioGuide = document.getElementById('modal-stremio-guide');
+        const wuplayGuide = document.getElementById('modal-wuplay-guide');
         const downloaderGuide = document.getElementById('modal-downloader-guide');
+        const cloudstreamGuide = document.getElementById('modal-cloudstream-guide');
 
-        if(nuvioGuide) nuvioGuide.classList.toggle('hidden', isAPK || (!appsLower.some(a => a.includes('nuvio')) && item.installGuide !== 'nuvio'));
-        if(stremioGuide) stremioGuide.classList.toggle('hidden', isAPK || (!appsLower.some(a => a.includes('stremio')) && item.installGuide !== 'stremio'));
-        if(downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
+        [nuvioGuide, stremioGuide, wuplayGuide, downloaderGuide, cloudstreamGuide].forEach(g => { if (g) g.removeAttribute('open'); });
+
+        if (nuvioGuide) nuvioGuide.classList.toggle('hidden', isAPK || !hasNuvio);
+        if (stremioGuide) stremioGuide.classList.toggle('hidden', isAPK || !hasStremio);
+        // WuPlay/Arvio Nuvio formatını kullandığı için Nuvio uyumlu her eklentide gösterilir
+        if (wuplayGuide) wuplayGuide.classList.toggle('hidden', isAPK || !hasNuvio);
+        if (downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
+        if (cloudstreamGuide) cloudstreamGuide.classList.toggle('hidden', !hasCloudstream);
         // ----------------------------------------------
 
         const savedRating = userRatings[key] || 0;
