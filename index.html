@@ -393,8 +393,8 @@
 
 <!-- ZAR (RASTGELE FİLM) MODALI -->
 <div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-    <div class="text-7xl rolling-dice mb-6">🎲</div>
-    <p class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
+    <div id="dice-loading-icon" class="text-7xl rolling-dice mb-6">🎲</div>
+    <p id="dice-loading-text" class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
 </div>
 
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
@@ -1266,8 +1266,15 @@ function closeMovieModal(e) {
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 function setDiceLoadingText(text) {
-    const p = document.querySelector('#dice-loading-overlay p');
+    const p = document.getElementById('dice-loading-text');
     if (p) p.textContent = text;
+}
+
+function setLoadingIcon(isDice) {
+    const icon = document.getElementById('dice-loading-icon');
+    if (!icon) return;
+    icon.textContent = isDice ? '🎲' : '🎬';
+    icon.classList.toggle('rolling-dice', isDice);
 }
 
 async function suggestRandomMovie() {
@@ -1280,6 +1287,7 @@ async function suggestRandomMovie() {
     if(posterEl) posterEl.classList.remove('hidden');
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
+    setLoadingIcon(true);
     setDiceLoadingText('Sizin için harika bir film seçiliyor...');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
     
@@ -1348,6 +1356,7 @@ async function playTrailerForItem(item) {
     if (posterEl) posterEl.classList.remove('hidden');
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
+    setLoadingIcon(false);
     setDiceLoadingText(`"${item.name}" için fragman aranıyor...`);
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
 
