@@ -828,7 +828,8 @@ function buildAppBadges(item) {
     }).join('');
 
     // Nuvio formatındaki eklentiler WuPlay ve Arvio gibi uygulamalarda da çalışır
-    if (appsLower.includes('nuvio')) {
+    // — ancak "Plugin" türü (repo tabanlı) eklentiler için geçerli değil
+    if (appsLower.includes('nuvio') && item.type !== 'Plugin') {
         html += `<span class="tag-compat px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1" title="Bu eklenti Nuvio formatında olduğu için WuPlay ve Arvio uygulamalarında da çalışır">🔗 WuPlay · Arvio</span>`;
     }
     return html;
@@ -1103,6 +1104,7 @@ function openModalItem(item) {
         const hasNuvio = appsLower.some(a => a.includes('nuvio')) || item.installGuide === 'nuvio';
         const hasStremio = appsLower.some(a => a.includes('stremio')) || item.installGuide === 'stremio';
         const hasCloudstream = appsLower.some(a => a.includes('cloudstream')) || item.installGuide === 'cloudstream';
+        const isWuplayCompatible = hasNuvio && item.type !== 'Plugin';
 
         const nuvioGuide = document.getElementById('modal-nuvio-guide');
         const stremioGuide = document.getElementById('modal-stremio-guide');
@@ -1114,8 +1116,7 @@ function openModalItem(item) {
 
         if (nuvioGuide) nuvioGuide.classList.toggle('hidden', isAPK || !hasNuvio);
         if (stremioGuide) stremioGuide.classList.toggle('hidden', isAPK || !hasStremio);
-        // WuPlay/Arvio Nuvio formatını kullandığı için Nuvio uyumlu her eklentide gösterilir
-        if (wuplayGuide) wuplayGuide.classList.toggle('hidden', isAPK || !hasNuvio);
+        if (wuplayGuide) wuplayGuide.classList.toggle('hidden', isAPK || !isWuplayCompatible); 
         if (downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
         if (cloudstreamGuide) cloudstreamGuide.classList.toggle('hidden', !hasCloudstream);
         // ----------------------------------------------
