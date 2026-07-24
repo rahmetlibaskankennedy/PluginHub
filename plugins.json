@@ -434,8 +434,8 @@
       "Nuvio",
       "Stremio"
     ],
-    "type": "Dublaj",
-    "name": "MoonCrown (Plug-in)",
+    "type": "Plugin",
+    "name": "MoonCrown",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/mooncrown04/nuviotr/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
@@ -832,7 +832,7 @@
       "Stremio"
     ],
     "type": "Plugin",
-    "name": "Patr0n (Plug-in)",
+    "name": "Patr0n",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/patr0nq/nuvioaddons/main/manifest.json",
     "installGuide": "nuvio",
     "debrid": "free",
