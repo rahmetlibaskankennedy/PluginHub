@@ -831,7 +831,7 @@
       "Nuvio",
       "Stremio"
     ],
-    "type": "Dublaj",
+    "type": "Plugin",
     "name": "Patr0n (Plug-in)",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/patr0nq/nuvioaddons/main/manifest.json",
     "installGuide": "nuvio",
