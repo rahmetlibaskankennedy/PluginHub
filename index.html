@@ -225,7 +225,54 @@
                     <div class="text-xs text-slate-400">Favori linklerini panoya yapıştır</div>
                 </div>
             </button>
+            <button onclick="closeMenuModal(); setTimeout(openAboutModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+    <span class="text-2xl">ℹ️</span>
+    <div>
+        <div class="text-sm font-bold text-white">Hakkında</div>
+        <div class="text-xs text-slate-400">Site hakkında bilgi ve wiki</div>
+    </div>
+</button>
+<button onclick="closeMenuModal(); setTimeout(openFeedbackModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+    <span class="text-2xl">💬</span>
+    <div>
+        <div class="text-sm font-bold text-white">Geri Bildirim Gönder</div>
+        <div class="text-xs text-slate-400">Öneri veya sorun bildir</div>
+    </div>
+</button>
+<button onclick="closeMenuModal(); confirmClearData()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-rose-900/30 p-4 rounded-xl transition text-left border border-white/5">
+    <span class="text-2xl">🗑️</span>
+    <div>
+        <div class="text-sm font-bold text-white">Verilerimi Temizle</div>
+        <div class="text-xs text-slate-400">Favori, not ve puanları sil</div>
+    </div>
+</button>
         </div>
+    </div>
+</div>
+
+<!-- HAKKINDA MODALI -->
+<div id="about-modal-overlay" onclick="closeAboutModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="about-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-bold text-white">Hakkında</h3>
+            <button onclick="closeAboutModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">PluginHub, Stremio, Nuvio ve CloudStream için eklenti, APK ve içerik kaynaklarını tek yerde bulmanızı sağlayan bir portaldır. TCLTVTÜRK topluluğu tarafından geliştirilir ve güncellenir.</p>
+        <p class="text-xs text-slate-500 mb-6">Favori, not ve puanlarınız yalnızca cihazınızda saklanır. Bildirim gönderdiğinizde IP adresiniz kötüye kullanımı önlemek amacıyla geçici olarak işlenir.</p>
+        <a href="https://tcl-iffalcon.github.io/wiki" target="_blank" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm py-3 rounded-xl transition">📖 Wiki'yi Ziyaret Et</a>
+    </div>
+</div>
+
+<!-- GERİ BİLDİRİM MODALI -->
+<div id="feedback-modal-overlay" onclick="closeFeedbackModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="feedback-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-bold text-white">Geri Bildirim Gönder</h3>
+            <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <textarea id="feedback-textarea" rows="4" maxlength="500" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 resize-y mb-2" placeholder="Öneri, hata veya isteğinizi yazın..."></textarea>
+        <div class="text-[10px] text-slate-500 mb-4 text-right" id="feedback-char-count">0/500</div>
+        <button onclick="submitFeedback()" id="feedback-submit-btn" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Gönder</button>
     </div>
 </div>
 
@@ -1215,6 +1262,67 @@ function closeMenuModal(e) {
     if(e && e.target!==document.getElementById('menu-modal-overlay')) return;
     document.getElementById('menu-modal-box').classList.add('translate-y-full');
     setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+
+function openAboutModal() {
+    document.getElementById('about-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('about-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeAboutModal() {
+    document.getElementById('about-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('about-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeAboutModalOnBackdrop(e) { if (e.target.id === 'about-modal-overlay') closeAboutModal(); }
+
+function openFeedbackModal() {
+    document.getElementById('feedback-textarea').value = '';
+    document.getElementById('feedback-char-count').textContent = '0/500';
+    document.getElementById('feedback-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('feedback-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeFeedbackModal() {
+    document.getElementById('feedback-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('feedback-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeFeedbackModalOnBackdrop(e) { if (e.target.id === 'feedback-modal-overlay') closeFeedbackModal(); }
+
+document.getElementById('feedback-textarea')?.addEventListener('input', function() {
+    document.getElementById('feedback-char-count').textContent = `${this.value.length}/500`;
+});
+
+async function submitFeedback() {
+    const text = document.getElementById('feedback-textarea').value.trim();
+    if (!text) { showToast('Lütfen bir mesaj yazın.', true); return; }
+    const btn = document.getElementById('feedback-submit-btn');
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                pluginName: 'Genel Geri Bildirim',
+                app: currentMainCategory,
+                type: 'feedback',
+                action: 'report',
+                message: text
+            })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast('💬 Gönderildi, teşekkürler!');
+        closeFeedbackModal();
+    } catch (err) {
+        console.error('Geri bildirim hatası:', err);
+        showToast('Gönderilemedi, tekrar deneyin.', true);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Gönder';
+    }
+}
+
+function confirmClearData() {
+    if (!confirm('Favori, not, puan ve senkron kodunuz bu cihazdan silinecek. Emin misiniz?')) return;
+    ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_sort'].forEach(k => localStorage.removeItem(k));
+    showToast('🗑️ Veriler temizlendi.');
+    setTimeout(() => location.reload(), 800);
 }
 
 function exportFavorites() {
