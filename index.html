@@ -442,6 +442,7 @@ const cachedData = {};
 let currentMainCategory = 'eklentiler';
 let plugins = [];
 let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
+let reportedItems = JSON.parse(localStorage.getItem('ph_reported') || '[]');
 let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
 let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}');
 let showFavsOnly = false;
@@ -1002,6 +1003,7 @@ function openModalItem(item) {
         const savedRating = userRatings[key] || 0;
         currentRatingDisplay = savedRating; updateStarsUI(savedRating);
         document.getElementById('modal-note-textarea').value = userNotes[key] || '';
+        updateReportButtonUI();
     }
 
     document.getElementById('modal-overlay').classList.add('open');
@@ -1044,7 +1046,13 @@ function saveNoteFromTextarea() {
 
 async function reportCurrentPlugin() {
     if (!currentModalItem) return;
-    if (!confirm(`"${currentModalItem.name}" öğesini sorunlu olarak bildirmek istediğine emin misin?`)) return;
+    const key = pluginKey(currentModalItem);
+    const isReported = reportedItems.includes(key);
+    const actionVerb = isReported ? 'unreport' : 'report';
+    const confirmMsg = isReported
+        ? `"${currentModalItem.name}" için bildirimi geri almak istediğine emin misin?`
+        : `"${currentModalItem.name}" öğesini sorunlu olarak bildirmek istediğine emin misin?`;
+    if (!confirm(confirmMsg)) return;
 
     const btn = document.getElementById('report-btn');
     const originalHTML = btn.innerHTML;
@@ -1060,17 +1068,42 @@ async function reportCurrentPlugin() {
                 pluginName: currentModalItem.name,
                 app: appVal,
                 type: currentModalItem.type || currentMainCategory,
-                action: 'report'
+                action: actionVerb
             })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showToast('🚩 Bildirildi, teşekkürler!');
+
+        if (isReported) {
+            reportedItems = reportedItems.filter(k => k !== key);
+            showToast('↩️ Bildirim geri alındı.');
+        } else {
+            reportedItems.push(key);
+            showToast('🚩 Bildirildi, teşekkürler!');
+        }
+        localStorage.setItem('ph_reported', JSON.stringify(reportedItems));
+        updateReportButtonUI();
     } catch (err) {
         console.error('Bildirme hatası:', err);
-        showToast('Bildirim gönderilemedi.', true);
+        showToast('İşlem gönderilemedi.', true);
+        btn.innerHTML = originalHTML;
     } finally {
         btn.disabled = false;
-        btn.innerHTML = originalHTML;
+    }
+}
+
+function updateReportButtonUI() {
+    if (!currentModalItem) return;
+    const btn = document.getElementById('report-btn');
+    if (!btn) return;
+    const isReported = reportedItems.includes(pluginKey(currentModalItem));
+    if (isReported) {
+        btn.innerHTML = '↩️ Bildirimi Geri Al';
+        btn.classList.remove('bg-rose-600/10', 'text-rose-400', 'border-rose-500/20');
+        btn.classList.add('bg-slate-700/40', 'text-slate-300', 'border-slate-500/20');
+    } else {
+        btn.innerHTML = '🚩 Bildir';
+        btn.classList.remove('bg-slate-700/40', 'text-slate-300', 'border-slate-500/20');
+        btn.classList.add('bg-rose-600/10', 'text-rose-400', 'border-rose-500/20');
     }
 }
 
