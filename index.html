@@ -1052,15 +1052,15 @@ async function reportCurrentPlugin() {
     btn.innerHTML = '⏳ Gönderiliyor...';
 
     try {
+        const appVal = Array.isArray(currentModalItem.app) ? currentModalItem.app.join(', ') : (currentModalItem.app || currentMainCategory);
         const res = await fetch(`${REPORT_ENDPOINT}/report`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                key: pluginKey(currentModalItem),
-                name: currentModalItem.name,
-                category: currentMainCategory,
-                ownerId: getOwnerId(),
-                ts: Date.now()
+                pluginName: currentModalItem.name,
+                app: appVal,
+                type: currentModalItem.type || currentMainCategory,
+                action: 'report'
             })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
