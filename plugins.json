@@ -707,7 +707,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23",
+    "dateAdded": "",
     "ageRestricted": true
 },
 {
@@ -718,7 +718,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 },
 {
     "app": ["CloudStream"],
@@ -728,7 +728,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 },
 {
     "app": ["CloudStream"],
@@ -738,7 +738,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 },
 {
     "app": ["CloudStream"],
@@ -748,7 +748,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 },
 {
     "app": ["CloudStream"],
@@ -758,7 +758,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 },
 {
     "app": ["CloudStream"],
@@ -768,7 +768,7 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 },
 {
     "app": ["CloudStream"],
@@ -778,6 +778,6 @@
     "installGuide": "cloudstream",
     "debrid": "free",
     "platform": ["tv", "mobile"],
-    "dateAdded": "2026-07-23"
+    "dateAdded": ""
 }
 ]
