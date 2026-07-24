@@ -941,6 +941,7 @@ function buildCardHTML(item) {
         const appBadgesHTML = buildAppBadges(item);
         const osBadgesHTML = buildOsBadges(item);
         const statusBadgesHTML = buildStatusBadges(item);
+        const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase">${escapeHtml(item.type)}</span>` : '';
 
         if (viewMode === 'list') {
             return `
@@ -965,7 +966,7 @@ function buildCardHTML(item) {
                     ${favBtnHTML}
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap mb-3">
-                    ${appBadgesHTML}${osBadgesHTML}${statusBadgesHTML}
+                    ${typeBadgeHTML}${appBadgesHTML}${osBadgesHTML}${statusBadgesHTML}
                 </div>
                 <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4 break-words">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
             </div>
