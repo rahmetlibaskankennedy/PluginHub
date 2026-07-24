@@ -161,7 +161,7 @@
   },
   {
     "app": ["Nuvio"],
-    "type": "Repo",
+    "type": "Plugin",
     "name": "Yoru's Repo",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/yoruix/nuvio-providers/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
@@ -171,7 +171,7 @@
   },
   {
     "app": ["Nuvio"],
-    "type": "Repo",
+    "type": "Plugin",
     "name": "Phisher's Repo",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/phisher98/phisher-nuvio-providers/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
@@ -181,7 +181,7 @@
   },
   {
     "app": ["Nuvio"],
-    "type": "Repo",
+    "type": "Plugin",
     "name": "Spidey's Providers",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/Abinanthankv/NuvioRepo/refs/heads/master/manifest.json",
     "installGuide": "nuvio",
@@ -271,7 +271,7 @@
   },
   {
     "app": ["Nuvio"],
-    "type": "Repo",
+    "type": "Plugin",
     "name": "Wekmed",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/Wekmed/nuvio/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
@@ -291,7 +291,7 @@
   },
   {
     "app": ["Nuvio"],
-    "type": "Repo",
+    "type": "Plugin",
     "name": "D3adlyRocket",
     "desc": "Bağlantı Linki: https://raw.githubusercontent.com/D3adlyRocket/All-in-One-Nuvio/refs/heads/main/manifest.json",
     "installGuide": "nuvio",
