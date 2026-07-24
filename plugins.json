@@ -431,8 +431,7 @@
   },
   {
     "app": [
-      "Nuvio",
-      "Stremio"
+      "Nuvio"
     ],
     "type": "Plugin",
     "name": "MoonCrown",
@@ -463,7 +462,6 @@
   {
     "app": [
       "Nuvio",
-      "Stremio"
     ],
     "type": "4K",
     "name": "WatchNow",
@@ -828,8 +826,7 @@
   },
   {
     "app": [
-      "Nuvio",
-      "Stremio"
+      "Nuvio"
     ],
     "type": "Plugin",
     "name": "Patr0n",
