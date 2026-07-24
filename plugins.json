@@ -698,5 +698,86 @@
     "debrid": "free",
     "platform": ["tv", "mobile", "web"],
     "dateAdded": "2026-07-23"
-  }
+  },
+  {
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "Gizlikeyif",
+    "desc": "!Gizlikeyif",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23",
+    "ageRestricted": true
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "Kraptor",
+    "desc": "!Kraptor",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "Cskarma",
+    "desc": "!Cskarma",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "Feroxxcs3",
+    "desc": "!Feroxxcs3",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "Makoto2",
+    "desc": "!Makoto2",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "AyzenCS3",
+    "desc": "!AyzenCS3",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "Sarapcanagii",
+    "desc": "!Sarapcanagii",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+},
+{
+    "app": ["CloudStream"],
+    "type": "Repo",
+    "name": "MegaTurk",
+    "desc": "!MegaTurk",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": ["tv", "mobile"],
+    "dateAdded": "2026-07-23"
+}
 ]
