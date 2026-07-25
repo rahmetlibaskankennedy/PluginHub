@@ -831,7 +831,7 @@ function buildAppBadges(item) {
     }
     return html;
 }
-ffunction buildAppBadgesGrid(item) {
+function buildAppBadgesGrid(item) {
     const appArray = Array.isArray(item.app) ? item.app : [item.app];
     const appsLower = appArray.filter(Boolean).map(a => String(a).toLowerCase());
 
