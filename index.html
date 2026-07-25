@@ -1094,12 +1094,12 @@ function sortPool(pool) {
     const arr = [...pool];
     if (activeSort === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
     else if (activeSort === 'newest') {
-        arr.sort((a, b) => {
-            if (a.dateAdded && b.dateAdded) return b.dateAdded.localeCompare(a.dateAdded);
-            if (a.year && b.year) return b.year - a.year;
-            return 0;
-        });
-    }
+    arr.sort((a, b) => {
+        const aKey = a.dateAdded || (a.year ? `${a.year}-01-01` : '0000-00-00');
+        const bKey = b.dateAdded || (b.year ? `${b.year}-01-01` : '0000-00-00');
+        return bKey.localeCompare(aKey);
+    });
+}
     return arr;
 }
 
