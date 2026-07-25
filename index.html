@@ -457,6 +457,7 @@ let activeGenreFilter = localStorage.getItem('ph_genre_filter') || 'all';
 let activeTypeFilter = 'all';   // ← YENİ EKLENEN SATIR
 let activeSort = localStorage.getItem('ph_sort') || 'default';
 let fuseIndex = null;
+let globalFuseIndex = null;
 let scrollLockCount = 0;
 let newestDate = null;
 let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
@@ -632,6 +633,7 @@ async function loadCategoryData(key) {
         const res = await fetch(DATA_SOURCES[key]);
         if (!res.ok) throw new Error(`HTTP ${res.status} - Dosya bulunamadı`);
         const data = await res.json();
+        data.forEach(it => it._cat = key);
         cachedData[key] = data;
         plugins = data;
         postLoadSetup();
@@ -645,6 +647,27 @@ async function loadCategoryData(key) {
                 <div class="text-xs text-slate-500 mt-4">Lütfen "${DATA_SOURCES[key]}" dosyasının sunucuda tam bu isimle var olduğundan emin olun (Büyük/küçük harf duyarlıdır). Ayrıca JSON sözdizimini (syntax) kontrol edin.</div>
             </div>`;
     }
+}
+
+async function ensureAllCategoriesLoaded() {
+    const keys = Object.keys(DATA_SOURCES);
+    await Promise.all(keys.map(async k => {
+        if (cachedData[k]) return;
+        try {
+            const res = await fetch(DATA_SOURCES[k]);
+            if (!res.ok) return;
+            const data = await res.json();
+            data.forEach(it => it._cat = k);
+            cachedData[k] = data;
+        } catch (e) { console.warn('Kategori yüklenemedi (genel arama):', k, e); }
+    }));
+    const all = keys.flatMap(k => cachedData[k] || []);
+    globalFuseIndex = new Fuse(all, {
+        keys: ['name'],
+        threshold: 0.2,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+    });
 }
 
 function postLoadSetup() {
@@ -715,9 +738,11 @@ function handleGridClick(e) {
     }
     const card = e.target.closest('.stream-card');
     if (card && card.dataset.key) {
-        const item = plugins.find(p => pluginKey(p) === card.dataset.key);
+        const cat = card.dataset.cat || currentMainCategory;
+        const source = cachedData[cat] || plugins;
+        const item = source.find(p => pluginKey(p) === card.dataset.key);
         if (item) {
-            openModalItem(item);
+            openModalItem(item, cat);
             const searchModal = document.getElementById('search-modal');
             if (!searchModal.classList.contains('opacity-0')) toggleSearchModal();
         }
@@ -727,15 +752,16 @@ function handleGridClick(e) {
 function renderExpandedSearchResults(query) {
     const container = document.getElementById('expandedSearchResults');
     const q = query.trim();
-    if (!q || !fuseIndex) { container.innerHTML = ''; return; }
-    const results = fuseIndex.search(q).map(r => r.item).slice(0, 30);
+    const idx = globalFuseIndex || fuseIndex;
+    if (!q || !idx) { container.innerHTML = ''; return; }
+    const results = idx.search(q).map(r => r.item).slice(0, 30);
     if (results.length === 0) {
         container.innerHTML = `<div class="text-center text-slate-500 text-sm py-10">Sonuç bulunamadı.</div>`;
         return;
     }
     container.innerHTML = results.map(item => `
-        <div class="stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} mb-4" data-key="${escapeHtml(pluginKey(item))}">
-            ${buildCardHTML(item)}
+        <div class="stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} mb-4" data-key="${escapeHtml(pluginKey(item))}" data-cat="${escapeHtml(item._cat || currentMainCategory)}">
+            ${buildCardHTML(item, item._cat)}
         </div>
     `).join('');
 }
@@ -917,10 +943,11 @@ function isRecentlyAdded(dateAddedStr) {
     return diffDays >= 0 && diffDays < NEW_BADGE_WINDOW_DAYS;
 }
 
-function buildCardHTML(item) {
+function buildCardHTML(item, catOverride) {
+    const cat = catOverride || currentMainCategory;
     const itemKey = pluginKey(item);
     const isFav = favorites.includes(itemKey);
-    const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
+    const isMovie = (cat === 'atmos' || cat === 'imax');
     const favBtnHTML = `<button class="fav-btn w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}">${isFav ? '❤️' : '♡'}</button>`;
 
     if (isMovie) {
@@ -999,7 +1026,7 @@ const urlDisplayHTML = item.code
 return `
         <div class="card-header w-full flex flex-col min-w-0">
             <div class="flex items-start gap-1.5 flex-wrap mb-3">
-            ${typeBadgeHTML}${buildAppBadgesGrid(item)}${currentMainCategory === 'eklentiler' ? buildDebridBadge(item) : ''}${statusBadgesHTML}
+            ${typeBadgeHTML}${buildAppBadgesGrid(item)}${cat === 'eklentiler' ? buildDebridBadge(item) : ''}${statusBadgesHTML}
         </div>
         <div class="flex justify-between items-start gap-2 mb-3">
             <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
@@ -1007,7 +1034,7 @@ return `
         </div>
         ${osBadgesHTML ? `<div class="flex flex-wrap gap-1.5 mb-3">${osBadgesHTML}</div>` : ''}
         ${urlDisplayHTML}
-        ${currentMainCategory !== 'eklentiler' ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : ''}
+        ${cat !== 'eklentiler' ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : ''}
     </div>
     <div class="card-footer w-full flex items-center justify-between mt-auto border-t border-white/5 pt-3">
         <div class="flex gap-1 text-lg">${starsHTML}</div>
@@ -1128,10 +1155,11 @@ function filterData() {
     renderCards(sortPool(pool));
 }
 
-function openModalItem(item) {
+function openModalItem(item, catOverride) {
     currentModalItem = item;
+    const modalCat = catOverride || currentMainCategory;
     const key = pluginKey(item);
-    const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
+    const isMovie = (modalCat === 'atmos' || modalCat === 'imax');
 
     document.getElementById('modal-title').textContent = item.name;
     document.getElementById('modal-tags').innerHTML = '';
@@ -1166,7 +1194,7 @@ function openModalItem(item) {
         document.getElementById('modal-subtitle').textContent = '';
         const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} badge-uniform">${escapeHtml(item.type)}</span>` : '';
         const modalAgeBadge = item.ageRestricted ? `<span class="bg-rose-600/90 text-white border border-white/20 badge-uniform">18+</span>` : '';
-        const modalDebridHTML = currentMainCategory === 'eklentiler' ? buildDebridBadge(item) : '';
+        const modalDebridHTML = modalCat === 'eklentiler' ? buildDebridBadge(item) : '';
         const modalBadgesHTML = typeBadgeHTML + buildAppBadgesGrid(item) + modalDebridHTML + buildStatusBadges(item) + buildOsBadges(item) + modalAgeBadge;        document.getElementById('modal-tags').innerHTML = modalBadgesHTML;
 
         const code = item.code;
@@ -1191,7 +1219,7 @@ function openModalItem(item) {
         // --- KURULUM REHBERLERİ GÖRÜNÜRLÜK MANTIĞI (açılır/kapanır <details>) ---
         const appArray = Array.isArray(item.app) ? item.app : [item.app];
         const appsLower = appArray.map(a => String(a).toLowerCase());
-        const isAPK = currentMainCategory !== 'eklentiler';
+        const isAPK = modalCat !== 'eklentiler';
         const hasNuvio = appsLower.some(a => a.includes('nuvio')) || item.installGuide === 'nuvio';
         const hasStremio = appsLower.some(a => a.includes('stremio')) || item.installGuide === 'stremio';
         const hasCloudstream = appsLower.some(a => a.includes('cloudstream')) || item.installGuide === 'cloudstream';
@@ -1434,7 +1462,10 @@ function toggleSearchModal() {
         lockBodyScroll();
         const currentVal = document.getElementById('searchInput').value;
         document.getElementById('expandedSearchInput').value = currentVal;
-        renderExpandedSearchResults(currentVal);
+        if (!globalFuseIndex) {
+            document.getElementById('expandedSearchResults').innerHTML = `<div class="text-center text-slate-500 text-sm py-10">Tüm kategoriler taranıyor...</div>`;
+        }
+        ensureAllCategoriesLoaded().then(() => renderExpandedSearchResults(document.getElementById('expandedSearchInput').value));
         setTimeout(()=>document.getElementById('expandedSearchInput').focus(),100);
     } else {
         m.classList.add('opacity-0','pointer-events-none');
