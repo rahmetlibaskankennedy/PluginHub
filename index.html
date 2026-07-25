@@ -869,7 +869,7 @@ function buildOsBadges(item) {
     }).filter(Boolean).join('');
 }
 
-ffunction buildStatusBadges(item) {
+function buildStatusBadges(item) {
     const isNew = isRecentlyAdded(item.dateAdded);
     const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 badge-uniform animate-pulse">YENİ</span>` : '';
     const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 badge-uniform">KOD: ${item.code}</span>` : '';
