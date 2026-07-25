@@ -90,7 +90,7 @@
     "desc": "Tidal ve Deezer gibi servislerden ücretsiz, kayıpsız (FLAC) müzik dinleme platformu. Eklenti deposu için Ayarlar > Cloud Storage > Add Connection bölümüne 'https://eclipsemusic.app/addonstore/manifest.json' eklenmelidir.",
     "sourceUrl": "https://eclipsemusic.app/download/android",
     "status": "ok",
-    "platform": ["mobile"],
+    "platform": ["mobile"]
   },
   {
     "app": ["Android", "iOS"],
@@ -99,7 +99,7 @@
     "desc": "Sadece debrid API anahtarı ile çalışan, karmaşıklıktan uzak minimalist oynatıcı. Gömülü WebStreamR ve HDHub ile gelir, harici eklenti eklenemez.",
     "sourceUrl": "https://play.google.com/store/apps/details?id=com.app.zxy&pli=1",
     "status": "ok",
-    "platform": ["mobile"],
+    "platform": ["mobile"]
   },
   {
     "app": ["Android"],
@@ -108,7 +108,7 @@
     "desc": "Film, YT müzik, kitap, manga ve IPTV'yi birleştiren proje. Ayarlar ve debrid özellikleri şu an stabil olmasa da gömülü YouTube müzik çaları sorunsuz çalışır.",
     "sourceUrl": "https://playtorrio.xyz/",
     "status": "warn",
-    "platform": ["mobile"],
+    "platform": ["mobile"]
   },
   {
     "app": ["iOS"],
@@ -117,6 +117,6 @@
     "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonu ve Trakt entegrasyonu var. Tam verim için Infuse medya oynatıcı (ücretli) ile kullanımı önerilir.",
     "sourceUrl": "https://apps.apple.com/us/app/fusion-media-center/id6759285919",
     "status": "ok",
-    "platform": ["mobile"],
+    "platform": ["mobile"]
   }
 ]
