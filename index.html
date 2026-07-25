@@ -634,12 +634,14 @@ async function loadCategoryData(key) {
     }
 }
 
-fuseIndex = new Fuse(plugins, {
-    keys: ['name'],
-    threshold: 0.2,
-    ignoreLocation: true,
-    minMatchCharLength: 2
-});
+function postLoadSetup() {
+    computeNewestDate();
+    fuseIndex = new Fuse(plugins, {
+        keys: ['name'],
+        threshold: 0.2,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+    });
     buildTabs();
     buildFilterOptions();
     filterData();
