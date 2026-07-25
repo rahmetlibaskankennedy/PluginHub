@@ -94,7 +94,7 @@
   },
   {
     "app": ["Android", "iOS"],
-    "type": "Media Player",
+    "type": "Stream",
     "name": "ZXY Media Player",
     "desc": "Sadece debrid API anahtarı ile çalışan, karmaşıklıktan uzak minimalist oynatıcı. Gömülü WebStreamR ve HDHub ile gelir, harici eklenti eklenemez.",
     "sourceUrl": "https://play.google.com/store/apps/details?id=com.app.zxy&pli=1",
@@ -112,7 +112,7 @@
   },
   {
     "app": ["iOS"],
-    "type": "Media Player",
+    "type": "Stream",
     "name": "Fusion",
     "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonu ve Trakt entegrasyonu var. Tam verim için Infuse medya oynatıcı (ücretli) ile kullanımı önerilir.",
     "sourceUrl": "https://apps.apple.com/us/app/fusion-media-center/id6759285919",
