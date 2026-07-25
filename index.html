@@ -498,7 +498,7 @@ function openCompareModal() {
     const rows = [
         { label: 'Tür', get: i => i.type || '—' },
         { label: 'Uygulama', get: i => Array.isArray(i.app) ? i.app.join(', ') : (i.app || '—') },
-        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Debrid' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz') },
+        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Gerekli' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz') },
         { label: 'Platform', get: i => Array.isArray(i.platform) ? i.platform.join(', ') : '—' },
         { label: 'Puanınız', get: i => userRatings[pluginKey(i)] ? `${userRatings[pluginKey(i)]}/5 ⭐` : '—' },
         { label: 'Durum', get: i => i.status === 'dead' ? '❌ Çalışmıyor' : '✅ Aktif' }
@@ -851,10 +851,10 @@ function buildDebridBadge(item) {
     const map = {
         free: { l: '🆓 Ücretsiz', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
         optional: { l: '🔓 Opsiyonel', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-        required: { l: '⚡ Debrid', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
+        required: { l: '⚡ Gerekli', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
     };
     const d = map[item.debrid] || map.free;
-    return `<span class="${d.cls} border px-2.5 py-1 rounded-full text-[10px] font-bold inline-block mb-4">${d.l}</span>`;
+    return `<span class="${d.cls} border badge-uniform">${d.l}</span>`;
 }
 
 function buildOsBadges(item) {
@@ -869,11 +869,11 @@ function buildOsBadges(item) {
     }).filter(Boolean).join('');
 }
 
-function buildStatusBadges(item) {
+ffunction buildStatusBadges(item) {
     const isNew = isRecentlyAdded(item.dateAdded);
-    const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider animate-pulse">YENİ</span>` : '';
-    const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] font-black">KOD: ${item.code}</span>` : '';
-    const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase">ÇALIŞMIYOR</span>` : '';
+    const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 badge-uniform animate-pulse">YENİ</span>` : '';
+    const codeBadgeHTML = item.code ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 badge-uniform">KOD: ${item.code}</span>` : '';
+    const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 badge-uniform">ÇALIŞMIYOR</span>` : '';
     return codeBadgeHTML + deadBadgeHTML + newBadgeHTML;
 }
 
@@ -947,7 +947,7 @@ function buildCardHTML(item) {
         const appBadgesHTML = buildAppBadges(item);
         const osBadgesHTML = buildOsBadges(item);
         const statusBadgesHTML = buildStatusBadges(item);
-        const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase">${escapeHtml(item.type)}</span>` : '';
+        const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} badge-uniform">${escapeHtml(item.type)}</span>` : '';
 
         if (viewMode === 'list') {
             return `
@@ -1046,7 +1046,7 @@ function buildFilterOptions() {
     const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
     
     if (!isMovie) {
-        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Debrid'}];
+        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Gerekli'}];
         document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
     }
 
