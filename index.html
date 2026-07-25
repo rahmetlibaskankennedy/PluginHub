@@ -498,7 +498,7 @@ function openCompareModal() {
     const rows = [
         { label: 'Tür', get: i => i.type || '—' },
         { label: 'Uygulama', get: i => Array.isArray(i.app) ? i.app.join(', ') : (i.app || '—') },
-        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Gerekli' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz') },
+        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Debrid' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz') },
         { label: 'Platform', get: i => Array.isArray(i.platform) ? i.platform.join(', ') : '—' },
         { label: 'Puanınız', get: i => userRatings[pluginKey(i)] ? `${userRatings[pluginKey(i)]}/5 ⭐` : '—' },
         { label: 'Durum', get: i => i.status === 'dead' ? '❌ Çalışmıyor' : '✅ Aktif' }
@@ -851,7 +851,7 @@ function buildDebridBadge(item) {
     const map = {
         free: { l: '🆓 Ücretsiz', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
         optional: { l: '🔓 Opsiyonel', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-        required: { l: '⚡ Gerekli', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
+        required: { l: '⚡ Debrid', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
     };
     const d = map[item.debrid] || map.free;
     return `<span class="${d.cls} border px-2.5 py-1 rounded-full text-[10px] font-bold inline-block mb-4">${d.l}</span>`;
@@ -1046,7 +1046,7 @@ function buildFilterOptions() {
     const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
     
     if (!isMovie) {
-        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Gerekli'}];
+        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Debrid'}];
         document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
     }
 
