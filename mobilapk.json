@@ -8,15 +8,15 @@
     "status": "ok",
     "platform": ["mobile"]
   },
-  {
-    "app": ["Android"],
-    "type": "Mobil Uygulama",
-    "name": "Nuvio",
-    "desc": "Hafif ve hızlı bir alternatif. TV box cihazlarında ve telefonlarda üstün performans sunar.",
-    "sourceUrl": "https://github.com/tapframe/NuvioMobile/releases",
-    "status": "ok",
-    "platform": ["mobile"]
-  },
+ {
+  "app": ["iOS"],
+  "type": "Mobil Uygulama",
+  "name": "Nuvio",
+  "desc": "Uyarı: App Store'dan kaldırıldı, TestFlight kotası genelde dolu ve güvenilir değil. Tek çalışan yöntem AltStore/Sideloadly ile resmi IPA dosyasının kenar yüklenmesi.",
+  "sourceUrl": "https://nuvio-app.com/download.html",
+  "status": "warn",
+  "platform": ["mobile"]
+}
   {
     "app": ["Android"],
     "type": "Mobil Uygulama",
