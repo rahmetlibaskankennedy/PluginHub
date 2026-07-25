@@ -971,13 +971,11 @@ const urlDisplayHTML = item.code
     : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
 
 return `
-    <div class="card-header w-full flex flex-col min-w-0">
-        <div class="flex items-center gap-1.5 flex-wrap mb-3">
-            ${typeBadgeHTML}${statusBadgesHTML}
+        <div class="card-header w-full flex flex-col min-w-0">
+        <div class="flex items-start gap-1.5 flex-wrap mb-3">
+            ${typeBadgeHTML}${buildAppBadgesGrid(item)}${currentMainCategory === 'eklentiler' ? buildDebridBadge(item) : ''}${statusBadgesHTML}
         </div>
-        ${buildAppBadgesGrid(item)}
-        ${currentMainCategory === 'eklentiler' ? buildDebridBadge(item) : ''}
-        <div class="flex justify-between items-start gap-2 mb-3 mt-1">
+        <div class="flex justify-between items-start gap-2 mb-3">
             <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
             ${favBtnHTML}
         </div>
