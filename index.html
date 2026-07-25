@@ -557,7 +557,8 @@ function getOwnerId() {
 
 function extractUrl(desc) {
     const m = desc?.match(/(https?:\/\/[^\s]+)/);
-    return m ? m[0] : '';
+    if (m) return m[0];
+    return desc && !desc.includes(' ') ? desc.trim() : '';
 }
 
 // YENİ: Açıklama metninden URL'yi çıkarıp geri kalan (örn. "Aylık Ücret: ~3€ ...") kısmı döndürür
