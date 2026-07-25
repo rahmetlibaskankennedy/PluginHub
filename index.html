@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -216,6 +217,10 @@
         <div class="mb-8">
             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Platform/Cihaz</label>
             <div class="flex flex-wrap gap-2" id="platformFilterGroup"></div>
+        </div>
+        <div class="mb-6" id="genreFilterWrapper">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Tür</label>
+            <div class="flex flex-wrap gap-2" id="genreFilterGroup"></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
             <button onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
@@ -446,9 +451,10 @@ let showFavsOnly = false;
 let currentModalItem = null;
 let currentRatingDisplay = 0;
 
-let activeTypeFilter = 'all';
 let activeDebridFilter = localStorage.getItem('ph_debrid_filter') || 'all';
 let activePlatformFilter = localStorage.getItem('ph_platform_filter') || 'all';
+let activeGenreFilter = localStorage.getItem('ph_genre_filter') || 'all';
+let activeSort = localStorage.getItem('ph_sort') || 'default';
 let activeSort = localStorage.getItem('ph_sort') || 'default';
 let fuseIndex = null;
 let scrollLockCount = 0;
@@ -566,7 +572,7 @@ async function loadCategoryData(key) {
 
 function postLoadSetup() {
     computeNewestDate();
-    fuseIndex = new Fuse(plugins, { keys: ['name', 'desc', 'app', 'type', 'code', 'genre', 'platform', 'studio', { name: 'year', getFn: (item) => (item.year !== undefined && item.year !== null) ? String(item.year) : '' }], threshold: 0.35 });
+    fuseIndex = new Fuse(plugins, { keys: ['name'], threshold: 0.35 });
     buildTabs();
     buildFilterOptions();
     filterData();
