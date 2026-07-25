@@ -250,6 +250,7 @@
             <div class="mb-6">
                 <label id="modal-url-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
                 <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-indigo-300 leading-relaxed break-all mb-4 text-center md:text-left"></div>
+                <div id="modal-desc-box" class="text-xs text-slate-400 leading-relaxed mb-4 hidden"></div>
                 <div class="flex gap-3">
                     <button id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] text-white font-semibold text-sm py-3 rounded-xl border border-white/5">Kopyala</button>
                     <button id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 text-white font-semibold text-sm py-3 rounded-xl flex justify-center items-center gap-1">Kaynağa Git ↗</button>
@@ -498,7 +499,7 @@ function openCompareModal() {
     const rows = [
         { label: 'Tür', get: i => i.type || '—' },
         { label: 'Uygulama', get: i => Array.isArray(i.app) ? i.app.join(', ') : (i.app || '—') },
-        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Ücretli' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz') },
+        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Debrid' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : (i.debrid === 'paid' ? '💳 Ücretli' : '🆓 Ücretsiz')) },
         { label: 'Platform', get: i => Array.isArray(i.platform) ? i.platform.join(', ') : '—' },
         { label: 'Puanınız', get: i => userRatings[pluginKey(i)] ? `${userRatings[pluginKey(i)]}/5 ⭐` : '—' },
         { label: 'Durum', get: i => i.status === 'dead' ? '❌ Çalışmıyor' : '✅ Aktif' }
@@ -559,6 +560,12 @@ function extractUrl(desc) {
     return m ? m[0] : '';
 }
 
+// YENİ: Açıklama metninden URL'yi çıkarıp geri kalan (örn. "Aylık Ücret: ~3€ ...") kısmı döndürür
+function descWithoutUrl(desc) {
+    if (!desc) return '';
+    return desc.replace(/(https?:\/\/[^\s]+)/g, '').replace(/\s{2,}/g, ' ').trim();
+}
+
 async function copyToClipboard(text, emptyMsg) {
     if (!text) { showToast(emptyMsg || 'Kopyalanacak içerik yok.', true); return; }
     try {
@@ -596,9 +603,6 @@ async function switchMainCategory(key, btnEl) {
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
-    // Kategoriler arası geçişte tüm filtreleri sıfırla
-    // (Atmos'ta seçilen bir platform ya da tür filtresinin Spor/TV APK gibi
-    // alakasız kategorilere sızmasını önler)
     activeDebridFilter = 'all';
     activePlatformFilter = 'all';
     activeGenreFilter = 'all';
@@ -863,8 +867,6 @@ function buildAppBadges(item) {
         return `<span class="${badgeClass} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-block">${escapeHtml(a)}</span>`;
     }).join('');
 
-    // Nuvio formatındaki eklentiler WuPlay ve Arvio gibi uygulamalarda da çalışır
-    // — ancak "Plugin" türü (repo tabanlı) eklentiler için geçerli değil
     if (appsLower.includes('nuvio') && item.type !== 'Plugin') {
         html += `<span class="tag-compat px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1" title="Bu eklenti Nuvio formatında olduğu için WuPlay ve Arvio uygulamalarında da çalışır">🔗 WuPlay · Arvio</span>`;
     }
@@ -900,11 +902,14 @@ function buildAppBadgesGrid(item) {
     return `<div class="badge-grid-2x2">${primaryHTML}${secondaryHTML}</div>`;
 }
 
+// DÜZELTİLDİ: "paid" (ücretli) durumu artık haritada tanımlı; önceden
+// map[item.debrid] === undefined olduğu için sessizce "free"ye düşüyordu.
 function buildDebridBadge(item) {
     const map = {
         free: { l: '🆓 Ücretsiz', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
         optional: { l: '🔓 Opsiyonel', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-        required: { l: '⚡ Ücretli', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
+        required: { l: '⚡ Debrid', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+        paid: { l: '💳 Ücretli', cls: 'bg-blue-500/10 text-blue-400 border-blue-500/20' }
     };
     const d = map[item.debrid] || map.free;
     return `<span class="${d.cls} border badge-uniform">${d.l}</span>`;
@@ -929,9 +934,6 @@ function buildStatusBadges(item) {
     return deadBadgeHTML + newBadgeHTML;
 }
 
-// "YENİ" rozeti artık veri kümesindeki en yeni tarihe göre değil,
-// gerçek takvim tarihine göre hesaplanır: son 3 gün içinde eklenenler YENİ sayılır.
-// Böylece yeni bir eklenti eklendiğinde eski eklentiler otomatik olarak rozetini kaybeder.
 const NEW_BADGE_WINDOW_DAYS = 3;
 function isRecentlyAdded(dateAddedStr) {
     if (!dateAddedStr) return false;
@@ -1023,6 +1025,13 @@ const urlDisplayHTML = item.code
     ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-sm text-emerald-400 font-black mb-3">Downloader Kodu: ${item.code}</div>`
     : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-xs text-indigo-300 leading-relaxed break-all mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
 
+// DÜZELTİLDİ: Açıklama artık "eklentiler" kategorisinde de gösteriliyor
+// (URL kısmı ayıklandıktan sonra kalan metin, örn. "Aylık Ücret: ~3€ ...")
+const cardDescText = descWithoutUrl(item.desc);
+const descDisplayHTML = cardDescText
+    ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(cardDescText)}</p>`
+    : (cat !== 'eklentiler' ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : '');
+
 return `
         <div class="card-header w-full flex flex-col min-w-0">
             <div class="flex items-start gap-1.5 flex-wrap mb-3">
@@ -1034,7 +1043,7 @@ return `
         </div>
         ${osBadgesHTML ? `<div class="flex flex-wrap gap-1.5 mb-3">${osBadgesHTML}</div>` : ''}
         ${urlDisplayHTML}
-        ${cat !== 'eklentiler' ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : ''}
+        ${descDisplayHTML}
     </div>
     <div class="card-footer w-full flex items-center justify-between mt-auto border-t border-white/5 pt-3">
         <div class="flex gap-1 text-lg">${starsHTML}</div>
@@ -1099,7 +1108,7 @@ function buildFilterOptions() {
     const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
     
     if (!isMovie) {
-        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Ücretli'}];
+        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Debrid'},{v:'paid',l:'💳 Ücretli'}];
         document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
     }
 
@@ -1190,7 +1199,6 @@ function openModalItem(item, catOverride) {
         document.getElementById('modal-apk-info').classList.remove('hidden');
         
 
-        // Rozetleri modalda da göster (uygulama, işletim sistemi, kod, durum, +18)
         document.getElementById('modal-subtitle').textContent = '';
         const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} badge-uniform">${escapeHtml(item.type)}</span>` : '';
         const modalAgeBadge = item.ageRestricted ? `<span class="bg-rose-600/90 text-white border border-white/20 badge-uniform">18+</span>` : '';
@@ -1216,7 +1224,17 @@ function openModalItem(item, catOverride) {
             goBtn.onclick = () => { if(urlStr) window.open(urlStr, '_blank'); };
         }
 
-        // --- KURULUM REHBERLERİ GÖRÜNÜRLÜK MANTIĞI (açılır/kapanır <details>) ---
+        // YENİ: Modalda da açıklama metnini (URL hariç) göster
+        const modalDescEl = document.getElementById('modal-desc-box');
+        const modalDescText = descWithoutUrl(item.desc);
+        if (modalDescText) {
+            modalDescEl.textContent = modalDescText;
+            modalDescEl.classList.remove('hidden');
+        } else {
+            modalDescEl.textContent = '';
+            modalDescEl.classList.add('hidden');
+        }
+
         const appArray = Array.isArray(item.app) ? item.app : [item.app];
         const appsLower = appArray.map(a => String(a).toLowerCase());
         const isAPK = modalCat !== 'eklentiler';
@@ -1238,7 +1256,6 @@ function openModalItem(item, catOverride) {
         if (wuplayGuide) wuplayGuide.classList.toggle('hidden', isAPK || !isWuplayCompatible); 
         if (downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
         if (cloudstreamGuide) cloudstreamGuide.classList.toggle('hidden', !hasCloudstream);
-        // ----------------------------------------------
 
         const savedRating = userRatings[key] || 0;
         currentRatingDisplay = savedRating; updateStarsUI(savedRating);
@@ -1621,7 +1638,6 @@ function closeMovieModal(e) {
     if (!e || e.target.id === 'movie-modal-overlay') {
         document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); 
         
-        // Modal kapanınca arkadaki videonun sesini/oynatmasını durdur
         const trailerEl = document.getElementById('movie-trailer');
         if(trailerEl) trailerEl.src = '';
     }
@@ -1644,7 +1660,6 @@ function setLoadingIcon(isDice) {
 async function suggestRandomMovie() {
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
     
-    // Eski verileri ve videoyu sıfırla
     const trailerEl = document.getElementById('movie-trailer');
     const posterEl = document.getElementById('movie-poster');
     if(trailerEl) { trailerEl.src = ''; trailerEl.classList.add('hidden'); }
@@ -1664,7 +1679,6 @@ async function suggestRandomMovie() {
         
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
         
-        // --- 1. ADIM: FRAGMANI WORKER ÜZERİNDEN GÜVENLİ ÇEK ---
         let youtubeKey = null;
         try {
             const vidRes = await fetch(`${REPORT_ENDPOINT}/tmdb-video?id=${randomMovie.id}`);
@@ -1681,7 +1695,6 @@ async function suggestRandomMovie() {
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
 
-        // --- 2. ADIM: EKRANA BAS (FRAGMAN VEYA POSTER) ---
         if (youtubeKey && trailerEl) {
             posterEl.classList.add('hidden');
             trailerEl.src = `https://www.youtube.com/embed/${youtubeKey}?autoplay=1&mute=1&controls=1&loop=1&playlist=${youtubeKey}&modestbranding=1`;
@@ -1692,7 +1705,6 @@ async function suggestRandomMovie() {
             posterEl.src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : FALLBACK_POSTER;
         }
         
-        // TMDB ID eşleştirme - Boş tür kutucuğu engelleme
         const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
         const genreId = randomMovie.genre_ids && randomMovie.genre_ids.length > 0 ? randomMovie.genre_ids[0] : null;
         const genreEl = document.getElementById('movie-genre');
@@ -1712,7 +1724,6 @@ async function suggestRandomMovie() {
     }
 }
 
-// Bir katalog filmi (Atmos/IMAX) için gerçek fragmanını arayıp zar modalıyla aynı pencerede gösterir
 async function playTrailerForItem(item) {
     const trailerEl = document.getElementById('movie-trailer');
     const posterEl = document.getElementById('movie-poster');
@@ -1770,7 +1781,6 @@ async function playTrailerForItem(item) {
     }
 }
 
-// Popüler Filmleri Worker Üzerinden Güvenli Çekme Fonksiyonu
 async function fetchPopularMovies(page) {
     const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}`);
     if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); 
