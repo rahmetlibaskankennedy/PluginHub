@@ -119,3 +119,8 @@
         details.install-guide .chevron { transition: transform 0.25s ease; display: inline-block; }
         details.install-guide[open] .chevron { transform: rotate(180deg); }
         details.install-guide .guide-body { padding: 0 24px 24px 24px; }
+
+        .badge-grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+        .badge-grid-single { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .app-badge-cell { padding: 6px 8px; border-radius: 8px; font-size: 10px; font-weight: 800; text-align: center; text-transform: uppercase; }
+        .app-badge-secondary { background: transparent; color: #7c7a9c; border: 1px dashed rgba(124,122,156,0.4); padding: 6px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; text-align: center; text-transform: uppercase; }
