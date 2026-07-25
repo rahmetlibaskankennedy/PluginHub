@@ -199,7 +199,7 @@
     "type": "Stream",
     "name": "STRMR Player",
     "desc": "Stremio ve benzeri platformlar için optimize edilmiş yeni nesil medya oynatıcı.",
-    "code": "N/A",
+    "sourceUrl": "https://play.google.com/store/apps/details?id=com.strmr.ps",
     "status": "ok",
     "platform": ["tv"]
   },
@@ -208,7 +208,7 @@
     "type": "Stream",
     "name": "Fusion",
     "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonlu ve Trakt destekli. Tam verim için Infuse medya oynatıcı ile kullanımı önerilir.",
-    "code": "N/A",
+    "sourceUrl": "https://apps.apple.com/tr/app/fusion-media-center/id6759285919?l=tr&platform=tv",
     "status": "ok",
     "platform": ["tv"]
   }
