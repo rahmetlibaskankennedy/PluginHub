@@ -36,22 +36,34 @@
     "platform": ["mobile"]
   },
   {
-    "app": ["iOS"],
+    "app": ["Android"],
     "type": "Mobil Uygulama",
-    "name": "Stremio",
-    "desc": "iOS eklenti desteğiyle App Store üzerinden resmi olarak erişilebilir.",
-    "sourceUrl": "https://apps.apple.com/app/stremio/id1642921384",
+    "name": "FilmPlus",
+    "desc": "Binlerce HD film, popüler dizi ve anime sunan, düzenli güncellenen popüler bir mobil uygulama.",
+    "sourceUrl": "https://filmplusapk.app/",
     "status": "ok",
-    "platform": ["mobile"]
+    "platform": ["mobile"],
+    "dateAdded": "2026-07-25"
   },
   {
-    "app": ["iOS"],
+    "app": ["Android"],
     "type": "Mobil Uygulama",
-    "name": "Nuvio",
-    "desc": "TestFlight beta programı üzerinden Nuvio deneyimini Apple cihazlarınızda yaşayın.",
-    "sourceUrl": "https://testflight.apple.com/join/QkKMGRqp",
+    "name": "CinePlus",
+    "desc": "BeeTV'nin resmi halefi. Film, dizi, web dizisi, anime ve canlı kanal içeriğini tek uygulamada sunar.",
+    "sourceUrl": "https://cineplus.app/",
     "status": "ok",
-    "platform": ["mobile"]
+    "platform": ["mobile"],
+    "dateAdded": "2026-07-25"
+  },
+  {
+    "app": ["Android"],
+    "type": "Mobil Uygulama",
+    "name": "Cinema HQ",
+    "desc": "Cinema HD'nin yerini alan güncel alternatif. Film, dizi, anime ve canlı TV içeriğini debrid destekli olarak sunar.",
+    "sourceUrl": "https://cinemahq.app/",
+    "status": "ok",
+    "platform": ["mobile"],
+    "dateAdded": "2026-07-25"
   },
   {
     "app": ["iOS"],
@@ -60,6 +72,24 @@
     "desc": "iOS'ta kurulumsuz kullanım için en pratik yöntem, tarayıcı üzerinden doğrudan çalışır.",
     "sourceUrl": "https://web.stremio.com/",
     "status": "ok",
+    "platform": ["mobile"]
+  },
+  {
+    "app": ["iOS"],
+    "type": "Mobil Uygulama",
+    "name": "Stremio (Sideload IPA)",
+    "desc": "Uyarı: Stremio App Store'dan kaldırıldı. Tam özellikli sürüm için resmi IPA dosyası AltStore/Sideloadly ile kenar yüklenebilir (torrent server dahil, App Store sınırlamaları yok).",
+    "sourceUrl": "https://www.stremio.com/downloads",
+    "status": "warn",
+    "platform": ["mobile"]
+  },
+  {
+    "app": ["iOS"],
+    "type": "Mobil Uygulama",
+    "name": "Nuvio",
+    "desc": "Uyarı: iOS'ta App Store durumu değişken (kısa süre mağazada kaldı, kaldırıldı). Güncel kurulum seçenekleri (TestFlight beta veya AltStore/SideStore ile sideload) resmi sayfada listeleniyor.",
+    "sourceUrl": "https://nuvio-app.com/download.html",
+    "status": "warn",
     "platform": ["mobile"]
   }
 ]
