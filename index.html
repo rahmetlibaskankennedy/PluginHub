@@ -463,6 +463,64 @@ let newestDate = null;
 let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
 
 let publicNotesCache = {};
+let compareList = JSON.parse(localStorage.getItem('ph_compare') || '[]');
+
+function toggleCompare(key) {
+    const idx = compareList.indexOf(key);
+    if (idx === -1) {
+        if (compareList.length >= 3) { showToast('En fazla 3 öğe karşılaştırabilirsin.', true); return; }
+        compareList.push(key);
+    } else {
+        compareList.splice(idx, 1);
+    }
+    localStorage.setItem('ph_compare', JSON.stringify(compareList));
+    updateCompareBar();
+    filterData();
+}
+
+function updateCompareBar() {
+    const bar = document.getElementById('compare-bar');
+    document.getElementById('compare-count').textContent = compareList.length;
+    bar.classList.toggle('hidden', compareList.length === 0);
+    bar.classList.toggle('flex', compareList.length > 0);
+}
+
+function clearCompare() {
+    compareList = [];
+    localStorage.setItem('ph_compare', JSON.stringify(compareList));
+    updateCompareBar();
+    filterData();
+}
+
+function openCompareModal() {
+    if (compareList.length === 0) return;
+    const items = compareList.map(key => plugins.find(p => pluginKey(p) === key)).filter(Boolean);
+    const rows = [
+        { label: 'Tür', get: i => i.type || '—' },
+        { label: 'Uygulama', get: i => Array.isArray(i.app) ? i.app.join(', ') : (i.app || '—') },
+        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Gerekli' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : '🆓 Ücretsiz') },
+        { label: 'Platform', get: i => Array.isArray(i.platform) ? i.platform.join(', ') : '—' },
+        { label: 'Puanınız', get: i => userRatings[pluginKey(i)] ? `${userRatings[pluginKey(i)]}/5 ⭐` : '—' },
+        { label: 'Durum', get: i => i.status === 'dead' ? '❌ Çalışmıyor' : '✅ Aktif' }
+    ];
+    let html = `<table class="w-full text-sm text-left border-collapse">
+        <thead><tr>
+            <th class="p-3 text-slate-500 text-xs uppercase"></th>
+            ${items.map(i => `<th class="p-3 text-white font-bold border-b border-white/10">${escapeHtml(i.name)}</th>`).join('')}
+        </tr></thead><tbody>`;
+    rows.forEach(r => {
+        html += `<tr class="border-b border-white/5"><td class="p-3 text-slate-500 text-xs font-bold uppercase">${r.label}</td>${items.map(i => `<td class="p-3 text-slate-300">${escapeHtml(String(r.get(i)))}</td>`).join('')}</tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('compare-table-wrapper').innerHTML = html;
+    document.getElementById('compare-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+}
+function closeCompareModal() {
+    document.getElementById('compare-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    unlockBodyScroll();
+}
+function closeCompareModalOnBackdrop(e) { if (e.target.id === 'compare-modal-overlay') closeCompareModal(); }
 
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
@@ -617,6 +675,8 @@ function setActiveDock(id) {
 }
 
 function handleGridClick(e) {
+    const compareBtn = e.target.closest('.compare-btn');
+    if (compareBtn) { e.stopPropagation(); if (compareBtn.dataset.key) toggleCompare(compareBtn.dataset.key); return; }
     const favBtn = e.target.closest('.fav-btn');
     if (favBtn) { e.stopPropagation(); if (favBtn.dataset.key) toggleFav(favBtn.dataset.key); return; }
     const fragmanBtn = e.target.closest('.fragman-badge');
@@ -675,7 +735,7 @@ window.addEventListener('DOMContentLoaded', () => {
             filterData();
         }
     });
-
+    updateCompareBar();
     switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
 });
 
@@ -867,16 +927,27 @@ function buildCardHTML(item) {
                 </div>
             `;
         }
+        const isComparing = compareList.includes(itemKey);
+        const compareBtnHTML = `<button class="compare-btn w-10 h-10 flex items-center justify-center text-lg transition shrink-0 ${isComparing ? 'text-indigo-400' : 'text-slate-500 hover:text-indigo-400'}" data-key="${escapeHtml(itemKey)}" title="Karşılaştır">⚖️</button>`;
+        const cardUrlStr = extractUrl(item.desc) || item.sourceUrl;
+        const urlDisplayHTML = item.code
+            ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[11px] font-mono text-emerald-400 font-black mb-3">KOD: ${item.code}</div>`
+            : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
+
         return `
             
             <div class="card-header w-full flex flex-col min-w-0">
-                <div class="flex justify-between items-start gap-2 mb-2">
-                    <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
-                    ${favBtnHTML}
-                </div>
                 <div class="flex items-center gap-1.5 flex-wrap mb-3">
                     ${typeBadgeHTML}${appBadgesHTML}${osBadgesHTML}${statusBadgesHTML}
                 </div>
+                <div class="flex justify-between items-start gap-2 mb-3">
+                    <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
+                    <div class="flex items-center gap-1 shrink-0">
+                        ${compareBtnHTML}
+                        ${favBtnHTML}
+                    </div>
+                </div>
+                ${urlDisplayHTML}
                 <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4 break-words">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
             </div>
             <div class="card-footer w-full flex items-center justify-between mt-auto">
@@ -1613,5 +1684,21 @@ async function fetchPopularMovies(page) {
     return res.json();
 }
 </script>
+<!-- KARŞILAŞTIRMA ÇUBUĞU -->
+<div id="compare-bar" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-5 py-3 rounded-full shadow-2xl shadow-indigo-600/40 z-[1500] hidden items-center gap-3 cursor-pointer" onclick="openCompareModal()">
+    <span>⚖️ Karşılaştır (<span id="compare-count">0</span>)</span>
+    <button onclick="event.stopPropagation(); clearCompare()" class="text-white/70 hover:text-white text-sm">✕</button>
+</div>
+
+<!-- KARŞILAŞTIRMA MODALI -->
+<div id="compare-modal-overlay" onclick="closeCompareModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[95%] max-w-4xl max-h-[85vh] overflow-y-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-white">Karşılaştırma</h3>
+            <button onclick="closeCompareModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <div id="compare-table-wrapper" class="overflow-x-auto"></div>
+    </div>
+</div>
 </body>
 </html>
