@@ -541,6 +541,8 @@ function pluginKey(p) {
     if (p.app) { 
         const appStr = Array.isArray(p.app) ? p.app.join('-') : p.app;
         return `${appStr}|${p.name}`;
+    } else if (p.type === 'Debrid') {
+        return `debrid|${p.name}`;
     } else {
         return `movie|${p.name}|${p.year || ''}`;
     }
