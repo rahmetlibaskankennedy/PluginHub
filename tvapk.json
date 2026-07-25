@@ -211,5 +211,14 @@
     "sourceUrl": "https://apps.apple.com/tr/app/fusion-media-center/id6759285919?l=tr&platform=tv",
     "status": "ok",
     "platform": ["tv"]
+  },
+  {
+    "app": ["Android TV"],
+    "type": "Kompakt Medya Portalı",
+    "name": "PlayTorrio",
+    "desc": "Film, YT müzik, kitap, manga ve IPTV'yi birleştiren proje. Ayarlar ve debrid özellikleri şu an stabil olmasa da gömülü YouTube müzik çaları sorunsuz çalışır.",
+    "sourceUrl": "https://playtorrio.xyz/",
+    "status": "warn",
+    "platform": ["tv"]
   }
 ]
