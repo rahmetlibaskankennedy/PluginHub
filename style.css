@@ -1,4 +1,3 @@
-<style>
         :root {
             --bg-main: #0b0a1f;
             --bg-card: #151333;
@@ -120,4 +119,3 @@
         details.install-guide .chevron { transition: transform 0.25s ease; display: inline-block; }
         details.install-guide[open] .chevron { transform: rotate(180deg); }
         details.install-guide .guide-body { padding: 0 24px 24px 24px; }
-    </style>
