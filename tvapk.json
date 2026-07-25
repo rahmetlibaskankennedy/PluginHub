@@ -1,7 +1,7 @@
 [
   {
     "app": ["Android TV", "webOS", "Tizen"],
-    "type": "Film & Dizi",
+    "type": "Stream",
     "name": "Stremio",
     "desc": "Tüm torrent ve streaming servislerini tek çatı altında toplayan modern medya merkezi. Eklenti desteği ile sınırsız içerik sunar. Kurulum: https://www.stremio.com/downloads",
     "code": "71893",
@@ -10,7 +10,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Stream",
     "name": "CloudStream",
     "desc": "Android tabanlı, reklam barındırmayan ve tamamen modüler dizi/film izleme uygulaması. Repolar ile özelleştirilebilir. Kurulum: https://github.com/recloudstream/cloudstream/releases",
     "code": "7264432",
@@ -19,7 +19,7 @@
   },
   {
     "app": ["Android TV", "webOS"],
-    "type": "Film & Dizi",
+    "type": "Stream",
     "name": "Nuvio",
     "desc": "Stremio benzeri, daha hafif ve hızlı bir alternatif. Özellikle TV box cihazlarında yüksek performans sergiler. Kurulum: https://github.com/tapframe/NuvioTV/releases",
     "code": "9231168",
@@ -37,7 +37,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Stream",
     "name": "WuPlay",
     "desc": "Gizlilik odaklı, hesap gerektirmeyen Android TV streaming uygulaması. Stremio eklentileriyle uyumlu. Kurulum: github.com/wuplayapp/wuplay-releases",
     "code": "5781040",
@@ -46,7 +46,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "FilmPlus",
     "desc": "En popüler yerli ve yabancı yapımlara kolayca ulaşmanızı sağlayan kullanıcı dostu bir araç.",
     "code": "52193",
@@ -55,7 +55,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi & Canlı",
+    "type": "Film/Dizi/Canlı TV",
     "name": "Flix Vision",
     "desc": "Zengin kütüphanesi ve sürekli güncellenen kaynakları ile kesintisiz izleme imkanı. VOD + canlı kanal desteği.",
     "code": "8799666",
@@ -64,7 +64,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "Viva TV",
     "desc": "Geniş içerik yelpazesi ve farklı sunucu seçenekleri ile donatılmış popüler medya izleme aracı.",
     "code": "82927",
@@ -73,7 +73,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "Nova TV",
     "desc": "Yüksek çözünürlüklü içerikleri ve stabiliteyi ön planda tutan modern streaming aracı.",
     "code": "70064",
@@ -82,7 +82,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "SStream",
     "desc": "Hızlı ve akıcı arayüzü ile yerli/yabancı dizi ve filmleri kolayca izlemenizi sağlar.",
     "code": "959386",
@@ -91,7 +91,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "Ocean Streamz",
     "desc": "Birden fazla kaynaktan veri çekerek her zaman çalışan linkler sunan güvenilir alternatif.",
     "code": "99317",
@@ -100,7 +100,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "Flixoid",
     "desc": "Cinema HD tabanlı fork, hızlı ve güvenli streaming deneyimi. Düzenli güncellemeler alıyor.",
     "code": "529057",
@@ -109,7 +109,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi/Canlı TV",
     "name": "NetMirror",
     "desc": "Film, dizi ve spor içerikleri için popüler alternatif streaming uygulaması.",
     "code": "6166931",
@@ -118,7 +118,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi/Canlı TV",
     "name": "Tea TV",
     "desc": "Geniş VOD arşivi ve M3U desteğiyle köklü streaming platformu. Uyarı: Güncel öneri listelerinde artık öne çıkmıyor, kurulum garantisi verilemez.",
     "code": "9829464",
@@ -127,7 +127,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "BeeTV",
     "desc": "Eskiden en popüler uygulamalardan biriydi. Uyarı: Amazon'un kısıtlamaları ve düzensiz geliştirici güncellemeleri yüzünden ivme kaybetti. Alternatif: CinePlus.",
     "code": "5671710",
@@ -136,7 +136,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi/Canlı TV",
     "name": "CinePlus",
     "desc": "BeeTV'nin en güncel klonu/halefi. V1.0.3 sürümüyle daha stabil çalışıyor.",
     "code": "2098541",
@@ -146,7 +146,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi/Canlı TV",
     "name": "Cinema HQ",
     "desc": "Cinema HD'nin yerini alan modern alternatif. Debrid entegrasyonu ile HD oynatma sunar, ücretsiz kaynaklarla da çalışır.",
     "code": "6989332",
@@ -156,7 +156,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Film/Dizi",
     "name": "Streamflix Reborn",
     "desc": "Reklamsız, sade üç kategorili arayüze sahip film/dizi uygulaması. TMDb gibi bir kaynak seçip tek tıkla oynatma sağlar.",
     "code": "2167888",
@@ -166,7 +166,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi",
+    "type": "Stream",
     "name": "Syncler",
     "desc": "Gelişmiş entegrasyon ve kişiselleştirme sunan güçlü streaming uygulaması. Syncler+ abonelik seçeneğiyle reklamsız kullanım mümkün.",
     "code": "65949",
@@ -176,7 +176,7 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi & Canlı",
+    "type": "Stream",
     "name": "Arvio",
     "desc": "Stremio tarzı, 3. parti eklentilerle film/dizi/canlı kanal (M3U veya Xtream Codes) sunan uygulama. Ücretsiz Arvio Cloud ile cihazlar arası senkronizasyon.",
     "code": "7233181",
@@ -186,12 +186,30 @@
   },
   {
     "app": ["Android TV"],
-    "type": "Film & Dizi & Canlı",
+    "type": "Stream",
     "name": "Rokkr",
     "desc": "Syncler ve Kodi'ye benzer şekilde çalışan, sağlayıcı (provider) kurulumu gerektiren şık arayüzlü uygulama. Canlı yayın desteği de içerir.",
     "code": "35861",
     "status": "ok",
     "platform": ["tv"],
     "dateAdded": "2026-07-25"
+  },
+  {
+    "app": ["Android TV"],
+    "type": "Stream",
+    "name": "STRMR Player",
+    "desc": "Stremio ve benzeri platformlar için optimize edilmiş yeni nesil medya oynatıcı.",
+    "code": "N/A",
+    "status": "ok",
+    "platform": ["tv"]
+  },
+  {
+    "app": ["Apple TV"],
+    "type": "Stream",
+    "name": "Fusion",
+    "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonlu ve Trakt destekli. Tam verim için Infuse medya oynatıcı ile kullanımı önerilir.",
+    "code": "N/A",
+    "status": "ok",
+    "platform": ["tv"]
   }
 ]
