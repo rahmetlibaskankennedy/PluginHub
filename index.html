@@ -970,7 +970,7 @@ const urlDisplayHTML = item.code
     ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[11px] font-mono text-emerald-400 font-black mb-3">KOD: ${item.code}</div>`
     : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
 
-rreturn `
+return `
     <div class="card-header w-full flex flex-col min-w-0">
         <div class="flex items-center gap-1.5 flex-wrap mb-3">
             ${typeBadgeHTML}${statusBadgesHTML}
