@@ -37,7 +37,7 @@
     "type": "Canlı",
     "name": "Sportzfy TV",
     "desc": "Premier League, Serie A, Champions League ve FIFA 2026 canlı yayınları. Xtream Codes API desteği.",
-    "code": "730116",
+    "code": "1150003",
     "status": "ok",
     "platform": [
       "tv",
@@ -67,7 +67,7 @@
     "type": "Canlı",
     "name": "Volta TV (Voltra)",
     "desc": "Binlerce canlı kanal, dizi, film ve canlı spor etkinlikleri. AFL, MLB, NBA ve dünya kupası yayınları.",
-    "code": "730116",
+    "code": "1165642",
     "status": "ok",
     "platform": [
       "tv",
@@ -112,7 +112,7 @@
     "type": "Canlı",
     "name": "MaxLiv TV",
     "desc": "Yeni nesil ücretsiz spor uygulaması. Futbol, kriket, boks, tenis. Tamamen reklamsız. Alçak kalite modu mevcut.",
-    "code": "730116",
+    "code": "7073289",
     "status": "ok",
     "isNew": true,
     "platform": [
