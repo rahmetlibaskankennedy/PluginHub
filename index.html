@@ -990,7 +990,7 @@ return `
         </div>
         ${osBadgesHTML ? `<div class="flex flex-wrap gap-1.5 mb-3">${osBadgesHTML}</div>` : ''}
         ${urlDisplayHTML}
-        ${currentMainCategory !== 'eklentiler' ? `<p class="text-[11px] font-bold text-slate-400 mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : ''}
+        ${currentMainCategory !== 'eklentiler' ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : ''}
     </div>
     <div class="card-footer w-full flex items-center justify-between mt-auto border-t border-white/5 pt-3">
         <div class="flex gap-1 text-lg">${starsHTML}</div>
