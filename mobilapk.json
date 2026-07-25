@@ -91,7 +91,6 @@
     "sourceUrl": "https://eclipsemusic.app/download/android",
     "status": "ok",
     "platform": ["mobile"],
-    "dateAdded": ""
   },
   {
     "app": ["Android", "iOS"],
@@ -101,7 +100,6 @@
     "sourceUrl": "https://play.google.com/store/apps/details?id=com.app.zxy&pli=1",
     "status": "ok",
     "platform": ["mobile"],
-    "dateAdded": ""
   },
   {
     "app": ["Android"],
@@ -111,7 +109,6 @@
     "sourceUrl": "https://playtorrio.xyz/",
     "status": "warn",
     "platform": ["mobile"],
-    "dateAdded": ""
   },
   {
     "app": ["iOS"],
@@ -121,6 +118,5 @@
     "sourceUrl": "https://apps.apple.com/us/app/fusion-media-center/id6759285919",
     "status": "ok",
     "platform": ["mobile"],
-    "dateAdded": ""
   }
 ]
