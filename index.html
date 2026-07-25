@@ -13,12 +13,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
 
     <script>
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
         const NOTES_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev/notes';
     </script>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -453,7 +454,6 @@ let currentRatingDisplay = 0;
 let activeDebridFilter = localStorage.getItem('ph_debrid_filter') || 'all';
 let activePlatformFilter = localStorage.getItem('ph_platform_filter') || 'all';
 let activeGenreFilter = localStorage.getItem('ph_genre_filter') || 'all';
-let activeSort = localStorage.getItem('ph_sort') || 'default';
 let activeSort = localStorage.getItem('ph_sort') || 'default';
 let fuseIndex = null;
 let scrollLockCount = 0;
@@ -934,7 +934,7 @@ function buildFilterOptions() {
     document.getElementById('platformFilterGroup').innerHTML = pOpts.map(o => `<button class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${escapeHtml(o.v)}" onclick="selectChip(this)">${escapeHtml(o.l)}</button>`).join('');
 }
 
-ffunction selectChip(el) {
+function selectChip(el) {
     const group = el.dataset.group;
     document.querySelectorAll(`.filter-chip[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
     el.classList.add('active');
