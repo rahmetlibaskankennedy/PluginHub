@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -596,6 +595,16 @@ async function switchMainCategory(key, btnEl) {
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
+    // Kategoriler arası geçişte tüm filtreleri sıfırla
+    // (Atmos'ta seçilen bir platform ya da tür filtresinin Spor/TV APK gibi
+    // alakasız kategorilere sızmasını önler)
+    activeDebridFilter = 'all';
+    activePlatformFilter = 'all';
+    activeGenreFilter = 'all';
+    localStorage.setItem('ph_debrid_filter', 'all');
+    localStorage.setItem('ph_platform_filter', 'all');
+    localStorage.setItem('ph_genre_filter', 'all');
+
     showFavsOnly = false;
     const favBtn = document.getElementById('favBtn');
     favBtn.style.background = '';
@@ -1094,12 +1103,12 @@ function sortPool(pool) {
     const arr = [...pool];
     if (activeSort === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
     else if (activeSort === 'newest') {
-    arr.sort((a, b) => {
-        const aKey = a.dateAdded || (a.year ? `${a.year}-01-01` : '0000-00-00');
-        const bKey = b.dateAdded || (b.year ? `${b.year}-01-01` : '0000-00-00');
-        return bKey.localeCompare(aKey);
-    });
-}
+        arr.sort((a, b) => {
+            const aKey = a.dateAdded || (a.year ? `${a.year}-01-01` : '0000-00-00');
+            const bKey = b.dateAdded || (b.year ? `${b.year}-01-01` : '0000-00-00');
+            return bKey.localeCompare(aKey);
+        });
+    }
     return arr;
 }
 
