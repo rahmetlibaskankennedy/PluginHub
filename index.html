@@ -976,7 +976,7 @@ function buildCardHTML(item) {
         const isComparing = compareList.includes(itemKey);
 const cardUrlStr = extractUrl(item.desc) || item.sourceUrl;
 const urlDisplayHTML = item.code
-    ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-emerald-400 font-black mb-3">Downloader Kodu: ${item.code}</div>`
+    ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-sm text-emerald-400 font-black mb-3">Downloader Kodu: ${item.code}</div>`
     : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
 
 return `
