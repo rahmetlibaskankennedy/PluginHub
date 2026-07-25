@@ -1,7 +1,7 @@
 [
   {
     "app": ["Android"],
-    "type": "Mobil Uygulama",
+    "type": "Stream",
     "name": "Stremio",
     "desc": "Modern medya merkezi. Android TV ve mobil için tam uyumlu, eklenti tabanlı geniş içerik yelpazesi.",
     "sourceUrl": "https://www.stremio.com/downloads",
@@ -10,7 +10,7 @@
   },
   {
     "app": ["iOS"],
-    "type": "Mobil Uygulama",
+    "type": "Stream",
     "name": "Nuvio",
     "desc": "Uyarı: App Store'dan kaldırıldı, TestFlight kotası genelde dolu ve güvenilir değil. Tek çalışan yöntem AltStore/Sideloadly ile resmi IPA dosyasının kenar yüklenmesi.",
     "sourceUrl": "https://nuvio-app.com/download.html",
@@ -19,7 +19,7 @@
   },
   {
     "app": ["Android"],
-    "type": "Mobil Uygulama",
+    "type": "Stream",
     "name": "CloudStream",
     "desc": "Reklamsız ve modüler dizi/film izleme uygulaması, repo tabanlı eklenti sistemiyle genişler.",
     "sourceUrl": "https://github.com/recloudstream/cloudstream/releases",
@@ -28,7 +28,7 @@
   },
   {
     "app": ["Android"],
-    "type": "Mobil Uygulama",
+    "type": "Film/Dizi/Canlı TV",
     "name": "Netfly",
     "desc": "Yerli ve yabancı içeriklere hızlı erişim sağlayan pratik bir uygulama.",
     "sourceUrl": "https://netflyapp.com/",
@@ -37,7 +37,7 @@
   },
   {
     "app": ["Android"],
-    "type": "Mobil Uygulama",
+    "type": "Film/Dizi",
     "name": "FilmPlus",
     "desc": "Binlerce HD film, popüler dizi ve anime sunan, düzenli güncellenen popüler bir mobil uygulama.",
     "sourceUrl": "https://filmplusapk.app/",
@@ -47,7 +47,7 @@
   },
   {
     "app": ["Android"],
-    "type": "Mobil Uygulama",
+    "type": "Film/Dizi/Canlı TV",
     "name": "CinePlus",
     "desc": "BeeTV'nin resmi halefi. Film, dizi, web dizisi, anime ve canlı kanal içeriğini tek uygulamada sunar.",
     "sourceUrl": "https://cineplus.app/",
@@ -57,7 +57,7 @@
   },
   {
     "app": ["Android"],
-    "type": "Mobil Uygulama",
+    "type": "Film/Dizi/Canlı TV",
     "name": "Cinema HQ",
     "desc": "Cinema HD'nin yerini alan güncel alternatif. Film, dizi, anime ve canlı TV içeriğini debrid destekli olarak sunar.",
     "sourceUrl": "https://cinemahq.app/",
@@ -67,7 +67,7 @@
   },
   {
     "app": ["iOS"],
-    "type": "Mobil Uygulama",
+    "type": "Stream",
     "name": "Stremio Web",
     "desc": "iOS'ta kurulumsuz kullanım için en pratik yöntem, tarayıcı üzerinden doğrudan çalışır.",
     "sourceUrl": "https://web.stremio.com/",
@@ -76,7 +76,7 @@
   },
   {
     "app": ["iOS"],
-    "type": "Mobil Uygulama",
+    "type": "Stream",
     "name": "Stremio (Sideload IPA)",
     "desc": "Uyarı: Stremio App Store'dan kaldırıldı. Tam özellikli sürüm için resmi IPA dosyası AltStore/Sideloadly ile kenar yüklenebilir (torrent server dahil, App Store sınırlamaları yok).",
     "sourceUrl": "https://www.stremio.com/downloads",
@@ -112,7 +112,7 @@
   },
   {
     "app": ["iOS"],
-    "type": "Medya Merkezi",
+    "type": "Media Player",
     "name": "Fusion",
     "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonu ve Trakt entegrasyonu var. Tam verim için Infuse medya oynatıcı (ücretli) ile kullanımı önerilir.",
     "sourceUrl": "https://apps.apple.com/us/app/fusion-media-center/id6759285919",
