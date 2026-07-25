@@ -601,9 +601,13 @@ async function switchMainCategory(key, btnEl) {
     activeDebridFilter = 'all';
     activePlatformFilter = 'all';
     activeGenreFilter = 'all';
+    activeSort = 'default';
     localStorage.setItem('ph_debrid_filter', 'all');
     localStorage.setItem('ph_platform_filter', 'all');
     localStorage.setItem('ph_genre_filter', 'all');
+    localStorage.setItem('ph_sort', 'default');
+    const sortSelectEl = document.getElementById('sortSelect');
+    if (sortSelectEl) sortSelectEl.value = 'default';
 
     showFavsOnly = false;
     const favBtn = document.getElementById('favBtn');
