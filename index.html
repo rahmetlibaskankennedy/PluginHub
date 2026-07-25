@@ -857,15 +857,6 @@ function buildAppBadgesGrid(item) {
     return `<div class="badge-grid-2x2">${primaryHTML}${secondaryHTML}</div>`;
 }
 
-    let secondaryHTML = '';
-    if (appsLower.includes('nuvio') && item.type !== 'Plugin') {
-        secondaryHTML = `<span class="app-badge-secondary">Arvio</span><span class="app-badge-secondary">WuPlay</span>`;
-    }
-
-    if (!secondaryHTML) return `<div class="badge-grid-single">${primaryHTML}</div>`;
-    return `<div class="badge-grid-2x2">${primaryHTML}${secondaryHTML}</div>`;
-}
-
 function buildDebridBadge(item) {
     const map = {
         free: { l: '🆓 Ücretsiz', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
