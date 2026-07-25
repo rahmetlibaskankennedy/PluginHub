@@ -100,14 +100,5 @@
     "sourceUrl": "https://play.google.com/store/apps/details?id=com.app.zxy&pli=1",
     "status": "ok",
     "platform": ["mobile"]
-  },
-  {
-    "app": ["Android"],
-    "type": "Kompakt Medya Portalı",
-    "name": "PlayTorrio",
-    "desc": "Film, YT müzik, kitap, manga ve IPTV'yi birleştiren proje. Ayarlar ve debrid özellikleri şu an stabil olmasa da gömülü YouTube müzik çaları sorunsuz çalışır.",
-    "sourceUrl": "https://playtorrio.xyz/",
-    "status": "warn",
-    "platform": ["mobile"]
   }
 ]
