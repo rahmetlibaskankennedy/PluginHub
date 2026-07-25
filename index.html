@@ -193,6 +193,7 @@
             <span class="absolute right-2 top-1/2 -translate-y-1/2 text-3xl opacity-50">🔍</span>
         </div>
     </div>
+    <div id="expandedSearchResults" class="max-w-3xl mx-auto w-full px-6 md:px-10 pb-10 overflow-y-auto flex-1"></div>
 </div>
 
 <!-- FİLTRELE & SIRALA MODALI -->
@@ -610,35 +611,54 @@ function setActiveDock(id) {
     if (el) { el.classList.add('active'); moveIndicator(el); }
 }
 
+function handleGridClick(e) {
+    const favBtn = e.target.closest('.fav-btn');
+    if (favBtn) { e.stopPropagation(); if (favBtn.dataset.key) toggleFav(favBtn.dataset.key); return; }
+    const fragmanBtn = e.target.closest('.fragman-badge');
+    if (fragmanBtn) {
+        e.stopPropagation();
+        if (fragmanBtn.dataset.key) {
+            const item = plugins.find(p => pluginKey(p) === fragmanBtn.dataset.key);
+            if (item) playTrailerForItem(item);
+        }
+        return;
+    }
+    const card = e.target.closest('.stream-card');
+    if (card && card.dataset.key) {
+        const item = plugins.find(p => pluginKey(p) === card.dataset.key);
+        if (item) {
+            openModalItem(item);
+            const searchModal = document.getElementById('search-modal');
+            if (!searchModal.classList.contains('opacity-0')) toggleSearchModal();
+        }
+    }
+}
+
+function renderExpandedSearchResults(query) {
+    const container = document.getElementById('expandedSearchResults');
+    const q = query.trim();
+    if (!q || !fuseIndex) { container.innerHTML = ''; return; }
+    const results = fuseIndex.search(q).map(r => r.item).slice(0, 30);
+    if (results.length === 0) {
+        container.innerHTML = `<div class="text-center text-slate-500 text-sm py-10">Sonuç bulunamadı.</div>`;
+        return;
+    }
+    container.innerHTML = results.map(item => `
+        <div class="stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} mb-4" data-key="${escapeHtml(pluginKey(item))}">
+            ${buildCardHTML(item)}
+        </div>
+    `).join('');
+}
+const debouncedExpandedSearch = debounce(renderExpandedSearchResults, 180);
+
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const activeEl = document.querySelector('.dock-btn.active');
         if (activeEl) moveIndicator(activeEl);
     }, 100);
 
-    const resultsGrid = document.getElementById('resultsGrid');
-    resultsGrid.addEventListener('click', (e) => {
-        const favBtn = e.target.closest('.fav-btn');
-        if (favBtn) {
-            e.stopPropagation();
-            if (favBtn.dataset.key) toggleFav(favBtn.dataset.key);
-            return;
-        }
-        const fragmanBtn = e.target.closest('.fragman-badge');
-        if (fragmanBtn) {
-            e.stopPropagation();
-            if (fragmanBtn.dataset.key) {
-                const item = plugins.find(p => pluginKey(p) === fragmanBtn.dataset.key);
-                if (item) playTrailerForItem(item);
-            }
-            return;
-        }
-        const card = e.target.closest('.stream-card');
-        if (card && card.dataset.key) {
-            const item = plugins.find(p => pluginKey(p) === card.dataset.key);
-            if (item) openModalItem(item);
-        }
-    });
+    document.getElementById('resultsGrid').addEventListener('click', handleGridClick);
+    document.getElementById('expandedSearchResults').addEventListener('click', handleGridClick);
 
     const categoryTabs = document.getElementById('categoryTabs');
     categoryTabs.addEventListener('click', (e) => {
@@ -1271,11 +1291,23 @@ function resetFilters() {
 
 function toggleSearchModal() {
     const m = document.getElementById('search-modal');
-    if (m.classList.contains('opacity-0')) { m.classList.remove('opacity-0','pointer-events-none'); lockBodyScroll(); setTimeout(()=>document.getElementById('expandedSearchInput').focus(),100); }
-    else { m.classList.add('opacity-0','pointer-events-none'); unlockBodyScroll(); }
+    if (m.classList.contains('opacity-0')) {
+        m.classList.remove('opacity-0','pointer-events-none');
+        lockBodyScroll();
+        const currentVal = document.getElementById('searchInput').value;
+        document.getElementById('expandedSearchInput').value = currentVal;
+        renderExpandedSearchResults(currentVal);
+        setTimeout(()=>document.getElementById('expandedSearchInput').focus(),100);
+    } else {
+        m.classList.add('opacity-0','pointer-events-none');
+        unlockBodyScroll();
+    }
 }
-function handleExpandedSearch(v) { document.getElementById('searchInput').value = v; debouncedFilter(); }
-
+function handleExpandedSearch(v) {
+    document.getElementById('searchInput').value = v;
+    debouncedFilter();
+    debouncedExpandedSearch(v);
+}
 function openMenuModal() {
     document.getElementById('menu-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
     lockBodyScroll(); setTimeout(() => document.getElementById('menu-modal-box').classList.remove('translate-y-full'), 10);
