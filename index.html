@@ -970,28 +970,25 @@ const urlDisplayHTML = item.code
     ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[11px] font-mono text-emerald-400 font-black mb-3">KOD: ${item.code}</div>`
     : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
 
-const debridOrDescHTML = currentMainCategory === 'eklentiler'
-    ? buildDebridBadge(item)
-    : `<p class="text-[11px] font-bold text-slate-400 mb-4 break-words">${escapeHtml(item.desc || '')}</p>`;
-
-return `
+rreturn `
     <div class="card-header w-full flex flex-col min-w-0">
         <div class="flex items-center gap-1.5 flex-wrap mb-3">
             ${typeBadgeHTML}${statusBadgesHTML}
         </div>
-        <div class="flex justify-between items-start gap-2 mb-3">
+        ${buildAppBadgesGrid(item)}
+        ${currentMainCategory === 'eklentiler' ? buildDebridBadge(item) : ''}
+        <div class="flex justify-between items-start gap-2 mb-3 mt-1">
             <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
             ${favBtnHTML}
         </div>
-        ${buildAppBadgesGrid(item)}
         ${osBadgesHTML ? `<div class="flex flex-wrap gap-1.5 mb-3">${osBadgesHTML}</div>` : ''}
         ${urlDisplayHTML}
-        ${debridOrDescHTML}
+        ${currentMainCategory !== 'eklentiler' ? `<p class="text-[11px] font-bold text-slate-400 mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : ''}
     </div>
     <div class="card-footer w-full flex items-center justify-between mt-auto border-t border-white/5 pt-3">
         <div class="flex gap-1 text-lg">${starsHTML}</div>
         <div class="flex items-center gap-2">
-            <button class="compare-btn w-9 h-9 flex items-center justify-center rounded-lg text-lg transition ${isComparing ? 'bg-indigo-600/30 text-indigo-300' : 'bg-white/5 text-slate-400 hover:text-indigo-400'}" data-key="${escapeHtml(itemKey)}" title="Karşılaştır">⚖️</button>
+            <button class="compare-btn h-9 flex items-center justify-center gap-1.5 rounded-lg text-xs font-bold px-3 transition ${isComparing ? 'bg-indigo-600/30 text-indigo-300' : 'bg-white/5 text-slate-400 hover:text-indigo-400'}" data-key="${escapeHtml(itemKey)}">+ Karşılaştır</button>
             <button class="copy-btn bg-indigo-600/20 text-indigo-300 text-xs px-4 py-2 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transition flex items-center gap-1.5" data-key="${escapeHtml(itemKey)}">📋 Kopyala</button>
         </div>
     </div>
