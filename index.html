@@ -538,6 +538,11 @@ async function switchMainCategory(key, btnEl) {
     activeTypeFilter = 'all';
     document.getElementById('searchInput').value = '';
 
+    showFavsOnly = false;
+    const favBtn = document.getElementById('favBtn');
+    favBtn.style.background = '';
+    favBtn.style.color = '';
+
     const isMovie = (key === 'atmos' || key === 'imax');
     document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
     document.getElementById('heroSection').style.display = (key === 'eklentiler') ? 'block' : 'none';
