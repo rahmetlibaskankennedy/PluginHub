@@ -677,7 +677,14 @@ function setActiveDock(id) {
 function handleGridClick(e) {
     const compareBtn = e.target.closest('.compare-btn');
     if (compareBtn) { e.stopPropagation(); if (compareBtn.dataset.key) toggleCompare(compareBtn.dataset.key); return; }
-    const favBtn = e.target.closest('.fav-btn');
+    const copyBtn = e.target.closest('.copy-btn');
+    if (copyBtn) {
+        e.stopPropagation();
+        const item = plugins.find(p => pluginKey(p) === copyBtn.dataset.key);
+        if (item) copyToClipboard(item.code || extractUrl(item.desc) || item.sourceUrl);
+        return;
+    }
+    const favBtn = e.target.closest('.fav-btn'); 
     if (favBtn) { e.stopPropagation(); if (favBtn.dataset.key) toggleFav(favBtn.dataset.key); return; }
     const fragmanBtn = e.target.closest('.fragman-badge');
     if (fragmanBtn) {
@@ -819,6 +826,36 @@ function buildAppBadges(item) {
     }
     return html;
 }
+function buildAppBadgesGrid(item) {
+    const appArray = Array.isArray(item.app) ? item.app : [item.app];
+    const appsLower = appArray.filter(Boolean).map(a => String(a).toLowerCase());
+
+    const primaryHTML = appArray.filter(Boolean).map(a => {
+        const name = String(a).toLowerCase();
+        const badgeClass = name.includes('cloudstream') ? 'tag-cloudstream'
+            : name.includes('stremio') ? 'tag-stremio'
+            : 'tag-nuvio';
+        return `<span class="${badgeClass} app-badge-cell">${escapeHtml(a)}</span>`;
+    }).join('');
+
+    let secondaryHTML = '';
+    if (appsLower.includes('nuvio') && item.type !== 'Plugin') {
+        secondaryHTML = `<span class="app-badge-secondary">Arvio</span><span class="app-badge-secondary">WuPlay</span>`;
+    }
+
+    if (!secondaryHTML) return `<div class="badge-grid-single">${primaryHTML}</div>`;
+    return `<div class="badge-grid-2x2">${primaryHTML}${secondaryHTML}</div>`;
+}
+
+function buildDebridBadge(item) {
+    const map = {
+        free: { l: '🆓 Ücretsiz', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+        optional: { l: '🔓 Opsiyonel', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+        required: { l: '⚡ Gerekli', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
+    };
+    const d = map[item.debrid] || map.free;
+    return `<span class="${d.cls} border px-2.5 py-1 rounded-full text-[10px] font-bold inline-block mb-4">${d.l}</span>`;
+}
 
 function buildOsBadges(item) {
     const osData = item.os || item.platform || [];
@@ -928,32 +965,36 @@ function buildCardHTML(item) {
             `;
         }
         const isComparing = compareList.includes(itemKey);
-        const compareBtnHTML = `<button class="compare-btn w-10 h-10 flex items-center justify-center text-lg transition shrink-0 ${isComparing ? 'text-indigo-400' : 'text-slate-500 hover:text-indigo-400'}" data-key="${escapeHtml(itemKey)}" title="Karşılaştır">⚖️</button>`;
-        const cardUrlStr = extractUrl(item.desc) || item.sourceUrl;
-        const urlDisplayHTML = item.code
-            ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[11px] font-mono text-emerald-400 font-black mb-3">KOD: ${item.code}</div>`
-            : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
+const cardUrlStr = extractUrl(item.desc) || item.sourceUrl;
+const urlDisplayHTML = item.code
+    ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[11px] font-mono text-emerald-400 font-black mb-3">KOD: ${item.code}</div>`
+    : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono text-indigo-300 truncate mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
 
-        return `
-            
-            <div class="card-header w-full flex flex-col min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap mb-3">
-                    ${typeBadgeHTML}${appBadgesHTML}${osBadgesHTML}${statusBadgesHTML}
-                </div>
-                <div class="flex justify-between items-start gap-2 mb-3">
-                    <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
-                    <div class="flex items-center gap-1 shrink-0">
-                        ${compareBtnHTML}
-                        ${favBtnHTML}
-                    </div>
-                </div>
-                ${urlDisplayHTML}
-                <p class="text-[11px] font-bold text-slate-400 border-b border-white/5 pb-4 mb-4 break-words">${currentMainCategory === 'eklentiler' ? (item.debrid==='required'?'⚡ Gerekli':(item.debrid==='optional'?'🔓 Opsiyonel':'🆓 Ücretsiz')) : escapeHtml(item.desc || '')}</p>
-            </div>
-            <div class="card-footer w-full flex items-center justify-between mt-auto">
-                <div class="flex gap-1 text-lg">${starsHTML}</div>
-                <button class="bg-indigo-600/20 text-indigo-300 text-xs px-4 py-2 rounded-xl pointer-events-none">İncele</button>
-            </div>
+const debridOrDescHTML = currentMainCategory === 'eklentiler'
+    ? buildDebridBadge(item)
+    : `<p class="text-[11px] font-bold text-slate-400 mb-4 break-words">${escapeHtml(item.desc || '')}</p>`;
+
+return `
+    <div class="card-header w-full flex flex-col min-w-0">
+        <div class="flex items-center gap-1.5 flex-wrap mb-3">
+            ${typeBadgeHTML}${statusBadgesHTML}
+        </div>
+        <div class="flex justify-between items-start gap-2 mb-3">
+            <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
+            ${favBtnHTML}
+        </div>
+        ${buildAppBadgesGrid(item)}
+        ${osBadgesHTML ? `<div class="flex flex-wrap gap-1.5 mb-3">${osBadgesHTML}</div>` : ''}
+        ${urlDisplayHTML}
+        ${debridOrDescHTML}
+    </div>
+    <div class="card-footer w-full flex items-center justify-between mt-auto border-t border-white/5 pt-3">
+        <div class="flex gap-1 text-lg">${starsHTML}</div>
+        <div class="flex items-center gap-2">
+            <button class="compare-btn w-9 h-9 flex items-center justify-center rounded-lg text-lg transition ${isComparing ? 'bg-indigo-600/30 text-indigo-300' : 'bg-white/5 text-slate-400 hover:text-indigo-400'}" data-key="${escapeHtml(itemKey)}" title="Karşılaştır">⚖️</button>
+            <button class="copy-btn bg-indigo-600/20 text-indigo-300 text-xs px-4 py-2 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transition flex items-center gap-1.5" data-key="${escapeHtml(itemKey)}">📋 Kopyala</button>
+        </div>
+    </div>
         `;
     }
 }
