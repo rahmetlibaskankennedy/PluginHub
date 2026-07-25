@@ -918,19 +918,30 @@ function buildFilterOptions() {
         document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
     }
 
+    document.getElementById('genreFilterWrapper').style.display = isMovie ? 'block' : 'none';
+    if (isMovie) {
+        let allGenres = new Set();
+        plugins.forEach(p => { if (p.genre) allGenres.add(p.genre); });
+        const gOpts = [{v:'all', l:'Tümü'}, ...Array.from(allGenres).map(g => ({v:g, l:g}))];
+        document.getElementById('genreFilterGroup').innerHTML = gOpts.map(o => {
+            const chipClass = o.v === 'all' ? '' : getGenreClass(o.v);
+            return `<button class="filter-chip ${chipClass} ${o.v === activeGenreFilter ? 'active' : ''}" data-group="genre" data-value="${escapeHtml(o.v)}" onclick="selectChip(this)">${escapeHtml(o.l)}</button>`;
+        }).join('');
+    }
+
     let allPlats = new Set();
     plugins.forEach(p => { if(Array.isArray(p.platform)) p.platform.forEach(x => allPlats.add(x)); });
     const pOpts = [{v:'all', l:'Tümü'}, ...Array.from(allPlats).map(p => ({v:p, l:p}))];
-    
     document.getElementById('platformFilterGroup').innerHTML = pOpts.map(o => `<button class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${escapeHtml(o.v)}" onclick="selectChip(this)">${escapeHtml(o.l)}</button>`).join('');
 }
 
-function selectChip(el) {
+ffunction selectChip(el) {
     const group = el.dataset.group;
     document.querySelectorAll(`.filter-chip[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     if (group === 'debrid') activeDebridFilter = el.dataset.value;
     if (group === 'platform') activePlatformFilter = el.dataset.value;
+    if (group === 'genre') activeGenreFilter = el.dataset.value;
 }
 function setSort(v) { activeSort = v; }
 
@@ -954,6 +965,7 @@ function filterData() {
     if (activeTypeFilter !== 'all') pool = pool.filter(p => p.type === activeTypeFilter);
     if (activeDebridFilter !== 'all' && currentMainCategory === 'eklentiler') pool = pool.filter(p => p.debrid === activeDebridFilter);
     if (activePlatformFilter !== 'all') pool = pool.filter(p => Array.isArray(p.platform) && p.platform.includes(activePlatformFilter));
+    if (activeGenreFilter !== 'all' && (currentMainCategory === 'atmos' || currentMainCategory === 'imax')) pool = pool.filter(p => p.genre === activeGenreFilter);
     if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
     renderCards(sortPool(pool));
 }
@@ -1239,8 +1251,23 @@ function closeFilterModal() {
     setTimeout(() => { document.getElementById('filter-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
 }
 function closeFilterModalOnBackdrop(e) { if (e.target.id === 'filter-modal-overlay') closeFilterModal(); }
-function applyFilters() { closeFilterModal(); filterData(); }
-function resetFilters() { activeDebridFilter='all'; activePlatformFilter='all'; activeSort='default'; buildFilterOptions(); document.getElementById('sortSelect').value='default'; filterData(); }
+function applyFilters() {
+    localStorage.setItem('ph_debrid_filter', activeDebridFilter);
+    localStorage.setItem('ph_platform_filter', activePlatformFilter);
+    localStorage.setItem('ph_genre_filter', activeGenreFilter);
+    localStorage.setItem('ph_sort', activeSort);
+    closeFilterModal();
+    filterData();
+}
+function resetFilters() {
+    activeDebridFilter = 'all';
+    activePlatformFilter = 'all';
+    activeGenreFilter = 'all';
+    activeSort = 'default';
+    buildFilterOptions();
+    document.getElementById('sortSelect').value = 'default';
+    filterData();
+}
 
 function toggleSearchModal() {
     const m = document.getElementById('search-modal');
