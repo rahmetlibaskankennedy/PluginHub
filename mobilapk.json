@@ -8,15 +8,15 @@
     "status": "ok",
     "platform": ["mobile"]
   },
- {
-  "app": ["iOS"],
-  "type": "Mobil Uygulama",
-  "name": "Nuvio",
-  "desc": "Uyarı: App Store'dan kaldırıldı, TestFlight kotası genelde dolu ve güvenilir değil. Tek çalışan yöntem AltStore/Sideloadly ile resmi IPA dosyasının kenar yüklenmesi.",
-  "sourceUrl": "https://nuvio-app.com/download.html",
-  "status": "warn",
-  "platform": ["mobile"]
-}
+  {
+    "app": ["iOS"],
+    "type": "Mobil Uygulama",
+    "name": "Nuvio",
+    "desc": "Uyarı: App Store'dan kaldırıldı, TestFlight kotası genelde dolu ve güvenilir değil. Tek çalışan yöntem AltStore/Sideloadly ile resmi IPA dosyasının kenar yüklenmesi.",
+    "sourceUrl": "https://nuvio-app.com/download.html",
+    "status": "warn",
+    "platform": ["mobile"]
+  },
   {
     "app": ["Android"],
     "type": "Mobil Uygulama",
@@ -80,15 +80,6 @@
     "name": "Stremio (Sideload IPA)",
     "desc": "Uyarı: Stremio App Store'dan kaldırıldı. Tam özellikli sürüm için resmi IPA dosyası AltStore/Sideloadly ile kenar yüklenebilir (torrent server dahil, App Store sınırlamaları yok).",
     "sourceUrl": "https://www.stremio.com/downloads",
-    "status": "warn",
-    "platform": ["mobile"]
-  },
-  {
-    "app": ["iOS"],
-    "type": "Mobil Uygulama",
-    "name": "Nuvio",
-    "desc": "Uyarı: iOS'ta App Store durumu değişken (kısa süre mağazada kaldı, kaldırıldı). Güncel kurulum seçenekleri (TestFlight beta veya AltStore/SideStore ile sideload) resmi sayfada listeleniyor.",
-    "sourceUrl": "https://nuvio-app.com/download.html",
     "status": "warn",
     "platform": ["mobile"]
   }
