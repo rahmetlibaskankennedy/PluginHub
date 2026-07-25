@@ -883,7 +883,7 @@ function buildStatusBadges(item) {
     const isNew = isRecentlyAdded(item.dateAdded);
     const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 badge-uniform animate-pulse">YENİ</span>` : '';
     const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 badge-uniform">ÇALIŞMIYOR</span>` : '';
-    return codeBadgeHTML + deadBadgeHTML + newBadgeHTML;
+    return deadBadgeHTML + newBadgeHTML;
 }
 
 // "YENİ" rozeti artık veri kümesindeki en yeni tarihe göre değil,
