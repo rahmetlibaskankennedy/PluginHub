@@ -454,6 +454,7 @@ let currentRatingDisplay = 0;
 let activeDebridFilter = localStorage.getItem('ph_debrid_filter') || 'all';
 let activePlatformFilter = localStorage.getItem('ph_platform_filter') || 'all';
 let activeGenreFilter = localStorage.getItem('ph_genre_filter') || 'all';
+let activeTypeFilter = 'all';   // ← YENİ EKLENEN SATIR
 let activeSort = localStorage.getItem('ph_sort') || 'default';
 let fuseIndex = null;
 let scrollLockCount = 0;
@@ -781,7 +782,7 @@ function buildCardHTML(item) {
                 <div class="card-header flex items-center gap-3 flex-1 min-w-0">
                     ${item.rank ? `<div class="text-sm font-black text-slate-500 w-6 shrink-0 text-center ${item.rank <= 3 ? 'text-amber-400 text-lg' : ''}">${item.rank}</div>` : ''}
                     <div class="min-w-0 flex-1">
-                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
                         <div class="text-[10px] text-slate-400">${item.year} · ${escapeHtml(item.genre || '')}</div>
                     </div>
                 </div>
@@ -1341,7 +1342,7 @@ async function submitFeedback() {
 
 function confirmClearData() {
     if (!confirm('Favori, not, puan ve senkron kodunuz bu cihazdan silinecek. Emin misiniz?')) return;
-    ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_sort'].forEach(k => localStorage.removeItem(k));
+    ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_genre_filter','ph_sort'].forEach(k => localStorage.removeItem(k));
     showToast('🗑️ Veriler temizlendi.');
     setTimeout(() => location.reload(), 800);
 }
