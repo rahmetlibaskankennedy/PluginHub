@@ -102,7 +102,7 @@
         <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
     </button>
 
-    <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film" onclick="suggestRandomMovie()">🎲</button>
+    <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film (basılı tut: türe göre)">🎲</button>
     
     <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
 </div>
@@ -400,6 +400,17 @@
     <p id="dice-loading-text" class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
 </div>
 
+<!-- TÜR MENÜSÜ MODALI (zar butonuna basılı tutunca açılır) -->
+<div id="genre-menu-overlay" onclick="closeGenreMenuOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2200] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="genre-menu-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 max-h-[80vh] overflow-y-auto shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-bold text-white">Türe Göre Zar At</h3>
+            <button onclick="closeGenreMenu()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <div class="flex flex-wrap gap-2" id="genre-menu-chips"></div>
+    </div>
+</div>
+
 <div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative">
         <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
@@ -425,7 +436,7 @@
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
             <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-6 border-l-2 border-indigo-500 pl-4"></p>
             <div id="movie-catalog-bridge" class="mb-6"></div>
-            <button id="movie-modal-suggest-btn" onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
+            <button id="movie-modal-suggest-btn" onclick="suggestRandomMovie(currentDiceGenre)" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
             <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
         </div>
@@ -442,6 +453,8 @@ const DATA_SOURCES = {
     'atmos': 'atmos.json',
     'imax': 'imax.json'
 };
+const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
+let currentDiceGenre = null;
 const cachedData = {};
 let currentMainCategory = 'eklentiler';
 let plugins = [];
@@ -460,6 +473,7 @@ let activeTypeFilter = 'all';   // ← YENİ EKLENEN SATIR
 let activeSort = localStorage.getItem('ph_sort') || 'default';
 let fuseIndex = null;
 let globalFuseIndex = null;
+let movieCatalogFuseIndex = null;
 let scrollLockCount = 0;
 let newestDate = null;
 let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
@@ -678,6 +692,32 @@ async function ensureAllCategoriesLoaded() {
     });
 }
 
+// YENİ: Zar → Katalog Köprüsü için sadece gerçek film verisi taşıyan
+// kategoriler (atmos, imax) üzerinde ayrı bir index kurulur. Eklenti/APK
+// listeleri (plugins/tvapk/mobilapk/sporapk) film adlarıyla eşleşmeyeceği
+// için buraya dahil edilmez.
+async function ensureMovieCatalogLoaded() {
+    if (movieCatalogFuseIndex) return;
+    const movieKeys = ['atmos', 'imax'];
+    await Promise.all(movieKeys.map(async k => {
+        if (cachedData[k]) return;
+        try {
+            const res = await fetch(DATA_SOURCES[k]);
+            if (!res.ok) return;
+            const data = await res.json();
+            data.forEach(it => it._cat = k);
+            cachedData[k] = data;
+        } catch (e) { console.warn('Film kataloğu yüklenemedi:', k, e); }
+    }));
+    const movies = movieKeys.flatMap(k => cachedData[k] || []);
+    movieCatalogFuseIndex = new Fuse(movies, {
+        keys: ['name'],
+        threshold: 0.2,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+    });
+}
+
 function postLoadSetup() {
     computeNewestDate();
     fuseIndex = new Fuse(plugins, {
@@ -780,6 +820,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const activeEl = document.querySelector('.dock-btn.active');
         if (activeEl) moveIndicator(activeEl);
     }, 100);
+
+    setupDiceButton();
 
     document.getElementById('resultsGrid').addEventListener('click', handleGridClick);
     document.getElementById('expandedSearchResults').addEventListener('click', handleGridClick);
@@ -1659,16 +1701,57 @@ function setLoadingIcon(isDice) {
     icon.classList.toggle('rolling-dice', isDice);
 }
 
-// === YENİ: ZAR → KATALOG KÖPRÜSÜ ===
-// Zar sonucu gelen filmi, sitenin kendi kataloğunda (eklentiler/tvapk/mobilapk/sporapk/atmos/imax)
-// arar. globalFuseIndex zaten arama modalı için kuruluydu, burada yeniden kullanılıyor.
+// YENİ: Zar butonuna kısa tıklama eskisi gibi rastgele film önerir;
+// basılı tutunca (500ms) tür menüsü açılır.
+function openGenreMenu() {
+    const chipsEl = document.getElementById('genre-menu-chips');
+    chipsEl.innerHTML = Object.entries(tmdbGenres).map(([id, name]) =>
+        `<button class="filter-chip" onclick="rollWithGenre(${id})">${escapeHtml(name)}</button>`
+    ).join('');
+    document.getElementById('genre-menu-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+    setTimeout(() => document.getElementById('genre-menu-box').classList.remove('translate-y-full'), 10);
+}
+function closeGenreMenu() {
+    document.getElementById('genre-menu-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('genre-menu-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeGenreMenuOnBackdrop(e) { if (e.target.id === 'genre-menu-overlay') closeGenreMenu(); }
+function rollWithGenre(genreId) {
+    closeGenreMenu();
+    suggestRandomMovie(genreId);
+}
+
+function setupDiceButton() {
+    const btn = document.getElementById('dock-dice');
+    if (!btn) return;
+    let pressTimer = null;
+    let longPressed = false;
+
+    const start = () => {
+        longPressed = false;
+        pressTimer = setTimeout(() => { longPressed = true; openGenreMenu(); }, 500);
+    };
+    const cancel = () => clearTimeout(pressTimer);
+
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', cancel);
+    btn.addEventListener('pointerleave', cancel);
+    btn.addEventListener('click', () => {
+        if (longPressed) { longPressed = false; return; }
+        suggestRandomMovie();
+    });
+}
+
+// === ZAR → KATALOG KÖPRÜSÜ ===
+// Zar sonucu gelen filmi, sitenin GERÇEK film kataloğunda (atmos/imax) arar.
+// Eklenti/APK listeleri (plugins/tvapk/mobilapk/sporapk) film verisi taşımadığı
+// için ensureMovieCatalogLoaded() sadece atmos+imax'ı yükler.
 async function findCatalogMatch(title, year) {
-    await ensureAllCategoriesLoaded();
-    if (!globalFuseIndex) return null;
-    const results = globalFuseIndex.search(title);
+    await ensureMovieCatalogLoaded();
+    if (!movieCatalogFuseIndex) return null;
+    const results = movieCatalogFuseIndex.search(title);
     if (!results.length) return null;
-    // Yıl bilgisi taşıyan kayıtlarda (atmos/imax) yıl eşleşmesi tercih edilir;
-    // yıl bilgisi olmayan kayıtlarda (eklentiler vb.) en iyi isim eşleşmesi kullanılır.
     const withYear = results.find(r => r.item.year && String(r.item.year) === String(year));
     return (withYear || results[0]).item;
 }
@@ -1744,7 +1827,11 @@ function openCatalogMatch(key, cat) {
 let bridgeToken = 0;
 let currentBridgeToken = 0;
 
-async function suggestRandomMovie() {
+// GÜNCELLENDİ: genreId parametresi eklendi (türe göre zar atma). Verilirse
+// TMDB discover ile o türden film çekilir, verilmezse eskisi gibi popüler filmlerden çekilir.
+async function suggestRandomMovie(genreId) {
+    currentDiceGenre = genreId || null;
+
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
     
     const trailerEl = document.getElementById('movie-trailer');
@@ -1757,14 +1844,18 @@ async function suggestRandomMovie() {
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     setLoadingIcon(true);
-    setDiceLoadingText('Sizin için harika bir film seçiliyor...');
+    setDiceLoadingText(genreId ? `${tmdbGenres[genreId] || ''} türünde bir film seçiliyor...` : 'Sizin için harika bir film seçiliyor...');
     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
     
-    const randomPage = Math.floor(Math.random() * 50) + 1;
+    const randomPage = Math.floor(Math.random() * 20) + 1;
     
     try {
-        const [data] = await Promise.all([ fetchPopularMovies(randomPage), wait(900) ]);
-        const movies = data.results || [];
+        let [data] = await Promise.all([ fetchPopularMovies(randomPage, genreId), wait(900) ]);
+        let movies = data.results || [];
+        if (movies.length === 0 && randomPage !== 1) {
+            data = await fetchPopularMovies(1, genreId);
+            movies = data.results || [];
+        }
         if (movies.length === 0) throw new Error('Film listesi boş');
         
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
@@ -1796,7 +1887,6 @@ async function suggestRandomMovie() {
             posterEl.src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : FALLBACK_POSTER;
         }
         
-        const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
         const movieGenres = (randomMovie.genre_ids || []).map(id => tmdbGenres[id]).filter(Boolean).join(', ');
         const genreEl = document.getElementById('movie-genre');
         
@@ -1880,8 +1970,10 @@ async function playTrailerForItem(item) {
     }
 }
 
-async function fetchPopularMovies(page) {
-    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}`);
+// GÜNCELLENDİ: genreId parametresi worker'a iletiliyor (türe göre zar atma)
+async function fetchPopularMovies(page, genreId) {
+    const genreParam = genreId ? `&genre=${genreId}` : '';
+    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}${genreParam}`);
     if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); 
     return res.json();
 }
