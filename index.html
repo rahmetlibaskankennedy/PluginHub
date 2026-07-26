@@ -1728,7 +1728,7 @@ async function updateCatalogBridge(title, year, tmdbId) {
         <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
             <div class="text-[10px] font-black text-slate-400 uppercase tracking-wide mb-3">○ Kataloğunda yok</div>
             ${flatrate.length ? `<div class="flex items-center gap-2 mb-3">${providerBadges}<span class="text-[10px] text-slate-500 ml-1">TR'de mevcut</span></div>` : ''}
-            ${imdbId ? `<a href="stremio://detail/movie/${imdbId}/${imdbId}" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio'da Aç</a>` : `<div class="text-[10px] text-slate-500 italic">Stremio bağlantısı bulunamadı.</div>`}
+            ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio'da Aç</a>` : `<div class="text-[10px] text-slate-500 italic">Stremio bağlantısı bulunamadı.</div>`}
         </div>
     `;
 }
