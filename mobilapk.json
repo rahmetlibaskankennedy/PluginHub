@@ -20,6 +20,15 @@
     {
     "app": ["iOS"],
     "type": "Stream",
+    "name": "Stremio (Sideload IPA)",
+    "desc": "Uyarı: Stremio App Store'dan kaldırıldı. Tam özellikli sürüm için resmi IPA dosyası AltStore/Sideloadly ile kenar yüklenebilir (torrent server dahil, App Store sınırlamaları yok).",
+    "sourceUrl": "https://www.stremio.com/downloads",
+    "status": "warn",
+    "platform": ["mobile"]
+  },
+    {
+    "app": ["iOS"],
+    "type": "Stream",
     "name": "Nuvio",
     "desc": "Uyarı: App Store'dan kaldırıldı, TestFlight kotası genelde dolu ve güvenilir değil. Tek çalışan yöntem AltStore/Sideloadly ile resmi IPA dosyasının kenar yüklenmesi.",
     "sourceUrl": "https://nuvio-app.com/download.html",
@@ -32,6 +41,15 @@
     "name": "CloudStream",
     "desc": "Reklamsız ve modüler dizi/film izleme uygulaması, repo tabanlı eklenti sistemiyle genişler.",
     "sourceUrl": "https://github.com/recloudstream/cloudstream/releases",
+    "status": "ok",
+    "platform": ["mobile"]
+  },
+  {
+    "app": ["iOS"],
+    "type": "Stream",
+    "name": "Fusion",
+    "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonlu ve Trakt destekli. Tam verim için Infuse medya oynatıcı ile kullanımı önerilir.",
+    "sourceUrl": "https://apps.apple.com/tr/app/fusion-media-center/id6759285919?l=tr&platform=tv",
     "status": "ok",
     "platform": ["mobile"]
   },
@@ -75,21 +93,12 @@
     "dateAdded": "2026-07-25"
   },
   {
-    "app": ["iOS"],
+    "app": [""],
     "type": "Stream",
     "name": "Stremio Web",
     "desc": "iOS'ta kurulumsuz kullanım için en pratik yöntem, tarayıcı üzerinden doğrudan çalışır.",
     "sourceUrl": "https://web.stremio.com/",
     "status": "ok",
-    "platform": ["mobile"]
-  },
-  {
-    "app": ["iOS"],
-    "type": "Stream",
-    "name": "Stremio (Sideload IPA)",
-    "desc": "Uyarı: Stremio App Store'dan kaldırıldı. Tam özellikli sürüm için resmi IPA dosyası AltStore/Sideloadly ile kenar yüklenebilir (torrent server dahil, App Store sınırlamaları yok).",
-    "sourceUrl": "https://www.stremio.com/downloads",
-    "status": "warn",
     "platform": ["mobile"]
   },
   {
