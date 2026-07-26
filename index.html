@@ -1787,24 +1787,7 @@ async function updateCatalogBridge(title, year, tmdbId) {
     const box = document.getElementById('movie-catalog-bridge');
     if (!box) return;
 
-    box.innerHTML = `<div class="text-xs text-slate-500 italic flex items-center gap-2"><span class="animate-pulse">🔎</span> Kataloğun kontrol ediliyor...</div>`;
-
-    const match = await findCatalogMatch(title, year);
-
-    if (currentBridgeToken !== bridgeToken) return;
-
-    if (match) {
-        box.innerHTML = `
-            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center justify-between gap-3">
-                <div class="min-w-0">
-                    <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wide mb-1">✅ Kataloğunda mevcut</div>
-                    <div class="text-xs text-slate-300 truncate" title="${escapeHtml(match.name)}">${escapeHtml(match.name)} · ${catalogLabelFor(match._cat)}</div>
-                </div>
-                <button onclick="openCatalogMatch('${escapeHtml(pluginKey(match)).replace(/'/g, "\\'")}', '${match._cat}')" class="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition">Aç</button>
-            </div>
-        `;
-        return;
-    }
+    box.innerHTML = `<div class="text-xs text-slate-500 italic flex items-center gap-2"><span class="animate-pulse">🔎</span> İzleme seçenekleri kontrol ediliyor...</div>`;
 
     const { imdbId, providers } = await fetchExternalOptions(tmdbId);
     if (currentBridgeToken !== bridgeToken) return;
@@ -1816,7 +1799,6 @@ async function updateCatalogBridge(title, year, tmdbId) {
 
     box.innerHTML = `
         <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wide mb-3">○ Kataloğunda yok</div>
             ${flatrate.length ? `<div class="flex items-center gap-2 mb-3">${providerBadges}<span class="text-[10px] text-slate-500 ml-1">Türkiye'de mevcut</span></div>` : ''}
             <div class="grid grid-cols-2 gap-2">
                 ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio'da Aç</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
@@ -1825,7 +1807,6 @@ async function updateCatalogBridge(title, year, tmdbId) {
         </div>
     `;
 }
-
     function openCatalogMatch(key, cat) {
     closeMovieModal();
     const source = cachedData[cat] || [];
