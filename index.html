@@ -1493,8 +1493,6 @@ function toggleSearchModal() {
     }
 }
 function handleExpandedSearch(v) {
-    document.getElementById('searchInput').value = v;
-    debouncedFilter();
     debouncedExpandedSearch(v);
 }
 function openMenuModal() {
