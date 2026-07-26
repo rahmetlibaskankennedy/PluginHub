@@ -88,16 +88,25 @@
     "type": "Müzik Uygulaması",
     "name": "Eclipse",
     "desc": "Tidal ve Deezer gibi servislerden ücretsiz, kayıpsız (FLAC) müzik dinleme platformu. Eklenti deposu için Ayarlar > Cloud Storage > Add Connection bölümüne 'https://eclipsemusic.app/addonstore/manifest.json' eklenmelidir.",
-    "sourceUrl": "https://eclipsemusic.app/download/android",
+    "sourceUrl": "https://eclipsemusic.app/download/",
     "status": "ok",
     "platform": ["mobile"]
   },
   {
-    "app": ["Android", "iOS"],
+    "app": ["Android"],
     "type": "Stream",
     "name": "ZXY Media Player",
     "desc": "Sadece debrid API anahtarı ile çalışan, karmaşıklıktan uzak minimalist oynatıcı. Gömülü WebStreamR ve HDHub ile gelir, harici eklenti eklenemez.",
     "sourceUrl": "https://play.google.com/store/apps/details?id=com.app.zxy&pli=1",
+    "status": "ok",
+    "platform": ["mobile"]
+  },
+  {
+    "app": ["iOS"],
+    "type": "Stream",
+    "name": "ZXY Media Player",
+    "desc": "Gömülü gelen WebStreamR ve HDHub eklentileri ile sadece debrid API anahtarı ile çalışır, harici eklenti eklenemez.",
+    "sourceUrl": "https://testflight.apple.com/join/U5vYdMw6",
     "status": "ok",
     "platform": ["mobile"]
   }
