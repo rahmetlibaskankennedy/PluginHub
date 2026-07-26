@@ -1826,42 +1826,7 @@ async function updateCatalogBridge(title, year, tmdbId) {
     `;
 }
 
-    const match = await findCatalogMatch(title, year);
-
-    // Kullanıcı bu sırada başka bir filme zar attıysa eski sonucu ekrana basma
-    if (currentBridgeToken !== bridgeToken) return;
-
-    if (match) {
-        box.innerHTML = `
-            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center justify-between gap-3">
-                <div class="min-w-0">
-                    <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wide mb-1">✅ Kataloğunda mevcut</div>
-                    <div class="text-xs text-slate-300 truncate" title="${escapeHtml(match.name)}">${escapeHtml(match.name)} · ${catalogLabelFor(match._cat)}</div>
-                </div>
-                <button onclick="openCatalogMatch('${escapeHtml(pluginKey(match)).replace(/'/g, "\\'")}', '${match._cat}')" class="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition">Aç</button>
-            </div>
-        `;
-        return;
-    }
-
-    const { imdbId, providers } = await fetchExternalOptions(tmdbId);
-    if (currentBridgeToken !== bridgeToken) return;
-
-    const flatrate = providers?.flatrate || [];
-    const providerBadges = flatrate.slice(0, 4).map(p => `
-        <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" alt="${escapeHtml(p.provider_name)}" title="${escapeHtml(p.provider_name)}" class="w-7 h-7 rounded-md">
-    `).join('');
-
-    box.innerHTML = `
-        <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wide mb-3">○ Kataloğunda yok</div>
-            ${flatrate.length ? `<div class="flex items-center gap-2 mb-3">${providerBadges}<span class="text-[10px] text-slate-500 ml-1">TR'de mevcut</span></div>` : ''}
-            ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio'da Aç</a>` : `<div class="text-[10px] text-slate-500 italic">Stremio bağlantısı bulunamadı.</div>`}
-        </div>
-    `;
-}
-
-function openCatalogMatch(key, cat) {
+    function openCatalogMatch(key, cat) {
     closeMovieModal();
     const source = cachedData[cat] || [];
     const item = source.find(p => pluginKey(p) === key);
