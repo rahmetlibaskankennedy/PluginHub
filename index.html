@@ -1787,16 +1787,44 @@ async function updateCatalogBridge(title, year, tmdbId) {
     const box = document.getElementById('movie-catalog-bridge');
     if (!box) return;
 
+    box.innerHTML = `<div class="text-xs text-slate-500 italic flex items-center gap-2"><span class="animate-pulse">🔎</span> Kataloğun kontrol ediliyor...</div>`;
+
+    const match = await findCatalogMatch(title, year);
+
+    if (currentBridgeToken !== bridgeToken) return;
+
+    if (match) {
+        box.innerHTML = `
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wide mb-1">✅ Kataloğunda mevcut</div>
+                    <div class="text-xs text-slate-300 truncate" title="${escapeHtml(match.name)}">${escapeHtml(match.name)} · ${catalogLabelFor(match._cat)}</div>
+                </div>
+                <button onclick="openCatalogMatch('${escapeHtml(pluginKey(match)).replace(/'/g, "\\'")}', '${match._cat}')" class="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition">Aç</button>
+            </div>
+        `;
+        return;
+    }
+
+    const { imdbId, providers } = await fetchExternalOptions(tmdbId);
+    if (currentBridgeToken !== bridgeToken) return;
+
+    const flatrate = providers?.flatrate || [];
+    const providerBadges = flatrate.slice(0, 4).map(p => `
+        <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" alt="${escapeHtml(p.provider_name)}" title="${escapeHtml(p.provider_name)}" class="w-7 h-7 rounded-md">
+    `).join('');
+
     box.innerHTML = `
         <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
             <div class="text-[10px] font-black text-slate-400 uppercase tracking-wide mb-3">○ Kataloğunda yok</div>
             ${flatrate.length ? `<div class="flex items-center gap-2 mb-3">${providerBadges}<span class="text-[10px] text-slate-500 ml-1">TR'de mevcut</span></div>` : ''}
             <div class="grid grid-cols-2 gap-2">
-                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center">Stremio yok</div>`}
+                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
                 <a href="${buildNuvioDeepLink(imdbId, tmdbId)}" class="block text-center bg-[#6156e2] hover:bg-[#4f45c9] text-white font-bold text-xs py-2.5 rounded-lg transition">📱 Nuvio</a>
             </div>
         </div>
     `;
+}
 
     const match = await findCatalogMatch(title, year);
 
