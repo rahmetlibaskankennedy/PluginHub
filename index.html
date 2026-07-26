@@ -1793,20 +1793,25 @@ async function updateCatalogBridge(title, year, tmdbId) {
     if (currentBridgeToken !== bridgeToken) return;
 
     const flatrate = providers?.flatrate || [];
+    const watchLink = providers?.link || null;
     const providerBadges = flatrate.slice(0, 4).map(p => `
         <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" alt="${escapeHtml(p.provider_name)}" title="${escapeHtml(p.provider_name)}" class="w-7 h-7 rounded-md">
     `).join('');
 
     box.innerHTML = `
         <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
-            ${flatrate.length ? `<div class="flex items-center gap-2 mb-3">${providerBadges}<span class="text-[10px] text-slate-500 ml-1">Türkiye'de mevcut</span></div>` : ''}
+            ${flatrate.length && watchLink ? `
+                <a href="${watchLink}" target="_blank" rel="noopener" class="flex items-center gap-2 mb-3 hover:opacity-80 transition">
+                    ${providerBadges}
+                    <span class="text-[10px] text-slate-400 ml-1 underline">TR'de nerede izlerim? →</span>
+                </a>
+            ` : ''}
             <div class="grid grid-cols-2 gap-2">
-                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio'da Aç</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
-                <a href="${buildNuvioDeepLink(imdbId, tmdbId)}" class="block text-center bg-[#6156e2] hover:bg-[#4f45c9] text-white font-bold text-xs py-2.5 rounded-lg transition">📱 Nuvio'da Aç</a>
+                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
+                <a href="${buildNuvioDeepLink(imdbId, tmdbId)}" class="block text-center bg-[#6156e2] hover:bg-[#4f45c9] text-white font-bold text-xs py-2.5 rounded-lg transition">📱 Nuvio</a>
             </div>
         </div>
     `;
-}
     function openCatalogMatch(key, cat) {
     closeMovieModal();
     const source = cachedData[cat] || [];
