@@ -9,6 +9,15 @@
     "platform": ["mobile"]
   },
   {
+    "app": ["Android"],
+    "type": "Stream",
+    "name": "Nuvio",
+    "desc": "Stremio alternatifi en iyi stream uygulamalarından.",
+    "sourceUrl": "https://github.com/NuvioMedia/NuvioMobile/releases/tag/0.3.1",
+    "status": "ok",
+    "platform": ["mobile"]
+  },
+    {
     "app": ["iOS"],
     "type": "Stream",
     "name": "Nuvio",
@@ -87,7 +96,7 @@
     "app": ["Android", "iOS"],
     "type": "Müzik Uygulaması",
     "name": "Eclipse",
-    "desc": "Tidal ve Deezer gibi servislerden ücretsiz, kayıpsız (FLAC) müzik dinleme platformu. Eklenti deposu için Ayarlar > Cloud Storage > Add Connection bölümüne 'https://eclipsemusic.app/addonstore/manifest.json' eklenmelidir.",
+    "desc": "Tidal ve Deezer gibi servislerden ücretsiz, kayıpsız (FLAC) müzik dinleme platformu.",
     "sourceUrl": "https://eclipsemusic.app/download/",
     "status": "ok",
     "platform": ["mobile"]
