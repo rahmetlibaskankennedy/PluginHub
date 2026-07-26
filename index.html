@@ -281,8 +281,8 @@
             <div class="flex flex-col gap-3 mb-4">
                 <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-stremio-guide">
                     <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
-                        <span class="flex items-center gap-2">🎬 Stremio'ya Nasıl Kurulur?</span>
-                        <span class="chevron text-slate-400">⌄</span>
+                          <span class="flex items-center gap-2"><img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg" alt="Stremio" class="w-5 h-5 rounded-md">Stremio'ya Nasıl Kurulur?</span>
+                          <span class="chevron text-slate-400">⌄</span>
                     </summary>
                     <div class="guide-body">
                         <ul class="text-sm text-slate-300 space-y-4">
@@ -294,8 +294,8 @@
                 </details>
                 <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-nuvio-guide">
                     <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
-                        <span class="flex items-center gap-2">📺 Nuvio'ya Nasıl Kurulur?</span>
-                        <span class="chevron text-slate-400">⌄</span>
+                          <span class="flex items-center gap-2"><img src="https://img.alternativeto.net/icons/140/jpeg/nuvio_275705.png" alt="Nuvio" class="w-5 h-5 rounded-md object-cover">Nuvio'ya Nasıl Kurulur?</span>
+                          <span class="chevron text-slate-400">⌄</span>
                     </summary>
                     <div class="guide-body">
                         <ul class="text-sm text-slate-300 space-y-4">
@@ -1807,8 +1807,8 @@ async function updateCatalogBridge(title, year, tmdbId) {
                 </a>
             ` : ''}
             <div class="grid grid-cols-2 gap-2">
-                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
-                <a href="${buildNuvioDeepLink(imdbId, tmdbId)}" class="block text-center bg-[#6156e2] hover:bg-[#4f45c9] text-white font-bold text-xs py-2.5 rounded-lg transition">📱 Nuvio</a>
+                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition"><img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg" alt="" class="w-4 h-4">Stremio</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
+                <a href="${buildNuvioDeepLink(imdbId, tmdbId)}" class="flex items-center justify-center gap-1.5 bg-[#6156e2] hover:bg-[#4f45c9] text-white font-bold text-xs py-2.5 rounded-lg transition"><img src="https://img.alternativeto.net/icons/140/jpeg/nuvio_275705.png" alt="" class="w-4 h-4 rounded object-cover">Nuvio</a>
             </div>
         </div>
     `;
