@@ -423,7 +423,8 @@
                 <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md hidden" id="movie-genre"></span>
             </div>
             <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
-            <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-8 border-l-2 border-indigo-500 pl-4"></p>
+            <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-6 border-l-2 border-indigo-500 pl-4"></p>
+            <div id="movie-catalog-bridge" class="mb-6"></div>
             <button id="movie-modal-suggest-btn" onclick="suggestRandomMovie()" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
             <span class="text-xl">🎲</span> Başka Bir Film Öner
             </button>
@@ -1658,6 +1659,91 @@ function setLoadingIcon(isDice) {
     icon.classList.toggle('rolling-dice', isDice);
 }
 
+// === YENİ: ZAR → KATALOG KÖPRÜSÜ ===
+// Zar sonucu gelen filmi, sitenin kendi kataloğunda (eklentiler/tvapk/mobilapk/sporapk/atmos/imax)
+// arar. globalFuseIndex zaten arama modalı için kuruluydu, burada yeniden kullanılıyor.
+async function findCatalogMatch(title, year) {
+    await ensureAllCategoriesLoaded();
+    if (!globalFuseIndex) return null;
+    const results = globalFuseIndex.search(title);
+    if (!results.length) return null;
+    // Yıl bilgisi taşıyan kayıtlarda (atmos/imax) yıl eşleşmesi tercih edilir;
+    // yıl bilgisi olmayan kayıtlarda (eklentiler vb.) en iyi isim eşleşmesi kullanılır.
+    const withYear = results.find(r => r.item.year && String(r.item.year) === String(year));
+    return (withYear || results[0]).item;
+}
+
+function catalogLabelFor(cat) {
+    const labels = { eklentiler: 'Eklenti', tvapk: 'TV APK', mobilapk: 'Telefon', sporapk: 'Spor', atmos: 'Dolby Atmos', imax: 'IMAX' };
+    return labels[cat] || cat;
+}
+
+// Eşleşme bulunamadığında worker üzerinden IMDb ID + TR izleme sağlayıcılarını çeker
+async function fetchExternalOptions(tmdbId) {
+    let imdbId = null, providers = null;
+    try {
+        const idRes = await fetch(`${REPORT_ENDPOINT}/tmdb-external-ids?id=${tmdbId}`);
+        if (idRes.ok) imdbId = (await idRes.json()).imdb_id;
+    } catch (e) { console.warn('IMDb ID alınamadı:', e); }
+    try {
+        const provRes = await fetch(`${REPORT_ENDPOINT}/tmdb-watch-providers?id=${tmdbId}`);
+        if (provRes.ok) providers = (await provRes.json()).providers;
+    } catch (e) { console.warn('Sağlayıcı bilgisi alınamadı:', e); }
+    return { imdbId, providers };
+}
+
+async function updateCatalogBridge(title, year, tmdbId) {
+    const box = document.getElementById('movie-catalog-bridge');
+    if (!box) return;
+
+    box.innerHTML = `<div class="text-xs text-slate-500 italic flex items-center gap-2"><span class="animate-pulse">🔎</span> Kataloğun kontrol ediliyor...</div>`;
+
+    const match = await findCatalogMatch(title, year);
+
+    // Kullanıcı bu sırada başka bir filme zar attıysa eski sonucu ekrana basma
+    if (currentBridgeToken !== bridgeToken) return;
+
+    if (match) {
+        box.innerHTML = `
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wide mb-1">✅ Kataloğunda mevcut</div>
+                    <div class="text-xs text-slate-300 truncate" title="${escapeHtml(match.name)}">${escapeHtml(match.name)} · ${catalogLabelFor(match._cat)}</div>
+                </div>
+                <button onclick="openCatalogMatch('${escapeHtml(pluginKey(match)).replace(/'/g, "\\'")}', '${match._cat}')" class="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition">Aç</button>
+            </div>
+        `;
+        return;
+    }
+
+    const { imdbId, providers } = await fetchExternalOptions(tmdbId);
+    if (currentBridgeToken !== bridgeToken) return;
+
+    const flatrate = providers?.flatrate || [];
+    const providerBadges = flatrate.slice(0, 4).map(p => `
+        <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" alt="${escapeHtml(p.provider_name)}" title="${escapeHtml(p.provider_name)}" class="w-7 h-7 rounded-md">
+    `).join('');
+
+    box.innerHTML = `
+        <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wide mb-3">○ Kataloğunda yok</div>
+            ${flatrate.length ? `<div class="flex items-center gap-2 mb-3">${providerBadges}<span class="text-[10px] text-slate-500 ml-1">TR'de mevcut</span></div>` : ''}
+            ${imdbId ? `<a href="stremio://detail/movie/${imdbId}/${imdbId}" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition">🎬 Stremio'da Aç</a>` : `<div class="text-[10px] text-slate-500 italic">Stremio bağlantısı bulunamadı.</div>`}
+        </div>
+    `;
+}
+
+function openCatalogMatch(key, cat) {
+    closeMovieModal();
+    const source = cachedData[cat] || [];
+    const item = source.find(p => pluginKey(p) === key);
+    if (item) openModalItem(item, cat);
+}
+
+// Ard arda zar atıldığında önceki bridge isteğinin sonucu ekrana yazılmasın diye basit bir token mekanizması
+let bridgeToken = 0;
+let currentBridgeToken = 0;
+
 async function suggestRandomMovie() {
     document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
     
@@ -1665,6 +1751,9 @@ async function suggestRandomMovie() {
     const posterEl = document.getElementById('movie-poster');
     if(trailerEl) { trailerEl.src = ''; trailerEl.classList.add('hidden'); }
     if(posterEl) posterEl.classList.remove('hidden');
+
+    const bridgeBox = document.getElementById('movie-catalog-bridge');
+    if (bridgeBox) bridgeBox.innerHTML = '';
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     setLoadingIcon(true);
@@ -1692,7 +1781,8 @@ async function suggestRandomMovie() {
 
         loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
         document.getElementById('movie-title').textContent = randomMovie.title;
-        document.getElementById('movie-year').textContent = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'Belirsiz';
+        const movieYear = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : null;
+        document.getElementById('movie-year').textContent = movieYear || 'Belirsiz';
         document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
         document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
 
@@ -1707,17 +1797,22 @@ async function suggestRandomMovie() {
         }
         
         const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
-        const genreId = randomMovie.genre_ids && randomMovie.genre_ids.length > 0 ? randomMovie.genre_ids[0] : null;
+        const movieGenres = (randomMovie.genre_ids || []).map(id => tmdbGenres[id]).filter(Boolean).join(', ');
         const genreEl = document.getElementById('movie-genre');
         
-        if (genreId && tmdbGenres[genreId]) {
-            genreEl.textContent = tmdbGenres[genreId];
+        if (movieGenres) {
+            genreEl.textContent = movieGenres;
             genreEl.classList.remove('hidden');
         } else {
             genreEl.classList.add('hidden');
         }
         document.getElementById('movie-modal-suggest-btn').classList.remove('hidden');
         document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+
+        // Katalog köprüsü: bu zar atışına ait token, sonraki bir zar atışı gelirse eski sonuç basılmasın
+        bridgeToken++;
+        currentBridgeToken = bridgeToken;
+        updateCatalogBridge(randomMovie.title, movieYear, randomMovie.id);
     } catch (err) {
         console.error("Zar Hatası: ", err);
         loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
@@ -1730,6 +1825,9 @@ async function playTrailerForItem(item) {
     const posterEl = document.getElementById('movie-poster');
     if (trailerEl) { trailerEl.src = ''; trailerEl.classList.add('hidden'); }
     if (posterEl) posterEl.classList.remove('hidden');
+
+    const bridgeBox = document.getElementById('movie-catalog-bridge');
+    if (bridgeBox) bridgeBox.innerHTML = '';
 
     const loadingOverlay = document.getElementById('dice-loading-overlay');
     setLoadingIcon(false);
