@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0b0a1f">
+    <title>PluginHub — Streaming Media Portal</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
+        const NOTES_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev/notes';
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Header -->
+<header class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center font-black text-indigo-400">P</div>
+        <span class="text-xl font-extrabold tracking-tight">PluginHub</span>
+    </div>
+    <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
+        <button onclick="toggleSearchModal()" id="headerSearchBtn" aria-label="Ara" class="min-h-[40px] min-w-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition flex items-center justify-center">🔍</button>
+        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-4">
+    
+   <!-- ANA KATEGORİLER -->
+    <div class="flex gap-1.5 sm:gap-3 overflow-x-auto pb-4 sm:pb-6 mb-2" id="mainCategoryTabs">
+        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
+        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
+        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('mobilapk', this)">📱 Telefon</button>
+        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor</button>
+    </div>
+
+    <!-- STATS HERO (tüm kategorilerde görünür) -->
+    <div class="hero-media-box p-6 md:p-8 mb-6 transition-all" id="heroSection">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="max-w-xl w-full text-center md:text-left">
+                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block" id="heroEyebrow">🧩 Eklenti Ekosistemi</span>
+                <h1 class="text-2xl md:text-4xl font-black text-white mb-2 break-words">Tüm <span class="bg-gradient-to-r from-pink-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">İçerikler</span> Tek Yerde</h1>
+                <p class="text-xs md:text-sm text-slate-400 leading-relaxed" id="heroDesc">Öne çıkan bilgiler yükleniyor...</p>
+            </div>
+            <div class="flex gap-6 md:gap-10 justify-center shrink-0">
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-black text-white" id="statTotal">—</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" id="statTotalLabel">İçerik</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-black text-white" id="statNew">—</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Bu Hafta Yeni</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-black text-white" id="statExtra">—</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" id="statExtraLabel">Uygulama</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GÜNÜN ÖNE ÇIKANI (sadece Eklentiler sekmesinde görünür) -->
+    <div class="hidden items-center justify-between gap-4 bg-[#151333] border border-pink-500/20 rounded-2xl px-5 py-3.5 mb-6" id="featuredStrip">
+        <div class="flex items-center gap-3 min-w-0">
+            <span class="text-[9px] font-black uppercase tracking-widest text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-full shrink-0">🔥 Günün Öne Çıkanı</span>
+            <span class="text-sm font-bold text-white truncate" id="featuredTitle">Yükleniyor...</span>
+        </div>
+        <div class="flex gap-2 shrink-0">
+            <button id="hero-copy-btn" class="min-h-[36px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[11px] px-4 py-2 rounded-lg hover:bg-slate-700 transition">📋 Kopyala</button>
+            <button id="hero-install-btn" class="min-h-[36px] bg-pink-600 hover:bg-pink-500 text-white font-bold text-[11px] px-4 py-2 rounded-lg shadow-lg shadow-pink-600/30 transition">🚀 Hızlı Kurulum</button>
+        </div>
+    </div>
+
+    <!-- ALT KATEGORİ SEKMELERİ -->
+    <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
+
+    <!-- ARAMA + GÖRÜNÜM DEĞİŞTİRİCİ + FİLTRELE -->
+    <div class="flex gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 İçerik, film veya uygulama ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
+        
+        <button onclick="toggleViewMode()" id="viewToggleBtn" class="shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-slate-300 hover:text-white px-3 py-3 rounded-xl flex items-center justify-center transition" aria-label="Görünümü Değiştir">
+            <svg id="viewIconGrid" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <svg id="viewIconList" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+        </button>
+
+        <button onclick="openFilterModal()" id="filterOpenBtn" class="relative shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-white text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition" aria-label="Filtrele ve sırala">
+            <span>⚙️</span><span class="hidden sm:inline">Filtrele</span>
+            <span id="filterBadge" class="hidden absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center">0</span>
+        </button>
+    </div>
+
+    <div class="flex justify-between items-center text-xs text-slate-400 mb-4">
+        <span id="resultCount">Yükleniyor...</span>
+    </div>
+
+    <!-- KARTLAR AKIŞI -->
+    <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</main>
+
+<!-- MOBİL DOCK NAVIGATION -->
+<div class="stream-dock">
+    <div class="dock-indicator" id="dockIndicator"></div>
+    <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
+    
+    <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 25px;">
+    </button>
+      
+    <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
+        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
+    </button>
+
+    <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film (basılı tut: türe göre)">🎲</button>
+    
+    <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
+</div>
+
+<!-- MENÜ MODALI -->
+<div id="menu-modal-overlay" onclick="closeMenuModal(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div onclick="event.stopPropagation()" id="menu-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-white">Menü</h3>
+            <button onclick="closeMenuModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <div class="flex flex-col gap-3">
+            <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+                <span class="text-2xl">🔄</span>
+                <div>
+                    <div class="text-sm font-bold text-white">Senkronizasyon</div>
+                    <div class="text-xs text-slate-400">Kişisel verilerini eşitle</div>
+                </div>
+            </button>
+            <button onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+                <span class="text-2xl">📋</span>
+                <div>
+                    <div class="text-sm font-bold text-white">Favorileri Kopyala</div>
+                    <div class="text-xs text-slate-400">Favori linklerini panoya yapıştır</div>
+                </div>
+            </button>
+            <button onclick="closeMenuModal(); setTimeout(openAboutModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+    <span class="text-2xl">ℹ️</span>
+    <div>
+        <div class="text-sm font-bold text-white">Hakkında</div>
+        <div class="text-xs text-slate-400">Site hakkında bilgi ve wiki</div>
+    </div>
+</button>
+<button onclick="closeMenuModal(); setTimeout(openFeedbackModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+    <span class="text-2xl">💬</span>
+    <div>
+        <div class="text-sm font-bold text-white">Geri Bildirim Gönder</div>
+        <div class="text-xs text-slate-400">Öneri veya sorun bildir</div>
+    </div>
+</button>
+<button onclick="closeMenuModal(); confirmClearData()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-rose-900/30 p-4 rounded-xl transition text-left border border-white/5">
+    <span class="text-2xl">🗑️</span>
+    <div>
+        <div class="text-sm font-bold text-white">Verilerimi Temizle</div>
+        <div class="text-xs text-slate-400">Favori, not ve puanları sil</div>
+    </div>
+</button>
+        </div>
+    </div>
+</div>
+
+<!-- HAKKINDA MODALI -->
+<div id="about-modal-overlay" onclick="closeAboutModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="about-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-bold text-white">Hakkında</h3>
+            <button onclick="closeAboutModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">PluginHub, Stremio, Nuvio ve CloudStream için eklenti, APK ve içerik kaynaklarını tek yerde bulmanızı sağlayan bir portaldır. TCLTVTÜRK topluluğu tarafından geliştirilir ve güncellenir.</p>
+        <p class="text-xs text-slate-500 mb-6">Favori, not ve puanlarınız yalnızca cihazınızda saklanır. Bildirim gönderdiğinizde IP adresiniz kötüye kullanımı önlemek amacıyla geçici olarak işlenir.</p>
+        <a href="https://tcl-iffalcon.github.io/wiki" target="_blank" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm py-3 rounded-xl transition">📖 Wiki'yi Ziyaret Et</a>
+    </div>
+</div>
+
+<!-- GERİ BİLDİRİM MODALI -->
+<div id="feedback-modal-overlay" onclick="closeFeedbackModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="feedback-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-bold text-white">Geri Bildirim Gönder</h3>
+            <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <textarea id="feedback-textarea" rows="4" maxlength="500" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 resize-y mb-2" placeholder="Öneri, hata veya isteğinizi yazın..."></textarea>
+        <div class="text-[10px] text-slate-500 mb-4 text-right" id="feedback-char-count">0/500</div>
+        <button onclick="submitFeedback()" id="feedback-submit-btn" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Gönder</button>
+    </div>
+</div>
+
+<!-- GENİŞLETİLMİŞ ARAMA MODALI -->
+<div id="search-modal" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex flex-col opacity-0 pointer-events-none transition-all duration-300">
+    <div class="p-6 md:p-10 flex flex-col gap-4 max-w-3xl mx-auto w-full mt-10 relative">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-pink-500 uppercase tracking-widest">Keşfet</span>
+            <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white text-3xl leading-none">&times;</button>
+        </div>
+        <div class="relative">
+            <input type="text" id="expandedSearchInput" placeholder="Arama yap..." class="w-full bg-transparent border-b-2 border-indigo-500/30 text-white text-2xl md:text-4xl py-4 pr-12 outline-none font-black" oninput="handleExpandedSearch(this.value)">
+            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-3xl opacity-50">🔍</span>
+        </div>
+    </div>
+    <div id="expandedSearchResults" class="max-w-3xl mx-auto w-full px-6 md:px-10 pb-10 overflow-y-auto flex-1"></div>
+</div>
+
+<!-- FİLTRELE & SIRALA MODALI -->
+<div id="filter-modal-overlay" onclick="closeFilterModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="filter-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 max-h-[85vh] overflow-y-auto shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-white">Filtrele & Sırala</h3>
+            <button onclick="closeFilterModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <div class="mb-6">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Sıralama</label>
+            <select id="sortSelect" onchange="setSort(this.value)" class="w-full min-h-[44px] bg-[#1a173d] border border-white/10 text-white text-sm p-3.5 rounded-xl outline-none">
+                <option value="default">Varsayılan (Sıra/Önem)</option>
+                <option value="name-asc">İsme Göre (A-Z)</option>
+                <option value="newest">En Yeni Yıl / Eklenen</option>
+            </select>
+        </div>
+        <div class="mb-6" id="debridFilterWrapper">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Debrid Durumu</label>
+            <div class="flex flex-wrap gap-2" id="debridFilterGroup"></div>
+        </div>
+        <div class="mb-8">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Platform/Cihaz</label>
+            <div class="flex flex-wrap gap-2" id="platformFilterGroup"></div>
+        </div>
+        <div class="mb-6" id="genreFilterWrapper">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Tür</label>
+            <div class="flex flex-wrap gap-2" id="genreFilterGroup"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="resetFilters()" class="min-h-[46px] bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition">Sıfırla</button>
+            <button onclick="applyFilters()" class="min-h-[46px] bg-pink-600 hover:bg-pink-500 text-white font-bold text-sm py-3.5 rounded-xl transition">Uygula</button>
+        </div>
+    </div>
+</div>
+
+<!-- DETAY MODALI (ORTAK: APK + FİLM) -->
+<div id="modal-overlay" onclick="closeModalOnBackdrop(event)">
+    <div id="modal-box" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-start mb-5">
+            <div class="flex flex-wrap gap-2 text-[9px] font-black tracking-wide" id="modal-tags"></div>
+            <div class="flex gap-4 items-center text-slate-400">
+                <button onclick="copyCurrentLink()" class="hover:text-indigo-400 transition" id="modal-copy-icon" aria-label="Linki Kopyala">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                </button>
+                <button onclick="closeModal()" class="hover:text-white text-2xl leading-none transition">✕</button>
+            </div>
+        </div>
+        
+        <h2 id="modal-title" class="text-2xl font-bold text-white mb-2 break-words"></h2>
+        <div id="modal-subtitle" class="text-xs text-slate-400 mb-6 font-semibold"></div>
+
+        <!-- BÖLÜM 1: APK / EKLENTİ BİLGİLERİ -->
+        <div id="modal-apk-info" class="hidden">
+            <div class="mb-6">
+                <label id="modal-url-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">BAĞLANTI</label>
+                <div id="modal-url-box" class="bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-indigo-300 leading-relaxed break-all mb-4 text-center md:text-left"></div>
+                <div id="modal-desc-box" class="text-xs text-slate-400 leading-relaxed mb-4 hidden"></div>
+                <div class="flex gap-3">
+                    <button id="modal-copy-btn" class="flex-1 min-h-[46px] bg-[#252836] text-white font-semibold text-sm py-3 rounded-xl border border-white/5">Kopyala</button>
+                    <button id="modal-go-btn" class="flex-1 min-h-[46px] bg-blue-600 text-white font-semibold text-sm py-3 rounded-xl flex justify-center items-center gap-1">Kaynağa Git ↗</button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">PUANINIZ</label>
+                <div class="flex gap-1 text-2xl" id="modal-rating" onmouseleave="resetStarHover()">
+                    <button class="star" onmouseover="hoverStars(1)" onclick="ratePlugin(1)">★</button>
+                    <button class="star" onmouseover="hoverStars(2)" onclick="ratePlugin(2)">★</button>
+                    <button class="star" onmouseover="hoverStars(3)" onclick="ratePlugin(3)">★</button>
+                    <button class="star" onmouseover="hoverStars(4)" onclick="ratePlugin(4)">★</button>
+                    <button class="star" onmouseover="hoverStars(5)" onclick="ratePlugin(5)">★</button>
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">KİŞİSEL NOTUM (SADECE SİZ GÖRÜRSÜNÜZ)</label>
+                <textarea id="modal-note-textarea" rows="3" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 resize-y mb-4" placeholder="Kişisel bir not bırak..."></textarea>
+                <div class="flex gap-3">
+                    <button onclick="saveNoteFromTextarea()" class="min-h-[46px] bg-slate-800 text-slate-200 font-bold text-sm px-6 py-3 rounded-xl border border-white/5">Notu Kaydet</button>
+                    <button onclick="reportCurrentPlugin()" id="report-btn" class="min-h-[46px] bg-rose-600/10 text-rose-400 border border-rose-500/20 font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2">🚩 Bildir</button>
+                </div>
+            </div>
+
+            <!-- Kurulum Kılavuzları (açılır/kapanır) -->
+            <div class="flex flex-col gap-3 mb-4">
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-stremio-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                          <span class="flex items-center gap-2"><img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg" alt="Stremio" class="w-5 h-5 rounded-md">Stremio'ya Nasıl Kurulur?</span>
+                          <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span><b>Hızlı Kurulum</b> butonuna tıklayın — Stremio yüklüyse otomatik açılır.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Otomatik açılmazsa <b>Kopyala</b> ile manifest linkini kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>Stremio içinde <b>Eklentiler</b> sekmesine gidip arama kutusuna linki yapıştırın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-nuvio-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                          <span class="flex items-center gap-2"><img src="https://img.alternativeto.net/icons/140/jpeg/nuvio_275705.png" alt="Nuvio" class="w-5 h-5 rounded-md object-cover">Nuvio'ya Nasıl Kurulur?</span>
+                          <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span><b>Nuvio</b> uygulamasını açın ve <b>Addons</b> bölümüne gidin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>Manage from phone</b> butonuna tıklayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Çıkan QR kodu telefonunuzda okutun.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">5</span><span>Açılan web sitesinde <b>Add</b> sekmesine tıklayın, URL'yi yapıştırın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-wuplay-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">🟡 WuPlay / Arvio'ya Nasıl Kurulur?</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <p class="text-xs text-slate-400 italic mb-4">Bu eklenti Nuvio formatında olduğu için WuPlay ve Arvio gibi Nuvio tabanlı uygulamalarda da aynı şekilde çalışır.</p>
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak URL'yi kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>WuPlay veya Arvio uygulamasını açın, <b>Ayarlar → Eklentiler / Addons</b> bölümüne gidin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>+ Eklenti Ekle</b> (Add Addon) seçeneğine dokunun.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-amber-500 text-black w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Kopyaladığınız URL'yi yapıştırıp onaylayın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-downloader-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">📥 TV'ye Nasıl Kurulur? (Downloader)</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>TV'nizin mağazasından <b>Downloader</b> uygulamasını indirin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>Arama çubuğuna yukarıdaki <b class="text-emerald-400">Kodu</b> yazıp Go tuşuna basın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-emerald-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span>İndirme bittikten sonra "Yükle" diyerek işlemi tamamlayın.</span></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="install-guide bg-[#151333] rounded-2xl border border-white/5" id="modal-cloudstream-guide">
+                    <summary class="p-5 flex items-center justify-between text-sm font-bold text-white">
+                        <span class="flex items-center gap-2">🟢 CloudStream'e Nasıl Kurulur?</span>
+                        <span class="chevron text-slate-400">⌄</span>
+                    </summary>
+                    <div class="guide-body">
+                        <ul class="text-sm text-slate-300 space-y-4">
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">1</span><span>Yukarıdaki <b>Kopyala</b> butonuna tıklayarak repo kısa kodunu ya da URL'sini kopyalayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">2</span><span>CloudStream uygulamasında <b>Ayarlar → Eklentiler (Extensions)</b> bölümüne girin.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">3</span><span><b>+ Depo Ekle</b> seçeneğine dokunup kısa kodu ya da URL'yi yapıştırın, bir isim verip onaylayın.</span></li>
+                            <li class="flex gap-4 items-start"><span class="bg-teal-600 text-white w-6 h-6 flex items-center justify-center rounded-full flex-shrink-0 text-xs font-bold mt-0.5">4</span><span>Repo eklendikten sonra içindeki eklentileri (extension) tek tek indirip etkinleştirin.</span></li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- BÖLÜM 2: FİLM BİLGİLERİ & HERKESE AÇIK NOTLAR -->
+        <div id="modal-movie-info" class="hidden">
+            <div id="modal-movie-hint" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-4 py-3 rounded-xl italic mb-6 hidden"></div>
+            
+            <div class="border-t border-white/10 pt-5">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">💬 Herkese Açık Notlar <span id="modal-public-note-count" class="text-blue-400"></span></p>
+                
+                <div id="public-notes-list" class="flex flex-col gap-2 max-h-[30vh] overflow-y-auto pr-2 mb-4">
+                    <div class="text-xs text-slate-500">Yükleniyor...</div>
+                </div>
+                
+                <div class="mt-4">
+                    <textarea id="public-note-input" class="w-full bg-[#1a173d] border border-white/10 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 resize-y min-h-[70px]" placeholder="Bu film hakkında herkese açık bir not bırak (örn: Hangi sahnede bas çok iyi?)" maxlength="300"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-[10px] text-slate-500" id="public-char-count">0/300</span>
+                        <button id="submit-public-note-btn" onclick="submitPublicNote()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition">Notu Paylaş</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- SENKRON MODALI -->
+<div id="sync-modal-overlay" onclick="closeSyncModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-white">Verilerini Senkronize Et</h3>
+            <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Favori ve kişisel notların bu cihaza özel kaydedilir. Başka bir cihazdan erişmek için kod oluştur.</p>
+        <div class="flex gap-2 mb-3">
+            <input id="sync-code-input" type="text" maxlength="8" placeholder="Kod (örn: A1B2C3)" class="flex-1 min-h-[44px] bg-[#1a173d] border border-white/10 rounded-xl p-3 text-sm text-white outline-none uppercase tracking-widest">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="syncPush()" class="min-h-[46px] bg-indigo-600 text-white font-semibold text-xs py-3 rounded-xl transition">⬆️ Kaydet</button>
+            <button onclick="syncPull()" class="min-h-[46px] bg-slate-800 text-white font-semibold text-xs py-3 rounded-xl transition">⬇️ Getir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ZAR (RASTGELE FİLM) MODALI -->
+<div id="dice-loading-overlay" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2500] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div id="dice-loading-icon" class="text-7xl rolling-dice mb-6">🎲</div>
+    <p id="dice-loading-text" class="text-white font-black text-xl tracking-wider animate-pulse">Sizin için harika bir film seçiliyor...</p>
+</div>
+
+<!-- TÜR MENÜSÜ MODALI (zar butonuna basılı tutunca açılır) -->
+<div id="genre-menu-overlay" onclick="closeGenreMenuOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2200] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="genre-menu-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 max-h-[80vh] overflow-y-auto shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-bold text-white">Türe Göre Zar At</h3>
+            <button onclick="closeGenreMenu()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <div class="flex flex-wrap gap-2" id="genre-menu-chips"></div>
+    </div>
+</div>
+
+<div id="movie-modal-overlay" onclick="closeMovieModal(event)" class="fixed inset-0 bg-[#05040f]/95 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div id="movie-modal-box" onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-3xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative">
+        <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-slate-300 hover:text-white hover:bg-black/80 text-lg transition" aria-label="Kapat">✕</button>
+        
+        <div class="md:w-5/12 relative shrink-0 bg-[#05040f] flex items-center justify-center overflow-hidden">
+    <!-- Fragman İframe'i (Başlangıçta gizli) -->
+    <iframe id="movie-trailer" class="w-full h-72 sm:h-80 md:h-full md:absolute md:inset-0 hidden" src="" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+    
+    <!-- Poster (Fragman bulunamazsa veya yüklenirken gösterilir) -->
+    <img id="movie-poster" src="" alt="Film Posteri" class="w-full h-72 sm:h-80 md:h-full md:absolute md:inset-0 object-contain md:object-cover">
+    
+    <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md border border-white/20 text-amber-400 font-black text-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5 z-10 pointer-events-none">
+        <span class="text-lg leading-none">★</span>
+        <span id="movie-imdb"></span>
+    </div>
+</div>
+        
+        <div class="md:w-7/12 p-6 md:p-8 flex flex-col justify-center relative">
+            <div class="mb-3 flex items-center gap-2 flex-wrap mt-2 md:mt-0">
+                <span class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md" id="movie-year"></span>
+                <span class="bg-pink-600/20 text-pink-400 border border-pink-500/30 text-[10px] font-black uppercase px-2 py-1 rounded-md hidden" id="movie-genre"></span>
+            </div>
+            <h2 id="movie-title" class="text-2xl md:text-3xl font-black text-white mb-4 leading-tight"></h2>
+            <p id="movie-plot" class="text-sm text-slate-300 leading-relaxed mb-6 border-l-2 border-indigo-500 pl-4"></p>
+            <div id="movie-catalog-bridge" class="mb-6"></div>
+            <button id="movie-modal-suggest-btn" onclick="suggestRandomMovie(currentDiceGenre)" class="w-full mt-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
+            <span class="text-xl">🎲</span> Başka Bir Film Öner
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// SPA Veri Altyapısı
+const DATA_SOURCES = {
+    'eklentiler': 'plugins.json',
+    'tvapk': 'tvapk.json',
+    'mobilapk': 'mobilapk.json',
+    'sporapk': 'sporapk.json',
+    'atmos': 'atmos.json',
+    'imax': 'imax.json'
+};
+const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
+let currentDiceGenre = null;
+const cachedData = {};
+let currentMainCategory = 'eklentiler';
+let plugins = [];
+let favorites = JSON.parse(localStorage.getItem('ph_favs') || '[]');
+let reportedItems = JSON.parse(localStorage.getItem('ph_reported') || '[]');
+let userRatings = JSON.parse(localStorage.getItem('ph_ratings') || '{}');
+let userNotes = JSON.parse(localStorage.getItem('ph_notes') || '{}');
+let showFavsOnly = false;
+let currentModalItem = null;
+let currentRatingDisplay = 0;
+
+let activeDebridFilter = localStorage.getItem('ph_debrid_filter') || 'all';
+let activePlatformFilter = localStorage.getItem('ph_platform_filter') || 'all';
+let activeGenreFilter = localStorage.getItem('ph_genre_filter') || 'all';
+let activeTypeFilter = 'all';   // ← YENİ EKLENEN SATIR
+let activeSort = localStorage.getItem('ph_sort') || 'default';
+let fuseIndex = null;
+let globalFuseIndex = null;
+let movieCatalogFuseIndex = null;
+let scrollLockCount = 0;
+let newestDate = null;
+let viewMode = localStorage.getItem('ph_view_mode') || 'grid'; 
+
+let publicNotesCache = {};
+let compareList = JSON.parse(localStorage.getItem('ph_compare') || '[]');
+
+function toggleCompare(key) {
+    const idx = compareList.indexOf(key);
+    if (idx === -1) {
+        if (compareList.length >= 3) { showToast('En fazla 3 öğe karşılaştırabilirsin.', true); return; }
+        compareList.push(key);
+    } else {
+        compareList.splice(idx, 1);
+    }
+    localStorage.setItem('ph_compare', JSON.stringify(compareList));
+    updateCompareBar();
+    filterData();
+}
+
+function updateCompareBar() {
+    const bar = document.getElementById('compare-bar');
+    document.getElementById('compare-count').textContent = compareList.length;
+    bar.classList.toggle('hidden', compareList.length === 0);
+    bar.classList.toggle('flex', compareList.length > 0);
+}
+
+function clearCompare() {
+    compareList = [];
+    localStorage.setItem('ph_compare', JSON.stringify(compareList));
+    updateCompareBar();
+    filterData();
+}
+
+function openCompareModal() {
+    if (compareList.length === 0) return;
+    const items = compareList.map(key => plugins.find(p => pluginKey(p) === key)).filter(Boolean);
+    const rows = [
+        { label: 'Tür', get: i => i.type || '—' },
+        { label: 'Uygulama', get: i => Array.isArray(i.app) ? i.app.join(', ') : (i.app || '—') },
+        { label: 'Debrid', get: i => i.debrid === 'required' ? '⚡ Debrid' : (i.debrid === 'optional' ? '🔓 Opsiyonel' : (i.debrid === 'paid' ? '💳 Ücretli' : '🆓 Ücretsiz')) },
+        { label: 'Platform', get: i => Array.isArray(i.platform) ? i.platform.join(', ') : '—' },
+        { label: 'Puanınız', get: i => userRatings[pluginKey(i)] ? `${userRatings[pluginKey(i)]}/5 ⭐` : '—' },
+        { label: 'Durum', get: i => i.status === 'dead' ? '❌ Çalışmıyor' : '✅ Aktif' }
+    ];
+    let html = `<table class="w-full text-sm text-left border-collapse">
+        <thead><tr>
+            <th class="p-3 text-slate-500 text-xs uppercase"></th>
+            ${items.map(i => `<th class="p-3 text-white font-bold border-b border-white/10">${escapeHtml(i.name)}</th>`).join('')}
+        </tr></thead><tbody>`;
+    rows.forEach(r => {
+        html += `<tr class="border-b border-white/5"><td class="p-3 text-slate-500 text-xs font-bold uppercase">${r.label}</td>${items.map(i => `<td class="p-3 text-slate-300">${escapeHtml(String(r.get(i)))}</td>`).join('')}</tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('compare-table-wrapper').innerHTML = html;
+    document.getElementById('compare-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+}
+function closeCompareModal() {
+    document.getElementById('compare-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    unlockBodyScroll();
+}
+function closeCompareModalOnBackdrop(e) { if (e.target.id === 'compare-modal-overlay') closeCompareModal(); }
+
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.toggle('error', !!isError);
+    t.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function pluginKey(p) {
+    if (p.app) { 
+        const appStr = Array.isArray(p.app) ? p.app.join('-') : p.app;
+        return `${appStr}|${p.name}`;
+    } else if (p.type === 'Debrid') {
+        return `debrid|${p.name}`;
+    } else {
+        return `movie|${p.name}|${p.year || ''}`;
+    }
+}
+
+function getOwnerId() {
+    let id = localStorage.getItem('ph_owner_id');
+    if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : 'oid-' + Math.random().toString(36).slice(2) + Date.now());
+        localStorage.setItem('ph_owner_id', id);
+    }
+    return id;
+}
+
+function extractUrl(desc) {
+    const m = desc?.match(/(https?:\/\/[^\s]+)/);
+    if (m) return m[0];
+    return desc && !desc.includes(' ') ? desc.trim() : '';
+}
+
+// YENİ: Açıklama metninden URL'yi çıkarıp geri kalan (örn. "Aylık Ücret: ~3€ ...") kısmı döndürür
+function descWithoutUrl(desc) {
+    if (!desc) return '';
+    return desc.replace(/(https?:\/\/[^\s]+)/g, '').replace(/\s{2,}/g, ' ').trim();
+}
+
+async function copyToClipboard(text, emptyMsg) {
+    if (!text) { showToast(emptyMsg || 'Kopyalanacak içerik yok.', true); return; }
+    try {
+        await navigator.clipboard.writeText(text);
+        showToast('📋 Kopyalandı!');
+    } catch (err) {
+        showToast('Kopyalama başarısız, elle seçin.', true);
+    }
+}
+
+function lockBodyScroll() { scrollLockCount++; document.body.style.overflow = 'hidden'; }
+function unlockBodyScroll() { scrollLockCount = Math.max(0, scrollLockCount - 1); if (scrollLockCount === 0) document.body.style.overflow = ''; }
+function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); }; }
+const debouncedFilter = debounce(filterData, 180);
+function onSearchInput() { debouncedFilter(); }
+
+async function switchMainCategory(key, btnEl) {
+    document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
+        b.className = "flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
+    });
+    
+    if (btnEl && btnEl.parentElement && btnEl.parentElement.id === 'mainCategoryTabs') {
+        btnEl.className = "flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30";
+    }
+
+    if (['eklentiler', 'tvapk', 'mobilapk', 'sporapk'].includes(key)) {
+        setActiveDock('home');
+    } else if (key === 'atmos') {
+        setActiveDock('atmos');
+    } else if (key === 'imax') {
+        setActiveDock('imax');
+    }
+
+    currentMainCategory = key;
+    activeTypeFilter = 'all';
+    document.getElementById('searchInput').value = '';
+
+    activeDebridFilter = 'all';
+    activePlatformFilter = 'all';
+    activeGenreFilter = 'all';
+    activeSort = 'default';
+    localStorage.setItem('ph_debrid_filter', 'all');
+    localStorage.setItem('ph_platform_filter', 'all');
+    localStorage.setItem('ph_genre_filter', 'all');
+    localStorage.setItem('ph_sort', 'default');
+    const sortSelectEl = document.getElementById('sortSelect');
+    if (sortSelectEl) sortSelectEl.value = 'default';
+
+    showFavsOnly = false;
+    const favBtn = document.getElementById('favBtn');
+    favBtn.style.background = '';
+    favBtn.style.color = '';
+
+    const isMovie = (key === 'atmos' || key === 'imax');
+    document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
+    document.getElementById('featuredStrip').classList.toggle('hidden', key !== 'eklentiler');
+    document.getElementById('featuredStrip').classList.toggle('flex', key === 'eklentiler');
+
+    await loadCategoryData(key);
+}
+
+async function loadCategoryData(key) {
+    if (cachedData[key]) {
+        plugins = cachedData[key];
+        postLoadSetup();
+        return;
+    }
+    renderSkeletons();
+    try {
+        const res = await fetch(DATA_SOURCES[key]);
+        if (!res.ok) throw new Error(`HTTP ${res.status} - Dosya bulunamadı`);
+        const data = await res.json();
+        data.forEach(it => it._cat = key);
+        cachedData[key] = data;
+        plugins = data;
+        postLoadSetup();
+    } catch (err) {
+        console.error(`[Veri Yükleme Hatası - ${key}]:`, err);
+        showToast(`${key} verisi yüklenemedi.`, true);
+        document.getElementById('resultsGrid').innerHTML = `
+            <div class="col-span-full text-center py-10">
+                <div class="text-rose-500 font-bold mb-2">Veri Yüklenemedi</div>
+                <div class="text-xs text-slate-400 break-all bg-black/20 p-3 rounded-lg inline-block border border-white/5">${err.message}</div>
+                <div class="text-xs text-slate-500 mt-4">Lütfen "${DATA_SOURCES[key]}" dosyasının sunucuda tam bu isimle var olduğundan emin olun (Büyük/küçük harf duyarlıdır). Ayrıca JSON sözdizimini (syntax) kontrol edin.</div>
+            </div>`;
+    }
+}
+
+async function ensureAllCategoriesLoaded() {
+    const keys = Object.keys(DATA_SOURCES);
+    await Promise.all(keys.map(async k => {
+        if (cachedData[k]) return;
+        try {
+            const res = await fetch(DATA_SOURCES[k]);
+            if (!res.ok) return;
+            const data = await res.json();
+            data.forEach(it => it._cat = k);
+            cachedData[k] = data;
+        } catch (e) { console.warn('Kategori yüklenemedi (genel arama):', k, e); }
+    }));
+    const all = keys.flatMap(k => cachedData[k] || []);
+    globalFuseIndex = new Fuse(all, {
+        keys: ['name'],
+        threshold: 0.2,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+    });
+}
+
+// YENİ: Zar → Katalog Köprüsü için sadece gerçek film verisi taşıyan
+// kategoriler (atmos, imax) üzerinde ayrı bir index kurulur. Eklenti/APK
+// listeleri (plugins/tvapk/mobilapk/sporapk) film adlarıyla eşleşmeyeceği
+// için buraya dahil edilmez.
+async function ensureMovieCatalogLoaded() {
+    if (movieCatalogFuseIndex) return;
+    const movieKeys = ['atmos', 'imax'];
+    await Promise.all(movieKeys.map(async k => {
+        if (cachedData[k]) return;
+        try {
+            const res = await fetch(DATA_SOURCES[k]);
+            if (!res.ok) return;
+            const data = await res.json();
+            data.forEach(it => it._cat = k);
+            cachedData[k] = data;
+        } catch (e) { console.warn('Film kataloğu yüklenemedi:', k, e); }
+    }));
+    const movies = movieKeys.flatMap(k => cachedData[k] || []);
+    movieCatalogFuseIndex = new Fuse(movies, {
+        keys: ['name'],
+        threshold: 0.2,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+    });
+}
+
+function postLoadSetup() {
+    computeNewestDate();
+    fuseIndex = new Fuse(plugins, {
+        keys: ['name'],
+        threshold: 0.2,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+    });
+    buildTabs();
+    buildFilterOptions();
+    updateStatsBar(currentMainCategory);
+    filterData();
+    if(currentMainCategory === 'eklentiler') updateDailyFeatured();
+}
+
+// YENİ: Üstteki hero'yu artık her kategoride görünen istatistik şeridi olarak günceller
+function updateStatsBar(key) {
+    document.getElementById('statTotal').textContent = plugins.length;
+
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const newCount = plugins.filter(p => {
+        if (!p.dateAdded) return false;
+        const d = new Date(p.dateAdded + 'T00:00:00');
+        return !isNaN(d.getTime()) && d >= weekAgo;
+    }).length;
+    document.getElementById('statNew').textContent = newCount;
+
+    const eyebrowMap = {
+        eklentiler: '🧩 Eklenti Ekosistemi',
+        tvapk: '📺 TV Uygulamaları',
+        mobilapk: '📱 Telefon Uygulamaları',
+        sporapk: '⚽ Spor Uygulamaları',
+        atmos: '🎬 Dolby Atmos Filmler',
+        imax: '🎞️ IMAX Filmler'
+    };
+    document.getElementById('heroEyebrow').textContent = eyebrowMap[key] || eyebrowMap.eklentiler;
+
+    const descMap = {
+        eklentiler: 'Stremio, Nuvio ve CloudStream için eklentiler ve repolar.',
+        tvapk: 'Android TV, webOS ve Tizen için TV uygulamaları.',
+        mobilapk: 'Telefon ve tabletler için uygulamalar.',
+        sporapk: 'Canlı spor yayınları için uygulamalar.',
+        atmos: 'Dolby Atmos ses desteğine sahip film kataloğu.',
+        imax: 'IMAX Enhanced formatında film kataloğu.'
+    };
+    document.getElementById('heroDesc').textContent = descMap[key] || '';
+
+    const isMovie = (key === 'atmos' || key === 'imax');
+    document.getElementById('statTotalLabel').textContent = isMovie ? 'Film' : 'İçerik';
+
+    if (isMovie) {
+        const allPlats = new Set();
+        plugins.forEach(p => { if (Array.isArray(p.platform)) p.platform.forEach(x => allPlats.add(x)); });
+        document.getElementById('statExtra').textContent = allPlats.size;
+        document.getElementById('statExtraLabel').textContent = 'Platform';
+    } else {
+        const allApps = new Set();
+        plugins.forEach(p => { const arr = Array.isArray(p.app) ? p.app : [p.app]; arr.forEach(a => a && allApps.add(a)); });
+        document.getElementById('statExtra').textContent = allApps.size;
+        document.getElementById('statExtraLabel').textContent = 'Uygulama';
+    }
+}
+
+function updateDailyFeatured() {
+    if (!plugins.length) return;
+    const seed = new Date().toISOString().slice(0, 10).split('-').reduce((a, b) => a + parseInt(b), 0);
+    const item = plugins[seed % plugins.length];
+
+    document.getElementById('featuredTitle').textContent = item.name;
+
+    const url = extractUrl(item.desc);
+    document.getElementById('hero-install-btn').onclick = () => {
+        if (item.code) copyToClipboard(item.code);
+        else if (url) window.open(url, '_blank');
+    };
+    document.getElementById('hero-copy-btn').onclick = () => {
+        copyToClipboard(item.code || url);
+    };
+}
+
+function moveIndicator(activeEl) {
+    const indicator = document.getElementById('dockIndicator');
+    if (indicator && activeEl) {
+        const leftPos = activeEl.offsetLeft + (activeEl.offsetWidth / 2) - 22;
+        indicator.style.transform = `translateX(${leftPos}px)`;
+    }
+}
+function setActiveDock(id) {
+    document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+    const el = document.getElementById(`dock-${id}`);
+    if (el) { el.classList.add('active'); moveIndicator(el); }
+}
+
+function handleGridClick(e) {
+    const compareBtn = e.target.closest('.compare-btn');
+    if (compareBtn) { e.stopPropagation(); if (compareBtn.dataset.key) toggleCompare(compareBtn.dataset.key); return; }
+    const copyBtn = e.target.closest('.copy-btn');
+    if (copyBtn) {
+        e.stopPropagation();
+        const item = plugins.find(p => pluginKey(p) === copyBtn.dataset.key);
+        if (item) copyToClipboard(item.code || extractUrl(item.desc) || item.sourceUrl);
+        return;
+    }
+    const favBtn = e.target.closest('.fav-btn'); 
+    if (favBtn) { e.stopPropagation(); if (favBtn.dataset.key) toggleFav(favBtn.dataset.key); return; }
+    const fragmanBtn = e.target.closest('.fragman-badge');
+    if (fragmanBtn) {
+        e.stopPropagation();
+        if (fragmanBtn.dataset.key) {
+            const item = plugins.find(p => pluginKey(p) === fragmanBtn.dataset.key);
+            if (item) playTrailerForItem(item);
+        }
+        return;
+    }
+    const card = e.target.closest('.stream-card');
+    if (card && card.dataset.key) {
+        const cat = card.dataset.cat || currentMainCategory;
+        const source = cachedData[cat] || plugins;
+        const item = source.find(p => pluginKey(p) === card.dataset.key);
+        if (item) {
+            openModalItem(item, cat);
+            const searchModal = document.getElementById('search-modal');
+            if (!searchModal.classList.contains('opacity-0')) toggleSearchModal();
+        }
+    }
+}
+
+function renderExpandedSearchResults(query) {
+    const container = document.getElementById('expandedSearchResults');
+    const q = query.trim();
+    const idx = globalFuseIndex || fuseIndex;
+    if (!q || !idx) { container.innerHTML = ''; return; }
+    const results = idx.search(q).map(r => r.item).slice(0, 30);
+    if (results.length === 0) {
+        container.innerHTML = `<div class="text-center text-slate-500 text-sm py-10">Sonuç bulunamadı.</div>`;
+        return;
+    }
+    container.innerHTML = results.map(item => `
+        <div class="stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} mb-4" data-key="${escapeHtml(pluginKey(item))}" data-cat="${escapeHtml(item._cat || currentMainCategory)}">
+            ${buildCardHTML(item, item._cat)}
+        </div>
+    `).join('');
+}
+const debouncedExpandedSearch = debounce(renderExpandedSearchResults, 180);
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const activeEl = document.querySelector('.dock-btn.active');
+        if (activeEl) moveIndicator(activeEl);
+    }, 100);
+
+    setupDiceButton();
+
+    document.getElementById('resultsGrid').addEventListener('click', handleGridClick);
+    document.getElementById('expandedSearchResults').addEventListener('click', handleGridClick);
+
+    const categoryTabs = document.getElementById('categoryTabs');
+    categoryTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.pill-tab');
+        if (btn && btn.dataset.type) {
+            document.querySelectorAll('#categoryTabs .pill-tab').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            activeTypeFilter = btn.dataset.type === 'Tümü' ? 'all' : btn.dataset.type;
+            filterData();
+        }
+    });
+    updateCompareBar();
+    switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
+});
+
+window.addEventListener('resize', () => {
+    const activeEl = document.querySelector('.dock-btn.active');
+    if (activeEl) moveIndicator(activeEl);
+});
+
+function goHome() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (showFavsOnly) { showFavsOnly = false; filterData(); }
+    
+    if (currentMainCategory === 'atmos' || currentMainCategory === 'imax') {
+        switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
+    } else {
+        setActiveDock('home');
+    }
+}
+function toggleFavFilter() {
+    showFavsOnly = !showFavsOnly;
+    const favBtn = document.getElementById('favBtn');
+    favBtn.style.background = showFavsOnly ? 'var(--accent-pink)' : '';
+    favBtn.style.color = showFavsOnly ? '#fff' : '';
+    filterData();
+}
+function toggleViewMode() {
+    viewMode = viewMode === 'grid' ? 'list' : 'grid';
+    localStorage.setItem('ph_view_mode', viewMode);
+    applyViewModeUI(); filterData(); 
+}
+function applyViewModeUI() {
+    const gridIcon = document.getElementById('viewIconGrid');
+    const listIcon = document.getElementById('viewIconList');
+    const gridContainer = document.getElementById('resultsGrid');
+    if (viewMode === 'list') {
+        gridIcon.classList.add('hidden'); listIcon.classList.remove('hidden');
+        gridContainer.className = 'grid grid-cols-1 gap-3';
+    } else {
+        listIcon.classList.add('hidden'); gridIcon.classList.remove('hidden');
+        gridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
+    }
+}
+
+const genreClasses = {"Aksiyon":"b-aksiyon","Bilim Kurgu":"b-bilimkurgu","Macera":"b-macera","Savaş":"b-savas","Korku":"b-korku","Dram":"b-dram","Animasyon":"b-animasyon","Müzik":"b-muzik","Gerilim":"b-gerilim","Fantastik":"b-fantastik","Tarih":"b-tarih","Suç":"b-suc"};
+const platClasses = {"Prime":"pt-prime","Netflix":"pt-netflix","TV+":"pt-tvplus","Max":"pt-max","Disney+":"pt-disney","TOD":"pt-tod","MUBI":"pt-mubi","Bravia":"pt-bravia","UHD":"pt-uhd","Dijital":"pt-dijital"};
+const studioClasses = {"marvel":"st-marvel","sony":"st-sony","paramount":"st-paramount"};
+const typePalette = ["b-aksiyon","b-bilimkurgu","b-macera","b-savas","b-korku","b-dram","b-animasyon","b-muzik","b-gerilim","b-fantastik","b-tarih","b-suc"];
+
+function getGenreClass(g) { return genreClasses[g] || 'bg-slate-700 text-slate-300'; }
+function getPlatformClass(p) { return platClasses[p] || 'bg-slate-800 text-slate-400 border border-slate-600'; }
+function getStudioClass(s) { return studioClasses[s] || 'bg-slate-800 text-slate-400'; }
+function getTypeClass(t) {
+    if (!t) return 'bg-slate-700 text-slate-300';
+    let hash = 0;
+    for (let i = 0; i < t.length; i++) hash = (hash * 31 + t.charCodeAt(i)) >>> 0;
+    return typePalette[hash % typePalette.length];
+}
+
+function buildAppBadges(item) {
+    const appArray = Array.isArray(item.app) ? item.app : [item.app];
+    const appsLower = appArray.filter(Boolean).map(a => String(a).toLowerCase());
+    let html = appArray.filter(Boolean).map(a => {
+        const name = String(a).toLowerCase();
+        if (name.includes('android')) {
+            return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 576 512"><path d="M420.22 175.76l44.68-77.34a10.92 10.92 0 0 0-3.95-15 10.87 10.87 0 0 0-14.92 4l-45.28 78.36A284.14 284.14 0 0 0 288 141.44a284.14 284.14 0 0 0-112.75 24.34l-45.28-78.36a10.88 10.88 0 0 0-14.94-4 10.92 10.92 0 0 0-3.95 15l44.68 77.34C93.42 229.47 21.05 328.72 0 448h576c-21.05-119.28-93.42-218.53-155.78-272.24zM160 352a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm256 0a32 32 0 1 1 32-32 32 32 0 0 1-32 32z"/></svg>${escapeHtml(a)}</span>`;
+        }
+        if (name.includes('ios') || name.includes('apple')) {
+            return `<span class="bg-slate-100/10 text-slate-300 border border-slate-100/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>${escapeHtml(a)}</span>`;
+        }
+        if (name.includes('cloudstream')) {
+            return `<span class="tag-cloudstream px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-block">${escapeHtml(a)}</span>`;
+        }
+        const badgeClass = name.includes('stremio') ? 'tag-stremio' : 'tag-nuvio';
+        return `<span class="${badgeClass} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-block">${escapeHtml(a)}</span>`;
+    }).join('');
+
+    if (appsLower.includes('nuvio') && item.type !== 'Plugin') {
+        html += `<span class="tag-compat px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1" title="Bu eklenti Nuvio formatında olduğu için WuPlay ve Arvio uygulamalarında da çalışır">🔗 WuPlay · Arvio</span>`;
+    }
+    return html;
+}
+function buildAppBadgesGrid(item) {
+    const appArray = Array.isArray(item.app) ? item.app : [item.app];
+    const appsLower = appArray.filter(Boolean).map(a => String(a).toLowerCase());
+
+    const androidIcon = `<svg class="w-3 h-3 inline-block mr-1" fill="currentColor" viewBox="0 0 576 512"><path d="M420.22 175.76l44.68-77.34a10.92 10.92 0 0 0-3.95-15 10.87 10.87 0 0 0-14.92 4l-45.28 78.36A284.14 284.14 0 0 0 288 141.44a284.14 284.14 0 0 0-112.75 24.34l-45.28-78.36a10.88 10.88 0 0 0-14.94-4 10.92 10.92 0 0 0-3.95 15l44.68 77.34C93.42 229.47 21.05 328.72 0 448h576c-21.05-119.28-93.42-218.53-155.78-272.24zM160 352a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm256 0a32 32 0 1 1 32-32 32 32 0 0 1-32 32z"/></svg>`;
+    const appleIcon = `<svg class="w-3 h-3 inline-block mr-1" fill="currentColor" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>`;
+
+    const primaryHTML = appArray.filter(Boolean).map(a => {
+        const name = String(a).toLowerCase();
+        if (name.includes('android')) {
+            return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 app-badge-cell">${androidIcon}${escapeHtml(a)}</span>`;
+        }
+        if (name.includes('ios') || name.includes('apple')) {
+            return `<span class="bg-slate-100/15 text-slate-300 border border-slate-100/30 app-badge-cell">${appleIcon}${escapeHtml(a)}</span>`;
+        }
+        const badgeClass = name.includes('cloudstream') ? 'tag-cloudstream'
+            : name.includes('stremio') ? 'tag-stremio'
+            : 'tag-nuvio';
+        return `<span class="${badgeClass} app-badge-cell">${escapeHtml(a)}</span>`;
+    }).join('');
+
+    let secondaryHTML = '';
+    if (appsLower.includes('nuvio') && item.type !== 'Plugin') {
+        secondaryHTML = `<span class="app-badge-secondary">Arvio</span><span class="app-badge-secondary">WuPlay</span>`;
+    }
+
+    if (!secondaryHTML) return `<div class="badge-grid-single">${primaryHTML}</div>`;
+    return `<div class="badge-grid-2x2">${primaryHTML}${secondaryHTML}</div>`;
+}
+
+// DÜZELTİLDİ: "paid" (ücretli) durumu artık haritada tanımlı; önceden
+// map[item.debrid] === undefined olduğu için sessizce "free"ye düşüyordu.
+function buildDebridBadge(item) {
+    const map = {
+        free: { l: '🆓 Ücretsiz', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+        optional: { l: '🔓 Opsiyonel', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+        required: { l: '⚡ Debrid', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+        paid: { l: '💳 Ücretli', cls: 'bg-blue-500/10 text-blue-400 border-blue-500/20' }
+    };
+    const d = map[item.debrid] || map.free;
+    return `<span class="${d.cls} border badge-uniform">${d.l}</span>`;
+}
+
+function buildOsBadges(item) {
+    const osData = item.os || item.platform || [];
+    const osList = Array.isArray(osData) ? osData : [osData];
+    return osList.map(os => {
+        const osLow = String(os).toLowerCase().replace(/\s+/g, '');
+        if (osLow === 'androidtv') return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1">📱 Android TV</span>`;
+        if (osLow === 'webos') return `<span class="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1">📺 webOS</span>`;
+        if (osLow === 'tizen') return `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase inline-flex items-center gap-1">📟 Tizen</span>`;
+        return '';
+    }).filter(Boolean).join('');
+}
+
+function buildStatusBadges(item) {
+    const isNew = isRecentlyAdded(item.dateAdded);
+    const newBadgeHTML = isNew ? `<span class="bg-amber-400/20 text-amber-400 border border-amber-400/40 badge-uniform animate-pulse">YENİ</span>` : '';
+    const deadBadgeHTML = item.status === 'dead' ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 badge-uniform">ÇALIŞMIYOR</span>` : '';
+    return deadBadgeHTML + newBadgeHTML;
+}
+
+const NEW_BADGE_WINDOW_DAYS = 3;
+function isRecentlyAdded(dateAddedStr) {
+    if (!dateAddedStr) return false;
+    const added = new Date(dateAddedStr + 'T00:00:00');
+    if (isNaN(added.getTime())) return false;
+    const now = new Date();
+    const todayUTC = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.floor((todayUTC - added) / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays < NEW_BADGE_WINDOW_DAYS;
+}
+
+function buildCardHTML(item, catOverride) {
+    const cat = catOverride || currentMainCategory;
+    const itemKey = pluginKey(item);
+    const isFav = favorites.includes(itemKey);
+    const isMovie = (cat === 'atmos' || cat === 'imax');
+    const favBtnHTML = `<button class="fav-btn w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}">${isFav ? '❤️' : '♡'}</button>`;
+
+    if (isMovie) {
+        const fragmanBadgeHTML = `<span class="fragman-badge cursor-pointer bg-blue-600/15 text-blue-300 border border-blue-500/30 px-2 py-1 rounded-lg text-[9px] font-bold inline-flex items-center gap-1 hover:bg-blue-600/30 transition shrink-0" data-key="${escapeHtml(itemKey)}">🎬 Fragman</span>`;
+        if (viewMode === 'list') {
+            return `
+                <div class="card-header flex items-center gap-3 flex-1 min-w-0">
+                    ${item.rank ? `<div class="text-sm font-black text-slate-500 w-6 shrink-0 text-center ${item.rank <= 3 ? 'text-amber-400 text-lg' : ''}">${item.rank}</div>` : ''}
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
+                        <div class="text-[10px] text-slate-400">${item.year} · ${escapeHtml(item.genre || '')}</div>
+                    </div>
+                </div>
+                <div class="card-footer flex items-center gap-2">
+                    ${fragmanBadgeHTML}
+                    <div class="flex gap-1">${(item.platform || []).map(p => `<span class="platform-tag ${getPlatformClass(p)} px-1.5 py-0.5 rounded text-[9px] font-bold">${escapeHtml(p)}</span>`).join('')}</div>
+                    ${favBtnHTML}
+                </div>
+            `;
+        }
+        return `
+            <div class="card-header w-full flex items-start justify-between mb-4 gap-2">
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                    ${item.rank ? `<div class="text-lg font-black text-slate-500 w-8 shrink-0 text-center pt-1 ${item.rank <= 3 ? 'text-amber-400 text-2xl' : ''}">${item.rank}</div>` : ''}
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-bold text-lg text-white mb-1 truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</h3>
+                        <div class="text-xs text-slate-400 mb-2">${item.year}</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="badge ${getGenreClass(item.genre)} px-2 py-0.5 rounded-full text-[9px] font-bold uppercase">${escapeHtml(item.genre)}</span>
+                            ${item.studio ? `<span class="studio-tag ${getStudioClass(item.studio)} px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">${escapeHtml(item.studio)}</span>` : ''}
+                            ${fragmanBadgeHTML}
+                        </div>
+                    </div>
+                </div>
+                ${favBtnHTML}
+            </div>
+            ${item.hint ? `<div class="w-full text-xs italic bg-emerald-500/10 text-emerald-400 px-3 py-2 rounded-lg mb-4">💡 ${escapeHtml(item.hint)}</div>` : ''}
+            <div class="card-footer w-full mt-auto flex items-center justify-between border-t border-white/5 pt-3">
+                <div class="flex gap-1 flex-wrap">${(item.platform || []).map(p => `<span class="platform-tag ${getPlatformClass(p)} px-2 py-1 rounded-md text-[9px] font-bold">${escapeHtml(p)}</span>`).join('')}</div>
+                <span class="text-xs font-bold text-blue-400 flex items-center gap-1 shrink-0">💬 Notlar</span>
+            </div>
+        `;
+    } else {
+        const userRating = userRatings[itemKey] || 0;
+        let starsHTML = '';
+        for (let i = 1; i <= 5; i++) starsHTML += `<span class="${i <= userRating ? 'text-amber-400' : 'text-[#2d2a54]'}">★</span>`;
+
+        const ageBadgeHTML = item.ageRestricted ? `<span class="age-badge">18+</span>` : '';
+
+        const appBadgesHTML = buildAppBadges(item);
+        const osBadgesHTML = buildOsBadges(item);
+        const statusBadgesHTML = buildStatusBadges(item);
+        const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} badge-uniform">${escapeHtml(item.type)}</span>` : '';
+
+        if (viewMode === 'list') {
+            return `
+                
+                <div class="card-header flex items-center gap-2 flex-1 min-w-0">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
+                        <div class="flex items-center gap-1 flex-wrap mt-1">${typeBadgeHTML}${appBadgesHTML}${statusBadgesHTML}</div>
+                    </div>
+                </div>
+                <div class="card-footer flex items-center gap-3">
+                    <div class="flex gap-0.5 text-xs">${starsHTML}</div>
+                    ${favBtnHTML}
+                </div>
+            `;
+        }
+        const isComparing = compareList.includes(itemKey);
+const cardUrlStr = extractUrl(item.desc) || item.sourceUrl;
+const urlDisplayHTML = item.code
+    ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-sm text-emerald-400 font-black mb-3">Downloader Kodu: ${item.code}</div>`
+    : (cardUrlStr ? `<div class="bg-[#1a173d] border border-white/10 rounded-lg px-3 py-2 text-xs text-indigo-300 leading-relaxed break-all mb-3" title="${escapeHtml(cardUrlStr)}">${escapeHtml(cardUrlStr)}</div>` : '');
+
+// DÜZELTİLDİ: Açıklama artık "eklentiler" kategorisinde de gösteriliyor
+// (URL kısmı ayıklandıktan sonra kalan metin, örn. "Aylık Ücret: ~3€ ...")
+const cardDescText = descWithoutUrl(item.desc);
+const descDisplayHTML = cardDescText
+    ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(cardDescText)}</p>`
+    : (cat !== 'eklentiler' ? `<p class="text-xs font-normal text-slate-400 leading-relaxed mb-4 break-words">${escapeHtml(item.desc || '')}</p>` : '');
+
+return `
+        <div class="card-header w-full flex flex-col min-w-0">
+            <div class="flex items-start gap-1.5 flex-wrap mb-3">
+            ${typeBadgeHTML}${buildAppBadgesGrid(item)}${cat === 'eklentiler' ? buildDebridBadge(item) : ''}${statusBadgesHTML}
+        </div>
+        <div class="flex justify-between items-start gap-2 mb-3">
+            <h3 class="font-bold text-lg text-white truncate flex-1 min-w-0" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageBadgeHTML}</h3>
+            ${favBtnHTML}
+        </div>
+        ${osBadgesHTML ? `<div class="flex flex-wrap gap-1.5 mb-3">${osBadgesHTML}</div>` : ''}
+        ${urlDisplayHTML}
+        ${descDisplayHTML}
+    </div>
+    <div class="card-footer w-full flex items-center justify-between mt-auto border-t border-white/5 pt-3">
+        <div class="flex gap-1 text-lg">${starsHTML}</div>
+        <div class="flex items-center gap-2">
+            <button class="compare-btn h-9 flex items-center justify-center gap-1.5 rounded-lg text-xs font-bold px-3 transition ${isComparing ? 'bg-indigo-600/30 text-indigo-300' : 'bg-white/5 text-slate-400 hover:text-indigo-400'}" data-key="${escapeHtml(itemKey)}">+ Karşılaştır</button>
+            <button class="copy-btn bg-indigo-600/20 text-indigo-300 text-xs px-4 py-2 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transition flex items-center gap-1.5" data-key="${escapeHtml(itemKey)}">📋 Kopyala</button>
+        </div>
+    </div>
+        `;
+    }
+}
+
+function renderCards(data) {
+    const grid = document.getElementById('resultsGrid');
+    const count = document.getElementById('resultCount');
+    grid.innerHTML = '';
+    count.textContent = `${data.length} İçerik Bulundu`;
+    applyViewModeUI();
+
+    if (data.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-500 text-sm py-16">Aramanızla eşleşen veri bulunamadı.</div>`;
+        return;
+    }
+
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `stream-card p-4 md:p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} ${item.status === 'dead' ? 'opacity-60 grayscale' : ''}`;
+        card.dataset.key = pluginKey(item);
+        card.innerHTML = buildCardHTML(item);
+        grid.appendChild(card);
+    });
+}
+
+function renderSkeletons() {
+    const grid = document.getElementById('resultsGrid');
+    grid.innerHTML = ''; applyViewModeUI();
+    for(let i=0; i<6; i++) {
+        grid.innerHTML += `<div class="stream-card p-5 ${viewMode === 'list' ? 'list-view' : 'flex flex-col'} pointer-events-none"><div class="skeleton-box w-16 h-6 mb-4"></div><div class="skeleton-box w-3/4 h-6 mb-2"></div></div>`;
+    }
+}
+
+function toggleFav(key) {
+    const idx = favorites.indexOf(key);
+    if (idx === -1) favorites.push(key);
+    else favorites.splice(idx, 1);
+    localStorage.setItem('ph_favs', JSON.stringify(favorites));
+    filterData();
+}
+
+function computeNewestDate() {
+    newestDate = null;
+    plugins.forEach(p => { if (p.dateAdded && (!newestDate || p.dateAdded > newestDate)) newestDate = p.dateAdded; });
+}
+
+function buildTabs() {
+    const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
+    const container = document.getElementById('categoryTabs');
+    container.innerHTML = types.map((t, i) => `<button class="pill-tab ${i === 0 ? 'active' : ''}" data-type="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+}
+
+function buildFilterOptions() {
+    const isMovie = (currentMainCategory === 'atmos' || currentMainCategory === 'imax');
+    
+    if (!isMovie) {
+        const debridOpts = [{v:'all',l:'Tümü'},{v:'free',l:'🆓 Ücretsiz'},{v:'optional',l:'🔓 Opsiyonel'},{v:'required',l:'⚡ Debrid'},{v:'paid',l:'💳 Ücretli'}];
+        document.getElementById('debridFilterGroup').innerHTML = debridOpts.map(o => `<button class="filter-chip ${o.v === activeDebridFilter ? 'active' : ''}" data-group="debrid" data-value="${o.v}" onclick="selectChip(this)">${o.l}</button>`).join('');
+    }
+
+    document.getElementById('genreFilterWrapper').style.display = isMovie ? 'block' : 'none';
+    if (isMovie) {
+        let allGenres = new Set();
+        plugins.forEach(p => { if (p.genre) allGenres.add(p.genre); });
+        const gOpts = [{v:'all', l:'Tümü'}, ...Array.from(allGenres).map(g => ({v:g, l:g}))];
+        document.getElementById('genreFilterGroup').innerHTML = gOpts.map(o => {
+            const chipClass = o.v === 'all' ? '' : getGenreClass(o.v);
+            return `<button class="filter-chip ${chipClass} ${o.v === activeGenreFilter ? 'active' : ''}" data-group="genre" data-value="${escapeHtml(o.v)}" onclick="selectChip(this)">${escapeHtml(o.l)}</button>`;
+        }).join('');
+    }
+
+    let allPlats = new Set();
+    plugins.forEach(p => { if(Array.isArray(p.platform)) p.platform.forEach(x => allPlats.add(x)); });
+    const pOpts = [{v:'all', l:'Tümü'}, ...Array.from(allPlats).map(p => ({v:p, l:p}))];
+    document.getElementById('platformFilterGroup').innerHTML = pOpts.map(o => `<button class="filter-chip ${o.v === activePlatformFilter ? 'active' : ''}" data-group="platform" data-value="${escapeHtml(o.v)}" onclick="selectChip(this)">${escapeHtml(o.l)}</button>`).join('');
+}
+
+function selectChip(el) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`.filter-chip[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    if (group === 'debrid') activeDebridFilter = el.dataset.value;
+    if (group === 'platform') activePlatformFilter = el.dataset.value;
+    if (group === 'genre') activeGenreFilter = el.dataset.value;
+}
+function setSort(v) { activeSort = v; }
+
+function sortPool(pool) {
+    const arr = [...pool];
+    if (activeSort === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    else if (activeSort === 'newest') {
+        arr.sort((a, b) => {
+            const aKey = a.dateAdded || (a.year ? `${a.year}-01-01` : '0000-00-00');
+            const bKey = b.dateAdded || (b.year ? `${b.year}-01-01` : '0000-00-00');
+            return bKey.localeCompare(aKey);
+        });
+    }
+    return arr;
+}
+
+function filterData() {
+    let pool = plugins;
+    const q = document.getElementById('searchInput').value.trim();
+    if (q && fuseIndex) pool = fuseIndex.search(q).map(r => r.item);
+    if (activeTypeFilter !== 'all') pool = pool.filter(p => p.type === activeTypeFilter);
+    if (activeDebridFilter !== 'all' && currentMainCategory === 'eklentiler') pool = pool.filter(p => p.debrid === activeDebridFilter);
+    if (activePlatformFilter !== 'all') pool = pool.filter(p => Array.isArray(p.platform) && p.platform.includes(activePlatformFilter));
+    if (activeGenreFilter !== 'all' && (currentMainCategory === 'atmos' || currentMainCategory === 'imax')) pool = pool.filter(p => p.genre === activeGenreFilter);
+    if (showFavsOnly) pool = pool.filter(p => favorites.includes(pluginKey(p)));
+    renderCards(sortPool(pool));
+}
+
+function openModalItem(item, catOverride) {
+    currentModalItem = item;
+    const modalCat = catOverride || currentMainCategory;
+    const key = pluginKey(item);
+    const isMovie = (modalCat === 'atmos' || modalCat === 'imax');
+
+    document.getElementById('modal-title').textContent = item.name;
+    document.getElementById('modal-tags').innerHTML = '';
+    document.getElementById('modal-copy-icon').style.display = isMovie ? 'none' : 'block';
+
+    if (isMovie) {
+        document.getElementById('modal-apk-info').classList.add('hidden');
+        document.getElementById('modal-movie-info').classList.remove('hidden');
+        
+        document.getElementById('modal-subtitle').textContent = `${item.year} · ${item.genre || ''}`;
+        
+        let tagsHTML = `<span class="badge ${getGenreClass(item.genre)} px-2 py-1 rounded text-[9px]">${escapeHtml(item.genre)}</span>`;
+        if(item.studio) tagsHTML += `<span class="studio-tag ${getStudioClass(item.studio)} px-2 py-1 rounded ml-2 text-[9px]">${escapeHtml(item.studio)}</span>`;
+        document.getElementById('modal-tags').innerHTML = tagsHTML;
+
+        const hintEl = document.getElementById('modal-movie-hint');
+        if (item.hint) { hintEl.textContent = `💡 ${item.hint}`; hintEl.classList.remove('hidden'); } 
+        else { hintEl.classList.add('hidden'); }
+
+        document.getElementById('public-note-input').value = '';
+        document.getElementById('public-char-count').textContent = '0/300';
+        document.getElementById('public-notes-list').innerHTML = `<div class="text-xs text-slate-500">Yükleniyor...</div>`;
+        
+        fetchPublicNotes(key);
+
+    } else {
+        document.getElementById('modal-movie-info').classList.add('hidden');
+        document.getElementById('modal-apk-info').classList.remove('hidden');
+        
+
+        document.getElementById('modal-subtitle').textContent = '';
+        const typeBadgeHTML = item.type ? `<span class="${getTypeClass(item.type)} badge-uniform">${escapeHtml(item.type)}</span>` : '';
+        const modalAgeBadge = item.ageRestricted ? `<span class="bg-rose-600/90 text-white border border-white/20 badge-uniform">18+</span>` : '';
+        const modalDebridHTML = modalCat === 'eklentiler' ? buildDebridBadge(item) : '';
+        const modalBadgesHTML = typeBadgeHTML + buildAppBadgesGrid(item) + modalDebridHTML + buildStatusBadges(item) + buildOsBadges(item) + modalAgeBadge;        document.getElementById('modal-tags').innerHTML = modalBadgesHTML;
+
+        const code = item.code;
+        const urlBox = document.getElementById('modal-url-box');
+        const copyBtn = document.getElementById('modal-copy-btn');
+        const goBtn = document.getElementById('modal-go-btn');
+        const urlStr = extractUrl(item.desc) || item.sourceUrl;
+
+        if (code) {
+            document.getElementById('modal-url-label').textContent = "DOWNLOADER KODU";
+            urlBox.innerHTML = `<span class="text-emerald-400 text-3xl font-black">${code}</span>`;
+            copyBtn.onclick = () => copyToClipboard(code);
+            goBtn.style.display = 'none';
+        } else {
+            document.getElementById('modal-url-label').textContent = "BAĞLANTI";
+            urlBox.textContent = urlStr || 'Bağlantı bulunamadı';
+            copyBtn.onclick = () => copyToClipboard(urlStr);
+            goBtn.style.display = 'flex';
+            goBtn.onclick = () => { if(urlStr) window.open(urlStr, '_blank'); };
+        }
+
+        // YENİ: Modalda da açıklama metnini (URL hariç) göster
+        const modalDescEl = document.getElementById('modal-desc-box');
+        const modalDescText = descWithoutUrl(item.desc);
+        if (modalDescText) {
+            modalDescEl.textContent = modalDescText;
+            modalDescEl.classList.remove('hidden');
+        } else {
+            modalDescEl.textContent = '';
+            modalDescEl.classList.add('hidden');
+        }
+
+        const appArray = Array.isArray(item.app) ? item.app : [item.app];
+        const appsLower = appArray.map(a => String(a).toLowerCase());
+        const isAPK = modalCat !== 'eklentiler';
+        const hasNuvio = appsLower.some(a => a.includes('nuvio')) || item.installGuide === 'nuvio';
+        const hasStremio = appsLower.some(a => a.includes('stremio')) || item.installGuide === 'stremio';
+        const hasCloudstream = appsLower.some(a => a.includes('cloudstream')) || item.installGuide === 'cloudstream';
+        const isWuplayCompatible = hasNuvio && item.type !== 'Plugin';
+
+        const nuvioGuide = document.getElementById('modal-nuvio-guide');
+        const stremioGuide = document.getElementById('modal-stremio-guide');
+        const wuplayGuide = document.getElementById('modal-wuplay-guide');
+        const downloaderGuide = document.getElementById('modal-downloader-guide');
+        const cloudstreamGuide = document.getElementById('modal-cloudstream-guide');
+
+        [nuvioGuide, stremioGuide, wuplayGuide, downloaderGuide, cloudstreamGuide].forEach(g => { if (g) g.removeAttribute('open'); });
+
+        if (nuvioGuide) nuvioGuide.classList.toggle('hidden', isAPK || !hasNuvio);
+        if (stremioGuide) stremioGuide.classList.toggle('hidden', isAPK || !hasStremio);
+        if (wuplayGuide) wuplayGuide.classList.toggle('hidden', isAPK || !isWuplayCompatible); 
+        if (downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
+        if (cloudstreamGuide) cloudstreamGuide.classList.toggle('hidden', !hasCloudstream);
+
+        const savedRating = userRatings[key] || 0;
+        currentRatingDisplay = savedRating; updateStarsUI(savedRating);
+        document.getElementById('modal-note-textarea').value = userNotes[key] || '';
+        updateReportButtonUI();
+    }
+
+    document.getElementById('modal-overlay').classList.add('open');
+    lockBodyScroll();
+}
+
+function copyCurrentLink() {
+    const el = document.getElementById('modal-url-box');
+    if(el) copyToClipboard(el.innerText);
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); unlockBodyScroll(); }
+function closeModalOnBackdrop(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+document.addEventListener('keydown', e => { 
+    if (e.key === 'Escape') {
+        closeModal();
+        if(typeof closeMovieModal === 'function') closeMovieModal();
+    } 
+});
+
+function hoverStars(i) { updateStarsUI(i, true); }
+function resetStarHover() { updateStarsUI(currentRatingDisplay); }
+function ratePlugin(index) {
+    if (!currentModalItem) return;
+    currentRatingDisplay = index; userRatings[pluginKey(currentModalItem)] = index;
+    localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
+    updateStarsUI(index); showToast(`⭐ Puan kaydedildi (${index}/5)`); filterData();
+}
+function updateStarsUI(count) {
+    const stars = document.getElementById('modal-rating').children;
+    for (let i = 0; i < 5; i++) stars[i].style.color = i < count ? '#ffb800' : '#2d2a54';
+}
+function saveNoteFromTextarea() {
+    if (!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const text = document.getElementById('modal-note-textarea').value.trim();
+    if (text === '') { delete userNotes[key]; showToast('📝 Not silindi.'); } 
+    else { userNotes[key] = text; showToast('📝 Not kaydedildi!'); }
+    localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+}
+
+async function reportCurrentPlugin() {
+    if (!currentModalItem) return;
+    const key = pluginKey(currentModalItem);
+    const isReported = reportedItems.includes(key);
+    const actionVerb = isReported ? 'unreport' : 'report';
+    const confirmMsg = isReported
+        ? `"${currentModalItem.name}" için bildirimi geri almak istediğine emin misin?`
+        : `"${currentModalItem.name}" öğesini sorunlu olarak bildirmek istediğine emin misin?`;
+    if (!confirm(confirmMsg)) return;
+
+    const btn = document.getElementById('report-btn');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Gönderiliyor...';
+
+    try {
+        const appVal = Array.isArray(currentModalItem.app) ? currentModalItem.app.join(', ') : (currentModalItem.app || currentMainCategory);
+        const res = await fetch(`${REPORT_ENDPOINT}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                pluginName: currentModalItem.name,
+                app: appVal,
+                type: currentModalItem.type || currentMainCategory,
+                action: actionVerb
+            })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        if (isReported) {
+            reportedItems = reportedItems.filter(k => k !== key);
+            showToast('↩️ Bildirim geri alındı.');
+        } else {
+            reportedItems.push(key);
+            showToast('🚩 Bildirildi, teşekkürler!');
+        }
+        localStorage.setItem('ph_reported', JSON.stringify(reportedItems));
+        updateReportButtonUI();
+    } catch (err) {
+        console.error('Bildirme hatası:', err);
+        showToast('İşlem gönderilemedi.', true);
+        btn.innerHTML = originalHTML;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function updateReportButtonUI() {
+    if (!currentModalItem) return;
+    const btn = document.getElementById('report-btn');
+    if (!btn) return;
+    const isReported = reportedItems.includes(pluginKey(currentModalItem));
+    if (isReported) {
+        btn.innerHTML = '↩️ Bildirimi Geri Al';
+        btn.classList.remove('bg-rose-600/10', 'text-rose-400', 'border-rose-500/20');
+        btn.classList.add('bg-slate-700/40', 'text-slate-300', 'border-slate-500/20');
+    } else {
+        btn.innerHTML = '🚩 Bildir';
+        btn.classList.remove('bg-slate-700/40', 'text-slate-300', 'border-slate-500/20');
+        btn.classList.add('bg-rose-600/10', 'text-rose-400', 'border-rose-500/20');
+    }
+}
+
+async function fetchPublicNotes(key) {
+    try {
+        const res = await fetch(`${NOTES_ENDPOINT}?movie=${encodeURIComponent(key)}`);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        publicNotesCache[key] = data.notes || [];
+        renderPublicNotesList(publicNotesCache[key]);
+    } catch {
+        document.getElementById('public-notes-list').innerHTML = `<div class="text-xs text-rose-400">Bulut notlarına erişilemiyor.</div>`;
+    }
+}
+async function submitPublicNote() {
+    if (!currentModalItem) return;
+    const input = document.getElementById('public-note-input');
+    const text = input.value.trim();
+    if (!text) { showToast('Boş not gönderemezsin', true); return; }
+    
+    const btn = document.getElementById('submit-public-note-btn');
+    btn.disabled = true; btn.textContent = '...';
+    
+    try {
+        const key = pluginKey(currentModalItem);
+        const res = await fetch(NOTES_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ movie: key, text, ownerId: getOwnerId() })
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        publicNotesCache[key] = data.notes || [];
+        renderPublicNotesList(publicNotesCache[key]);
+        input.value = ''; document.getElementById('public-char-count').textContent = '0/300';
+        showToast('💬 Notun paylaşıldı!');
+    } catch (err) {
+        showToast('Not gönderilemedi.', true);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Notu Paylaş';
+    }
+}
+async function deletePublicNote(id) {
+    if(!confirm('Bu notu silmek istediğine emin misin?')) return;
+    try {
+        const key = pluginKey(currentModalItem);
+        const res = await fetch(NOTES_ENDPOINT, {
+            method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ movie: key, id, ownerId: getOwnerId() })
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        publicNotesCache[key] = data.notes || [];
+        renderPublicNotesList(publicNotesCache[key]);
+        showToast('🗑️ Not silindi');
+    } catch { showToast('Silinemedi.', true); }
+}
+
+function renderPublicNotesList(notes) {
+    const el = document.getElementById('public-notes-list');
+    document.getElementById('modal-public-note-count').textContent = notes.length ? `(${notes.length})` : '';
+    const myId = getOwnerId();
+
+    if (!notes.length) {
+        el.innerHTML = `<div class="text-xs text-slate-500">Henüz not yok. İlk notu sen bırak!</div>`;
+        return;
+    }
+
+    el.innerHTML = notes.slice().reverse().map(n => {
+        const mine = n.ownerId === myId;
+        return `
+            <div class="note-item ${mine ? 'mine' : ''}">
+                <div class="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(n.text)}</div>
+                <div class="flex justify-between items-center mt-2">
+                    <div class="text-[10px] text-slate-500">${new Date(n.ts).toLocaleString('tr-TR')}</div>
+                    ${mine ? `<button onclick="deletePublicNote('${n.id}')" class="text-[10px] font-bold text-rose-400 hover:text-rose-300">Sil</button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+document.getElementById('public-note-input').addEventListener('input', function() {
+    document.getElementById('public-char-count').textContent = `${this.value.length}/300`;
+});
+
+function openFilterModal() {
+    document.getElementById('filter-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('filter-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeFilterModal() {
+    document.getElementById('filter-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('filter-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeFilterModalOnBackdrop(e) { if (e.target.id === 'filter-modal-overlay') closeFilterModal(); }
+function applyFilters() {
+    localStorage.setItem('ph_debrid_filter', activeDebridFilter);
+    localStorage.setItem('ph_platform_filter', activePlatformFilter);
+    localStorage.setItem('ph_genre_filter', activeGenreFilter);
+    localStorage.setItem('ph_sort', activeSort);
+    closeFilterModal();
+    filterData();
+}
+function resetFilters() {
+    activeDebridFilter = 'all';
+    activePlatformFilter = 'all';
+    activeGenreFilter = 'all';
+    activeSort = 'default';
+    buildFilterOptions();
+    document.getElementById('sortSelect').value = 'default';
+    filterData();
+}
+
+function toggleSearchModal() {
+    const m = document.getElementById('search-modal');
+    if (m.classList.contains('opacity-0')) {
+        m.classList.remove('opacity-0','pointer-events-none');
+        lockBodyScroll();
+        const currentVal = document.getElementById('searchInput').value;
+        document.getElementById('expandedSearchInput').value = currentVal;
+        if (!globalFuseIndex) {
+            document.getElementById('expandedSearchResults').innerHTML = `<div class="text-center text-slate-500 text-sm py-10">Tüm kategoriler taranıyor...</div>`;
+        }
+        ensureAllCategoriesLoaded().then(() => renderExpandedSearchResults(document.getElementById('expandedSearchInput').value));
+        setTimeout(()=>document.getElementById('expandedSearchInput').focus(),100);
+    } else {
+        m.classList.add('opacity-0','pointer-events-none');
+        unlockBodyScroll();
+    }
+}
+function handleExpandedSearch(v) {
+    debouncedExpandedSearch(v);
+}
+function openMenuModal() {
+    document.getElementById('menu-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('menu-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeMenuModal(e) {
+    if(e && e.target!==document.getElementById('menu-modal-overlay')) return;
+    document.getElementById('menu-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('menu-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+
+function openAboutModal() {
+    document.getElementById('about-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('about-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeAboutModal() {
+    document.getElementById('about-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('about-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeAboutModalOnBackdrop(e) { if (e.target.id === 'about-modal-overlay') closeAboutModal(); }
+
+function openFeedbackModal() {
+    document.getElementById('feedback-textarea').value = '';
+    document.getElementById('feedback-char-count').textContent = '0/500';
+    document.getElementById('feedback-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('feedback-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closeFeedbackModal() {
+    document.getElementById('feedback-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('feedback-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeFeedbackModalOnBackdrop(e) { if (e.target.id === 'feedback-modal-overlay') closeFeedbackModal(); }
+
+document.getElementById('feedback-textarea')?.addEventListener('input', function() {
+    document.getElementById('feedback-char-count').textContent = `${this.value.length}/500`;
+});
+
+async function submitFeedback() {
+    const text = document.getElementById('feedback-textarea').value.trim();
+    if (!text) { showToast('Lütfen bir mesaj yazın.', true); return; }
+    const btn = document.getElementById('feedback-submit-btn');
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                pluginName: 'Genel Geri Bildirim',
+                app: currentMainCategory,
+                type: 'feedback',
+                action: 'report',
+                message: text
+            })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast('💬 Gönderildi, teşekkürler!');
+        closeFeedbackModal();
+    } catch (err) {
+        console.error('Geri bildirim hatası:', err);
+        showToast('Gönderilemedi, tekrar deneyin.', true);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Gönder';
+    }
+}
+
+function confirmClearData() {
+    if (!confirm('Favori, not, puan ve senkron kodunuz bu cihazdan silinecek. Emin misiniz?')) return;
+    ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_genre_filter','ph_sort'].forEach(k => localStorage.removeItem(k));
+    showToast('🗑️ Veriler temizlendi.');
+    setTimeout(() => location.reload(), 800);
+}
+
+function exportFavorites() {
+    if (!favorites.length) { showToast('Favorin yok.', true); return; }
+    const lines = favorites.map(k => k.split('|').slice(1).join('|')).join('\n');
+    copyToClipboard(lines, 'Favorin yok.');
+}
+
+// --- SENKRONİZASYON ---
+function generateSyncCode() {
+    return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+function openSyncModal() {
+    const savedCode = localStorage.getItem('ph_sync_code') || '';
+    document.getElementById('sync-code-input').value = savedCode;
+    document.getElementById('sync-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+}
+function closeSyncModal() {
+    document.getElementById('sync-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    unlockBodyScroll();
+}
+function closeSyncModalOnBackdrop(e) { if (e.target.id === 'sync-modal-overlay') closeSyncModal(); }
+
+async function syncPush() {
+    let code = document.getElementById('sync-code-input').value.trim().toUpperCase();
+    if (!code) {
+        code = generateSyncCode();
+        document.getElementById('sync-code-input').value = code;
+    }
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/sync`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, data: { favorites, ratings: userRatings, notes: userNotes } })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        localStorage.setItem('ph_sync_code', code);
+        showToast(`⬆️ Kaydedildi! Kodun: ${code}`);
+    } catch (err) {
+        console.error('Sync push hatası:', err);
+        showToast('Senkronizasyon başarısız.', true);
+    }
+}
+
+async function syncPull() {
+    const code = document.getElementById('sync-code-input').value.trim().toUpperCase();
+    if (!code) { showToast('Lütfen bir kod girin.', true); return; }
+    try {
+        const res = await fetch(`${REPORT_ENDPOINT}/sync?code=${encodeURIComponent(code)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data || !data.data) throw new Error('Boş veri');
+
+        favorites = data.data.favorites || [];
+        userRatings = data.data.ratings || {};
+        userNotes = data.data.notes || {};
+        localStorage.setItem('ph_favs', JSON.stringify(favorites));
+        localStorage.setItem('ph_ratings', JSON.stringify(userRatings));
+        localStorage.setItem('ph_notes', JSON.stringify(userNotes));
+        localStorage.setItem('ph_sync_code', code);
+
+        filterData();
+        showToast('⬇️ Veriler getirildi!');
+        closeSyncModal();
+    } catch (err) {
+        console.error('Sync pull hatası:', err);
+        showToast('Kod bulunamadı veya hata oluştu.', true);
+    }
+}
+
+function closeMovieModal(e) { 
+    if (!e || e.target.id === 'movie-modal-overlay') {
+        document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); 
+        
+        const trailerEl = document.getElementById('movie-trailer');
+        if(trailerEl) trailerEl.src = '';
+    }
+}
+
+function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function setDiceLoadingText(text) {
+    const p = document.getElementById('dice-loading-text');
+    if (p) p.textContent = text;
+}
+
+function setLoadingIcon(isDice) {
+    const icon = document.getElementById('dice-loading-icon');
+    if (!icon) return;
+    icon.textContent = isDice ? '🎲' : '🎬';
+    icon.classList.toggle('rolling-dice', isDice);
+}
+
+// YENİ: Zar butonuna kısa tıklama eskisi gibi rastgele film önerir;
+// basılı tutunca (500ms) tür menüsü açılır.
+function openGenreMenu() {
+    const chipsEl = document.getElementById('genre-menu-chips');
+    chipsEl.innerHTML = Object.entries(tmdbGenres).map(([id, name]) =>
+        `<button class="filter-chip" onclick="rollWithGenre(${id})">${escapeHtml(name)}</button>`
+    ).join('');
+    document.getElementById('genre-menu-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll();
+    setTimeout(() => document.getElementById('genre-menu-box').classList.remove('translate-y-full'), 10);
+}
+function closeGenreMenu() {
+    document.getElementById('genre-menu-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('genre-menu-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closeGenreMenuOnBackdrop(e) { if (e.target.id === 'genre-menu-overlay') closeGenreMenu(); }
+function rollWithGenre(genreId) {
+    closeGenreMenu();
+    suggestRandomMovie(genreId);
+}
+
+function setupDiceButton() {
+    const btn = document.getElementById('dock-dice');
+    if (!btn) return;
+    let pressTimer = null;
+    let longPressed = false;
+
+    const start = () => {
+        longPressed = false;
+        pressTimer = setTimeout(() => { longPressed = true; openGenreMenu(); }, 500);
+    };
+    const cancel = () => clearTimeout(pressTimer);
+
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', cancel);
+    btn.addEventListener('pointerleave', cancel);
+    btn.addEventListener('click', () => {
+        if (longPressed) { longPressed = false; return; }
+        suggestRandomMovie();
+    });
+}
+
+// === ZAR → KATALOG KÖPRÜSÜ ===
+// Zar sonucu gelen filmi, sitenin GERÇEK film kataloğunda (atmos/imax) arar.
+// Eklenti/APK listeleri (plugins/tvapk/mobilapk/sporapk) film verisi taşımadığı
+// için ensureMovieCatalogLoaded() sadece atmos+imax'ı yükler.
+async function findCatalogMatch(title, year) {
+    await ensureMovieCatalogLoaded();
+    if (!movieCatalogFuseIndex) return null;
+    const results = movieCatalogFuseIndex.search(title);
+    if (!results.length) return null;
+    const withYear = results.find(r => r.item.year && String(r.item.year) === String(year));
+    return (withYear || results[0]).item;
+}
+
+function catalogLabelFor(cat) {
+    const labels = { eklentiler: 'Eklenti', tvapk: 'TV APK', mobilapk: 'Telefon', sporapk: 'Spor', atmos: 'Dolby Atmos', imax: 'IMAX' };
+    return labels[cat] || cat;
+}
+
+// YENİ: Nuvio uygulamasının resmi nuvio://meta deep link şeması
+function buildNuvioDeepLink(imdbId, tmdbId) {
+    const params = new URLSearchParams();
+    params.set('type', 'movie');
+    if (imdbId) params.set('id', imdbId);
+    else params.set('tmdb', String(tmdbId));
+    return `nuvio://meta?${params.toString()}`;
+}
+// Eşleşme bulunamadığında worker üzerinden IMDb ID + TR izleme sağlayıcılarını çeker
+async function fetchExternalOptions(tmdbId) {
+    let imdbId = null, providers = null;
+    try {
+        const idRes = await fetch(`${REPORT_ENDPOINT}/tmdb-external-ids?id=${tmdbId}`);
+        if (idRes.ok) imdbId = (await idRes.json()).imdb_id;
+    } catch (e) { console.warn('IMDb ID alınamadı:', e); }
+    try {
+        const provRes = await fetch(`${REPORT_ENDPOINT}/tmdb-watch-providers?id=${tmdbId}`);
+        if (provRes.ok) providers = (await provRes.json()).providers;
+    } catch (e) { console.warn('Sağlayıcı bilgisi alınamadı:', e); }
+    return { imdbId, providers };
+}
+
+async function updateCatalogBridge(title, year, tmdbId) {
+    const box = document.getElementById('movie-catalog-bridge');
+    if (!box) return;
+
+    box.innerHTML = `<div class="text-xs text-slate-500 italic flex items-center gap-2"><span class="animate-pulse">🔎</span> İzleme seçenekleri kontrol ediliyor...</div>`;
+
+    const { imdbId, providers } = await fetchExternalOptions(tmdbId);
+    if (currentBridgeToken !== bridgeToken) return;
+
+    const flatrate = providers?.flatrate || [];
+    const watchLink = providers?.link || null;
+    const providerBadges = flatrate.slice(0, 4).map(p => `
+        <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" alt="${escapeHtml(p.provider_name)}" title="${escapeHtml(p.provider_name)}" class="w-7 h-7 rounded-md">
+    `).join('');
+
+    box.innerHTML = `
+        <div class="bg-[#1a173d] border border-white/10 rounded-xl p-4">
+            ${flatrate.length && watchLink ? `
+                <a href="${watchLink}" target="_blank" rel="noopener" class="flex items-center gap-2 mb-3 hover:opacity-80 transition">
+                    ${providerBadges}
+                    <span class="text-[10px] text-slate-400 ml-1 underline">Türkiye'de nerede izlerim? →</span>
+                </a>
+            ` : ''}
+            <div class="grid grid-cols-2 gap-2">
+                ${imdbId ? `<a href="https://web.stremio.com/#/detail/movie/${imdbId}/${imdbId}" target="_blank" rel="noopener" class="flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition"><img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg" alt="" class="w-4 h-4">Stremio</a>` : `<div class="text-[10px] text-slate-500 italic flex items-center justify-center">Stremio yok</div>`}
+                <a href="${buildNuvioDeepLink(imdbId, tmdbId)}" class="flex items-center justify-center gap-1.5 bg-[#6156e2] hover:bg-[#4f45c9] text-white font-bold text-xs py-2.5 rounded-lg transition"><img src="https://img.alternativeto.net/icons/140/jpeg/nuvio_275705.png" alt="" class="w-4 h-4 rounded object-cover">Nuvio</a>
+            </div>
+        </div>
+    `;
+}
+    function openCatalogMatch(key, cat) {
+    closeMovieModal();
+    const source = cachedData[cat] || [];
+    const item = source.find(p => pluginKey(p) === key);
+    if (item) openModalItem(item, cat);
+}
+
+// Ard arda zar atıldığında önceki bridge isteğinin sonucu ekrana yazılmasın diye basit bir token mekanizması
+let bridgeToken = 0;
+let currentBridgeToken = 0;
+
+// GÜNCELLENDİ: genreId parametresi eklendi (türe göre zar atma). Verilirse
+// TMDB discover ile o türden film çekilir, verilmezse eskisi gibi popüler filmlerden çekilir.
+async function suggestRandomMovie(genreId) {
+    currentDiceGenre = genreId || null;
+
+    document.getElementById('movie-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    
+    const trailerEl = document.getElementById('movie-trailer');
+    const posterEl = document.getElementById('movie-poster');
+    if(trailerEl) { trailerEl.src = ''; trailerEl.classList.add('hidden'); }
+    if(posterEl) posterEl.classList.remove('hidden');
+
+    const bridgeBox = document.getElementById('movie-catalog-bridge');
+    if (bridgeBox) bridgeBox.innerHTML = '';
+
+    const loadingOverlay = document.getElementById('dice-loading-overlay');
+    setLoadingIcon(true);
+    setDiceLoadingText(genreId ? `${tmdbGenres[genreId] || ''} türünde bir film seçiliyor...` : 'Sizin için harika bir film seçiliyor...');
+    loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+    
+    const randomPage = Math.floor(Math.random() * 20) + 1;
+    
+    try {
+        let [data] = await Promise.all([ fetchPopularMovies(randomPage, genreId), wait(900) ]);
+        let movies = data.results || [];
+        if (movies.length === 0 && randomPage !== 1) {
+            data = await fetchPopularMovies(1, genreId);
+            movies = data.results || [];
+        }
+        if (movies.length === 0) throw new Error('Film listesi boş');
+        
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+        
+        let youtubeKey = null;
+        try {
+            const vidRes = await fetch(`${REPORT_ENDPOINT}/tmdb-video?id=${randomMovie.id}`);
+            if (vidRes.ok) {
+                const vidData = await vidRes.json();
+                const trailer = vidData.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+                if (trailer) youtubeKey = trailer.key;
+            }
+        } catch(e) { console.warn("Fragman çekilemedi, postere dönülüyor...", e); }
+
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        document.getElementById('movie-title').textContent = randomMovie.title;
+        const movieYear = randomMovie.release_date ? randomMovie.release_date.split('-')[0] : null;
+        document.getElementById('movie-year').textContent = movieYear || 'Belirsiz';
+        document.getElementById('movie-imdb').textContent = randomMovie.vote_average ? randomMovie.vote_average.toFixed(1) : '?';
+        document.getElementById('movie-plot').textContent = randomMovie.overview || "Türkçe özet bulunmuyor.";
+
+        if (youtubeKey && trailerEl) {
+            posterEl.classList.add('hidden');
+            trailerEl.src = `https://www.youtube.com/embed/${youtubeKey}?autoplay=1&mute=1&controls=1&loop=1&playlist=${youtubeKey}&modestbranding=1`;
+            trailerEl.classList.remove('hidden');
+        } else {
+            const FALLBACK_POSTER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750"><rect width="500" height="750" fill="%23151333"/><text x="50%" y="50%" fill="%238c89b4" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Poster Yok</text></svg>`);
+            posterEl.onerror = () => { posterEl.onerror = null; posterEl.src = FALLBACK_POSTER; };
+            posterEl.src = randomMovie.poster_path ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` : FALLBACK_POSTER;
+        }
+        
+        const movieGenres = (randomMovie.genre_ids || []).map(id => tmdbGenres[id]).filter(Boolean).join(', ');
+        const genreEl = document.getElementById('movie-genre');
+        
+        if (movieGenres) {
+            genreEl.textContent = movieGenres;
+            genreEl.classList.remove('hidden');
+        } else {
+            genreEl.classList.add('hidden');
+        }
+        document.getElementById('movie-modal-suggest-btn').classList.remove('hidden');
+        document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+
+        // Katalog köprüsü: bu zar atışına ait token, sonraki bir zar atışı gelirse eski sonuç basılmasın
+        bridgeToken++;
+        currentBridgeToken = bridgeToken;
+        updateCatalogBridge(randomMovie.title, movieYear, randomMovie.id);
+    } catch (err) {
+        console.error("Zar Hatası: ", err);
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        showToast("Film önerisi alınamadı.", true);
+    }
+}
+
+async function playTrailerForItem(item) {
+    const trailerEl = document.getElementById('movie-trailer');
+    const posterEl = document.getElementById('movie-poster');
+    if (trailerEl) { trailerEl.src = ''; trailerEl.classList.add('hidden'); }
+    if (posterEl) posterEl.classList.remove('hidden');
+
+    const bridgeBox = document.getElementById('movie-catalog-bridge');
+    if (bridgeBox) bridgeBox.innerHTML = '';
+
+    const loadingOverlay = document.getElementById('dice-loading-overlay');
+    setLoadingIcon(false);
+    setDiceLoadingText(`"${item.name}" için fragman aranıyor...`);
+    loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+
+    try {
+        const searchRes = await fetch(`${REPORT_ENDPOINT}/tmdb-search?query=${encodeURIComponent(item.name)}&year=${item.year || ''}`);
+        if (!searchRes.ok) throw new Error(`HTTP ${searchRes.status}`);
+        const searchData = await searchRes.json();
+        const match = (searchData.results || [])[0];
+        if (!match) throw new Error('Eşleşme bulunamadı');
+
+        let youtubeKey = null;
+        try {
+            const vidRes = await fetch(`${REPORT_ENDPOINT}/tmdb-video?id=${match.id}`);
+            if (vidRes.ok) {
+                const vidData = await vidRes.json();
+                const trailer = (vidData.results || []).find(v => v.site === 'YouTube' && v.type === 'Trailer');
+                if (trailer) youtubeKey = trailer.key;
+            }
+        } catch (e) { console.warn('Fragman video isteği başarısız:', e); }
+
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        document.getElementById('movie-title').textContent = item.name;
+        document.getElementById('movie-year').textContent = item.year || 'Belirsiz';
+        document.getElementById('movie-imdb').textContent = match.vote_average ? match.vote_average.toFixed(1) : '?';
+        document.getElementById('movie-plot').textContent = match.overview || 'Türkçe özet bulunmuyor.';
+
+        const genreEl = document.getElementById('movie-genre');
+        if (item.genre) { genreEl.textContent = item.genre; genreEl.classList.remove('hidden'); } else { genreEl.classList.add('hidden'); }
+
+        if (youtubeKey && trailerEl) {
+            posterEl.classList.add('hidden');
+            trailerEl.src = `https://www.youtube.com/embed/${youtubeKey}?autoplay=1&mute=1&controls=1&loop=1&playlist=${youtubeKey}&modestbranding=1`;
+            trailerEl.classList.remove('hidden');
+        } else {
+            const FALLBACK_POSTER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750"><rect width="500" height="750" fill="%23151333"/><text x="50%" y="50%" fill="%238c89b4" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Fragman Yok</text></svg>`);
+            posterEl.onerror = () => { posterEl.onerror = null; posterEl.src = FALLBACK_POSTER; };
+            posterEl.src = match.poster_path ? `https://image.tmdb.org/t/p/w500${match.poster_path}` : FALLBACK_POSTER;
+            if (!youtubeKey) showToast('Bu film için fragman bulunamadı.', true);
+        }
+
+        document.getElementById('movie-modal-suggest-btn').classList.add('hidden');
+        document.getElementById('movie-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    } catch (err) {
+        console.error('Fragman arama hatası:', err);
+        loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+        showToast('Fragman bulunamadı.', true);
+    }
+}
+
+// GÜNCELLENDİ: genreId parametresi worker'a iletiliyor (türe göre zar atma)
+async function fetchPopularMovies(page, genreId) {
+    const genreParam = genreId ? `&genre=${genreId}` : '';
+    const res = await fetch(`${REPORT_ENDPOINT}/tmdb?page=${page}${genreParam}`);
+    if (!res.ok) throw new Error(`Worker HTTP ${res.status}`); 
+    return res.json();
+}
+</script>
+<!-- KARŞILAŞTIRMA ÇUBUĞU -->
+<div id="compare-bar" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-5 py-3 rounded-full shadow-2xl shadow-indigo-600/40 z-[1500] hidden items-center gap-3 cursor-pointer" onclick="openCompareModal()">
+    <span>Karşılaştır (<span id="compare-count">0</span>)</span>
+    <button onclick="event.stopPropagation(); clearCompare()" class="text-white/70 hover:text-white text-sm">✕</button>
+</div>
+
+<!-- KARŞILAŞTIRMA MODALI -->
+<div id="compare-modal-overlay" onclick="closeCompareModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[95%] max-w-4xl max-h-[85vh] overflow-y-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-white">Karşılaştırma</h3>
+            <button onclick="closeCompareModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <div id="compare-table-wrapper" class="overflow-x-auto"></div>
+    </div>
+</div>
+</body>
+</html>
