@@ -1817,6 +1817,28 @@ function buildNuvioDeepLink(imdbId, tmdbId) {
 
     return `nuvio://meta?${params.toString()}`;
 }
+async function fetchExternalOptions(tmdbId) {
+    let imdbId = null;
+    let providers = null;
+
+    try {
+        const idRes = await fetch(`${REPORT_ENDPOINT}/tmdb-external-ids?id=${tmdbId}`);
+        if (idRes.ok) {
+            const idData = await idRes.json();
+            imdbId = idData.imdb_id || null;
+        }
+    } catch (e) { console.warn('IMDb id alınamadı:', e); }
+
+    try {
+        const provRes = await fetch(`${REPORT_ENDPOINT}/tmdb-watch-providers?id=${tmdbId}`);
+        if (provRes.ok) {
+            const provData = await provRes.json();
+            providers = provData.providers || null;
+        }
+    } catch (e) { console.warn('İzleme seçenekleri alınamadı:', e); }
+
+    return { imdbId, providers };
+}
 
 async function updateCatalogBridge(title, year, tmdbId) {
     const box = document.getElementById('movie-catalog-bridge');
