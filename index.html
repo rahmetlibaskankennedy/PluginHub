@@ -1799,25 +1799,23 @@ function catalogLabelFor(cat) {
 }
 
 // YENİ: Nuvio uygulamasının resmi nuvio://meta deep link şeması
+// GÜNCELLENDİ: Android'de nuvio:// şeması Chrome tarafından güvenilir şekilde
+// açılmıyor (iOS Safari'nin aksine). Android'de resmi çözüm olan intent://
+// formatını kullanıyoruz — paket bulunamazsa Play Store'a yönlendirir.
 function buildNuvioDeepLink(imdbId, tmdbId) {
     const params = new URLSearchParams();
     params.set('type', 'movie');
     if (imdbId) params.set('id', imdbId);
     else params.set('tmdb', String(tmdbId));
+
+    const isAndroid = /android/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+        const fallback = encodeURIComponent('https://play.google.com/store/apps/details?id=com.nuvio.app');
+        return `intent://meta?${params.toString()}#Intent;scheme=nuvio;package=com.nuvio.app;S.browser_fallback_url=${fallback};end`;
+    }
+
     return `nuvio://meta?${params.toString()}`;
-}
-// Eşleşme bulunamadığında worker üzerinden IMDb ID + TR izleme sağlayıcılarını çeker
-async function fetchExternalOptions(tmdbId) {
-    let imdbId = null, providers = null;
-    try {
-        const idRes = await fetch(`${REPORT_ENDPOINT}/tmdb-external-ids?id=${tmdbId}`);
-        if (idRes.ok) imdbId = (await idRes.json()).imdb_id;
-    } catch (e) { console.warn('IMDb ID alınamadı:', e); }
-    try {
-        const provRes = await fetch(`${REPORT_ENDPOINT}/tmdb-watch-providers?id=${tmdbId}`);
-        if (provRes.ok) providers = (await provRes.json()).providers;
-    } catch (e) { console.warn('Sağlayıcı bilgisi alınamadı:', e); }
-    return { imdbId, providers };
 }
 
 async function updateCatalogBridge(title, year, tmdbId) {
