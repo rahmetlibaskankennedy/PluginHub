@@ -46,22 +46,42 @@
         <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor</button>
     </div>
 
-    <!-- HERO FEATURED MEDIA -->
-    <div class="hero-media-box p-6 md:p-8 mb-8 transition-all" id="heroSection">
+    <!-- STATS HERO (tüm kategorilerde görünür) -->
+    <div class="hero-media-box p-6 md:p-8 mb-6 transition-all" id="heroSection">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="max-w-xl w-full">
-                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block">Günün Öne Çıkanı</span>
-                <h1 class="text-2xl md:text-4xl font-black text-white mb-2 break-words" id="heroTitle">Yükleniyor...</h1>
-                <p class="text-xs md:text-sm text-slate-400 leading-relaxed mb-6 break-all" id="heroDesc">Öne çıkan eklenti bilgileri yükleniyor...</p>
-                <div class="flex flex-wrap gap-3">
-                    <button id="hero-install-btn" class="min-h-[44px] bg-pink-600 hover:bg-pink-500 active:bg-pink-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg shadow-pink-600/30 transition flex items-center gap-2">
-                        <span>🚀</span> Hızlı Kurulum
-                    </button>
-                    <button id="hero-copy-btn" class="min-h-[44px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs px-5 py-3 rounded-xl hover:bg-slate-700 active:bg-slate-700 transition">📋 Manifest Kopyala</button>
+            <div class="max-w-xl w-full text-center md:text-left">
+                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block" id="heroEyebrow">🧩 Eklenti Ekosistemi</span>
+                <h1 class="text-2xl md:text-4xl font-black text-white mb-2 break-words">Tüm <span class="bg-gradient-to-r from-pink-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">İçerikler</span> Tek Yerde</h1>
+                <p class="text-xs md:text-sm text-slate-400 leading-relaxed" id="heroDesc">Öne çıkan bilgiler yükleniyor...</p>
+            </div>
+            <div class="flex gap-6 md:gap-10 justify-center shrink-0">
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-black text-white" id="statTotal">—</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" id="statTotalLabel">İçerik</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-black text-white" id="statNew">—</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Bu Hafta Yeni</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-black text-white" id="statExtra">—</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" id="statExtraLabel">Uygulama</div>
                 </div>
             </div>
         </div>
     </div>
+
+   <!-- GÜNÜN ÖNE ÇIKANI -->
+<div class="hidden flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#151333] border border-pink-500/20 rounded-2xl px-4 sm:px-5 py-3.5 mb-6" id="featuredStrip">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <span class="text-[9px] font-black uppercase tracking-widest text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-full shrink-0">🔥 Günün Öne Çıkanı</span>
+        <span class="text-sm font-bold text-white truncate min-w-0" id="featuredTitle">Yükleniyor...</span>
+    </div>
+    <div class="flex gap-2 shrink-0">
+        <button id="hero-copy-btn" class="flex-1 sm:flex-none min-h-[36px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[11px] px-4 py-2 rounded-lg hover:bg-slate-700 transition">📋 Kopyala</button>
+        <button id="hero-install-btn" class="flex-1 sm:flex-none min-h-[36px] bg-pink-600 hover:bg-pink-500 text-white font-bold text-[11px] px-4 py-2 rounded-lg shadow-lg shadow-pink-600/30 transition">🚀 Hızlı Kurulum</button>
+    </div>
+</div>
 
     <!-- ALT KATEGORİ SEKMELERİ -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
@@ -639,7 +659,8 @@ async function switchMainCategory(key, btnEl) {
 
     const isMovie = (key === 'atmos' || key === 'imax');
     document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
-    document.getElementById('heroSection').style.display = (key === 'eklentiler') ? 'block' : 'none';
+    document.getElementById('featuredStrip').classList.toggle('hidden', key !== 'eklentiler');
+    document.getElementById('featuredStrip').classList.toggle('flex', key === 'eklentiler');
 
     await loadCategoryData(key);
 }
@@ -652,7 +673,7 @@ async function loadCategoryData(key) {
     }
     renderSkeletons();
     try {
-        const res = await fetch(DATA_SOURCES[key], { cache: 'no-store' });
+        const res = await fetch(DATA_SOURCES[key]);
         if (!res.ok) throw new Error(`HTTP ${res.status} - Dosya bulunamadı`);
         const data = await res.json();
         data.forEach(it => it._cat = key);
@@ -728,8 +749,58 @@ function postLoadSetup() {
     });
     buildTabs();
     buildFilterOptions();
+    updateStatsBar(currentMainCategory);
     filterData();
     if(currentMainCategory === 'eklentiler') updateDailyFeatured();
+}
+
+// YENİ: Üstteki hero'yu artık her kategoride görünen istatistik şeridi olarak günceller
+function updateStatsBar(key) {
+    document.getElementById('statTotal').textContent = plugins.length;
+
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const newCount = plugins.filter(p => {
+        if (!p.dateAdded) return false;
+        const d = new Date(p.dateAdded + 'T00:00:00');
+        return !isNaN(d.getTime()) && d >= weekAgo;
+    }).length;
+    document.getElementById('statNew').textContent = newCount;
+
+    const eyebrowMap = {
+        eklentiler: '🧩 Eklenti ve Uygulama Ekosistemi',
+        tvapk: '📺 TV Uygulamaları',
+        mobilapk: '📱 Telefon Uygulamaları',
+        sporapk: '⚽ Spor Uygulamaları',
+        atmos: '🎬 Dolby Atmos Filmler',
+        imax: '🎞️ IMAX Filmler'
+    };
+    document.getElementById('heroEyebrow').textContent = eyebrowMap[key] || eyebrowMap.eklentiler;
+
+    const descMap = {
+    eklentiler: "Stremio, Nuvio ve CloudStream vb. için eklenti ve repolar; TV ve mobil cihazlar için popüler uygulamalar StreamRehber'de.",
+    tvapk: 'Android TV, webOS ve Tizen için TV uygulamaları.',
+    mobilapk: 'Telefon ve tabletler için uygulamalar.',
+    sporapk: 'Canlı spor yayınları için uygulamalar.',
+    atmos: 'Dolby Atmos ses desteğine sahip film kataloğu.',
+    imax: 'IMAX Enhanced formatında film kataloğu.'
+    };
+    document.getElementById('heroDesc').textContent = descMap[key] || '';
+
+    const isMovie = (key === 'atmos' || key === 'imax');
+    document.getElementById('statTotalLabel').textContent = isMovie ? 'Film' : 'İçerik';
+
+    if (isMovie) {
+        const allPlats = new Set();
+        plugins.forEach(p => { if (Array.isArray(p.platform)) p.platform.forEach(x => allPlats.add(x)); });
+        document.getElementById('statExtra').textContent = allPlats.size;
+        document.getElementById('statExtraLabel').textContent = 'Platform';
+    } else {
+        const allApps = new Set();
+        plugins.forEach(p => { const arr = Array.isArray(p.app) ? p.app : [p.app]; arr.forEach(a => a && allApps.add(a)); });
+        document.getElementById('statExtra').textContent = allApps.size;
+        document.getElementById('statExtraLabel').textContent = 'Uygulama';
+    }
 }
 
 function updateDailyFeatured() {
@@ -737,8 +808,7 @@ function updateDailyFeatured() {
     const seed = new Date().toISOString().slice(0, 10).split('-').reduce((a, b) => a + parseInt(b), 0);
     const item = plugins[seed % plugins.length];
 
-    document.getElementById('heroTitle').textContent = item.name;
-    document.getElementById('heroDesc').textContent = item.desc || '';
+    document.getElementById('featuredTitle').textContent = item.name;
 
     const url = extractUrl(item.desc);
     document.getElementById('hero-install-btn').onclick = () => {
