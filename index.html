@@ -71,18 +71,6 @@
         </div>
     </div>
 
-   <!-- GÜNÜN ÖNE ÇIKANI -->
-<div class="hidden flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-[#151333] border border-pink-500/20 rounded-2xl px-4 sm:px-5 py-3.5 mb-6" id="featuredStrip">
-    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-        <span class="text-[9px] font-black uppercase tracking-widest text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-full shrink-0">🔥 Günün Öne Çıkanı</span>
-        <span class="text-sm font-bold text-white truncate min-w-0" id="featuredTitle">Yükleniyor...</span>
-    </div>
-    <div class="flex gap-2 shrink-0">
-        <button id="hero-copy-btn" class="flex-1 sm:flex-none min-h-[36px] bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[11px] px-4 py-2 rounded-lg hover:bg-slate-700 transition">📋 Kopyala</button>
-        <button id="hero-install-btn" class="flex-1 sm:flex-none min-h-[36px] bg-pink-600 hover:bg-pink-500 text-white font-bold text-[11px] px-4 py-2 rounded-lg shadow-lg shadow-pink-600/30 transition">🚀 Hızlı Kurulum</button>
-    </div>
-</div>
-
     <!-- ALT KATEGORİ SEKMELERİ -->
     <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
 
@@ -659,8 +647,6 @@ async function switchMainCategory(key, btnEl) {
 
     const isMovie = (key === 'atmos' || key === 'imax');
     document.getElementById('debridFilterWrapper').style.display = (key === 'eklentiler') ? 'block' : 'none';
-    document.getElementById('featuredStrip').classList.toggle('hidden', key !== 'eklentiler');
-    document.getElementById('featuredStrip').classList.toggle('flex', key === 'eklentiler');
 
     await loadCategoryData(key);
 }
@@ -751,7 +737,6 @@ function postLoadSetup() {
     buildFilterOptions();
     updateStatsBar(currentMainCategory);
     filterData();
-    if(currentMainCategory === 'eklentiler') updateDailyFeatured();
 }
 
 // YENİ: Üstteki hero'yu artık her kategoride görünen istatistik şeridi olarak günceller
@@ -801,23 +786,6 @@ function updateStatsBar(key) {
         document.getElementById('statExtra').textContent = allApps.size;
         document.getElementById('statExtraLabel').textContent = 'Uygulama';
     }
-}
-
-function updateDailyFeatured() {
-    if (!plugins.length) return;
-    const seed = new Date().toISOString().slice(0, 10).split('-').reduce((a, b) => a + parseInt(b), 0);
-    const item = plugins[seed % plugins.length];
-
-    document.getElementById('featuredTitle').textContent = item.name;
-
-    const url = extractUrl(item.desc);
-    document.getElementById('hero-install-btn').onclick = () => {
-        if (item.code) copyToClipboard(item.code);
-        else if (url) window.open(url, '_blank');
-    };
-    document.getElementById('hero-copy-btn').onclick = () => {
-        copyToClipboard(item.code || url);
-    };
 }
 
 function moveIndicator(activeEl) {
