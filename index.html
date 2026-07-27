@@ -652,7 +652,7 @@ async function loadCategoryData(key) {
     }
     renderSkeletons();
     try {
-        const res = await fetch(DATA_SOURCES[key]);
+        const res = await fetch(DATA_SOURCES[key], { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status} - Dosya bulunamadı`);
         const data = await res.json();
         data.forEach(it => it._cat = key);
