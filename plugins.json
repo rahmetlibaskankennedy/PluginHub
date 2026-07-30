@@ -1341,7 +1341,7 @@
     "desc": "https://stremio.mmlive.qzz.io/manifest.json",
     "ageRestricted": true,
     "installGuide": "web",
-    "debrid": "required",
+    "debrid": "free",
     "platform": [
       "tv",
       "mobile",
