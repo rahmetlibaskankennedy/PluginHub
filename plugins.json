@@ -461,7 +461,8 @@
   },
   {
     "app": [
-      "Nuvio","Stremio"
+      "Nuvio",
+      "Stremio"
     ],
     "type": "4K",
     "name": "WatchNow",
@@ -1334,7 +1335,7 @@
     ],
     "dateAdded": "2026-07-25"
   },
-    {
+  {
     "type": "Film",
     "name": "Vietnamese Sexy Girl Stream",
     "desc": "https://stremio.mmlive.qzz.io/manifest.json",
@@ -1346,6 +1347,6 @@
       "mobile",
       "web"
     ],
-    "dateAdded": ""
+    "dateAdded": "2026-07-30"
   }
 ]
