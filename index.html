@@ -383,6 +383,17 @@
     </div>
 </div>
 
+<!-- ONAY MODALI (native confirm() yerine — Android WebView'de confirm() güvenilir çalışmıyor) -->
+<div id="confirm-modal-overlay" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[3000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-sm p-6">
+        <p id="confirm-modal-text" class="text-sm text-slate-200 mb-6 leading-relaxed"></p>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="resolveConfirmModal(false)" class="min-h-[44px] bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm rounded-xl transition">Vazgeç</button>
+            <button onclick="resolveConfirmModal(true)" class="min-h-[44px] bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm rounded-xl transition">Onayla</button>
+        </div>
+    </div>
+</div>
+
 <!-- SENKRON MODALI -->
 <div id="sync-modal-overlay" onclick="closeSyncModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div onclick="event.stopPropagation()" class="bg-[#151333] border border-white/10 rounded-2xl w-[90%] max-w-md p-6">
@@ -487,6 +498,26 @@ let viewMode = localStorage.getItem('ph_view_mode') || 'grid';
 
 let publicNotesCache = {};
 let compareList = JSON.parse(localStorage.getItem('ph_compare') || '[]');
+
+// YENİ: native confirm()'in yerini alan promise tabanlı onay modalı.
+// Android WebView'de WebChromeClient.onJsConfirm implemente edilmediyse
+// native confirm() sessizce false döner ve butonlar "çalışmıyormuş" gibi
+// görünür. Bu fonksiyon salt DOM/CSS ile çalıştığı için hem web hem APK'da
+// güvenilir şekilde çalışır.
+let _confirmResolve = null;
+function showConfirmModal(message) {
+    return new Promise(resolve => {
+        _confirmResolve = resolve;
+        document.getElementById('confirm-modal-text').textContent = message;
+        document.getElementById('confirm-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+        lockBodyScroll();
+    });
+}
+function resolveConfirmModal(result) {
+    document.getElementById('confirm-modal-overlay').classList.add('opacity-0', 'pointer-events-none');
+    unlockBodyScroll();
+    if (_confirmResolve) { _confirmResolve(result); _confirmResolve = null; }
+}
 
 function toggleCompare(key) {
     const idx = compareList.indexOf(key);
@@ -1392,7 +1423,7 @@ async function reportCurrentPlugin() {
     const confirmMsg = isReported
         ? `"${currentModalItem.name}" için bildirimi geri almak istediğine emin misin?`
         : `"${currentModalItem.name}" öğesini sorunlu olarak bildirmek istediğine emin misin?`;
-    if (!confirm(confirmMsg)) return;
+    if (!await showConfirmModal(confirmMsg)) return;
 
     const btn = document.getElementById('report-btn');
     const originalHTML = btn.innerHTML;
@@ -1486,7 +1517,7 @@ async function submitPublicNote() {
     }
 }
 async function deletePublicNote(id) {
-    if(!confirm('Bu notu silmek istediğine emin misin?')) return;
+    if(!await showConfirmModal('Bu notu silmek istediğine emin misin?')) return;
     try {
         const key = pluginKey(currentModalItem);
         const res = await fetch(NOTES_ENDPOINT, {
@@ -1639,8 +1670,8 @@ async function submitFeedback() {
     }
 }
 
-function confirmClearData() {
-    if (!confirm('Favori, not, puan ve senkron kodunuz bu cihazdan silinecek. Emin misiniz?')) return;
+async function confirmClearData() {
+    if (!await showConfirmModal('Favori, not, puan ve senkron kodunuz bu cihazdan silinecek. Emin misiniz?')) return;
     ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_genre_filter','ph_sort'].forEach(k => localStorage.removeItem(k));
     showToast('🗑️ Veriler temizlendi.');
     setTimeout(() => location.reload(), 800);
