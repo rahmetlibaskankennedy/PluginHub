@@ -1333,5 +1333,19 @@
       "web"
     ],
     "dateAdded": "2026-07-25"
+  },
+    {
+    "type": "Film",
+    "name": "Vietnamese Sexy Girl Stream",
+    "desc": "https://stremio.mmlive.qzz.io/manifest.json",
+    "ageRestricted": true,
+    "installGuide": "web",
+    "debrid": "required",
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
+    "dateAdded": ""
   }
 ]
