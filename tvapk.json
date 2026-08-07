@@ -228,6 +228,6 @@
     "desc": "Debrid hesabınızı, torrent arama motorunuzu ve Stremio eklentilerinizi tek bir uygulamada birleştiren, yerel bir oynatıcıya ve düzgün bir Android TV deneyimine sahip bir medya yöneticisi/oynatıcısıdır.",
     "sourceUrl": "https://github.com/varunsalian/debrify/releases/download/v0.7.0-beta.1/debrify-v0.7.0-beta.1.apk",
     "status": "ok",
-    "platform": ["tv"],
+    "platform": ["tv"]
   }
 ]
