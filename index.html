@@ -31,7 +31,7 @@
     </div>
     <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
         <button onclick="toggleSearchModal()" id="headerSearchBtn" aria-label="Ara" class="min-h-[40px] min-w-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition flex items-center justify-center">🔍</button>
-        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
+        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="relative min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span><span id="favUpdateBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center">0</span></button>
     </div>
 </header>
 
@@ -129,6 +129,13 @@
                     <div class="text-xs text-slate-400">Kişisel verilerini eşitle</div>
                 </div>
             </button>
+            <button onclick="closeMenuModal(); setTimeout(openPlatformModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
+                <span class="text-2xl">📱</span>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-white">Platform</div>
+                    <div class="text-xs text-slate-400" id="menuPlatformValue">Seçilmedi — dokun, seç</div>
+                </div>
+            </button>
             <button onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
                 <span class="text-2xl">📋</span>
                 <div>
@@ -171,6 +178,24 @@
         <p class="text-sm text-slate-300 leading-relaxed mb-4">StreamRehber, Stremio, Nuvio ve CloudStream için eklenti, APK ve içerik kaynaklarını tek yerde bulmanızı sağlayan bir portaldır.</p>
         <p class="text-xs text-slate-500 mb-6">Favori, not ve puanlarınız yalnızca cihazınızda saklanır. Bildirim gönderdiğinizde IP adresiniz kötüye kullanımı önlemek amacıyla geçici olarak işlenir.</p>
         <a href="https://tcl-iffalcon.github.io/wiki" target="_blank" class="block text-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm py-3 rounded-xl transition">📖 Wiki'yi Ziyaret Et</a>
+    </div>
+</div>
+
+<!-- PLATFORM SEÇİCİ MODALI -->
+<div id="platform-modal-overlay" onclick="closePlatformModalOnBackdrop(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div onclick="event.stopPropagation()" id="platform-modal-box" class="bg-[#151333] border border-white/10 rounded-t-3xl md:rounded-2xl w-full md:w-[90%] md:max-w-md p-6 pb-[calc(20px+env(safe-area-inset-bottom))] transform translate-y-full md:translate-y-0 transition-transform duration-300 shadow-2xl">
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="text-xl font-bold text-white">Hangi uygulamayı kullanıyorsun?</h3>
+            <button onclick="closePlatformModal()" class="text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">Seçimin bu cihazda saklanır; eklenti detaylarında artık sadece bu platformun kurulum adımı otomatik açılır. İstediğin an menüden değiştirebilirsin.</p>
+        <div class="flex flex-col gap-2">
+            <button onclick="choosePlatform('stremio')" data-platform="stremio" class="platform-choice-btn flex items-center gap-3 bg-[#1a173d] hover:bg-indigo-600/30 p-4 rounded-xl transition text-left border border-white/5 font-bold text-sm text-white">🟣 Stremio</button>
+            <button onclick="choosePlatform('nuvio')" data-platform="nuvio" class="platform-choice-btn flex items-center gap-3 bg-[#1a173d] hover:bg-indigo-600/30 p-4 rounded-xl transition text-left border border-white/5 font-bold text-sm text-white">🟠 Nuvio</button>
+            <button onclick="choosePlatform('wuplay')" data-platform="wuplay" class="platform-choice-btn flex items-center gap-3 bg-[#1a173d] hover:bg-indigo-600/30 p-4 rounded-xl transition text-left border border-white/5 font-bold text-sm text-white">🟡 WuPlay / Arvio</button>
+            <button onclick="choosePlatform('cloudstream')" data-platform="cloudstream" class="platform-choice-btn flex items-center gap-3 bg-[#1a173d] hover:bg-indigo-600/30 p-4 rounded-xl transition text-left border border-white/5 font-bold text-sm text-white">🟢 CloudStream</button>
+            <button onclick="choosePlatform('tv')" data-platform="tv" class="platform-choice-btn flex items-center gap-3 bg-[#1a173d] hover:bg-indigo-600/30 p-4 rounded-xl transition text-left border border-white/5 font-bold text-sm text-white">📥 TV (Downloader)</button>
+        </div>
     </div>
 </div>
 
@@ -498,6 +523,23 @@ let viewMode = localStorage.getItem('ph_view_mode') || 'grid';
 
 let publicNotesCache = {};
 let compareList = JSON.parse(localStorage.getItem('ph_compare') || '[]');
+
+// YENİ: Kurulum platformu tercihi — kullanıcı hangi uygulamayı (Stremio/Nuvio/...) kullanıyorsa
+// eklenti detayındaki ilgili kurulum kılavuzu otomatik açılır.
+let platformPref = localStorage.getItem('ph_platform_pref') || null;
+const PLATFORM_LABELS = {
+    stremio: '🟣 Stremio', nuvio: '🟠 Nuvio', wuplay: '🟡 WuPlay / Arvio',
+    cloudstream: '🟢 CloudStream', tv: '📥 TV (Downloader)'
+};
+const PLATFORM_GUIDE_IDS = {
+    stremio: 'modal-stremio-guide', nuvio: 'modal-nuvio-guide', wuplay: 'modal-wuplay-guide',
+    cloudstream: 'modal-cloudstream-guide', tv: 'modal-downloader-guide'
+};
+
+// YENİ: Favori güncelleme takibi — favorilenen bir eklentinin verisi (bağlantı, açıklama,
+// durum vb.) değiştiğinde kullanıcıya 🔔 rozetiyle haber verilir.
+let favoriteSnapshots = JSON.parse(localStorage.getItem('ph_fav_snapshots') || '{}');
+let favoriteUpdates = JSON.parse(localStorage.getItem('ph_fav_updates') || '{}');
 
 // YENİ: native confirm()'in yerini alan promise tabanlı onay modalı.
 // Android WebView'de WebChromeClient.onJsConfirm implemente edilmediyse
@@ -906,6 +948,14 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     updateCompareBar();
     switchMainCategory('eklentiler', document.querySelector('#mainCategoryTabs button'));
+
+    // YENİ: platform tercihi hiç seçilmediyse bir kereliğine sor; favorilerde
+    // güncelleme olup olmadığını arka planda kontrol et.
+    updateFavUpdateBadge();
+    if (!platformPref) {
+        setTimeout(openPlatformModal, 1200);
+    }
+    checkFavoriteUpdates();
 });
 
 window.addEventListener('resize', () => {
@@ -1064,7 +1114,8 @@ function buildCardHTML(item, catOverride) {
     const itemKey = pluginKey(item);
     const isFav = favorites.includes(itemKey);
     const isMovie = (cat === 'atmos' || cat === 'imax');
-    const favBtnHTML = `<button class="fav-btn w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}">${isFav ? '❤️' : '♡'}</button>`;
+    const hasFavUpdate = isFav && !!favoriteUpdates[itemKey];
+    const favBtnHTML = `<button class="fav-btn relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-pink-500 text-xl transition shrink-0" data-key="${escapeHtml(itemKey)}" aria-label="${hasFavUpdate ? 'Bu favoride güncelleme var' : ''}">${isFav ? '❤️' : '♡'}${hasFavUpdate ? '<span class="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-400 rounded-full ring-2 ring-[#141230]"></span>' : ''}</button>`;
 
     if (isMovie) {
         const fragmanBadgeHTML = `<span class="fragman-badge cursor-pointer bg-blue-600/15 text-blue-300 border border-blue-500/30 px-2 py-1 rounded-lg text-[9px] font-bold inline-flex items-center gap-1 hover:bg-blue-600/30 transition shrink-0" data-key="${escapeHtml(itemKey)}">🎬 Fragman</span>`;
@@ -1201,10 +1252,77 @@ function renderSkeletons() {
 
 function toggleFav(key) {
     const idx = favorites.indexOf(key);
-    if (idx === -1) favorites.push(key);
-    else favorites.splice(idx, 1);
+    if (idx === -1) {
+        favorites.push(key);
+        const item = plugins.find(p => pluginKey(p) === key) || (cachedData[currentMainCategory] || []).find(p => pluginKey(p) === key);
+        if (item) {
+            favoriteSnapshots[key] = snapshotForItem(item);
+            localStorage.setItem('ph_fav_snapshots', JSON.stringify(favoriteSnapshots));
+        }
+    } else {
+        favorites.splice(idx, 1);
+        delete favoriteSnapshots[key];
+        delete favoriteUpdates[key];
+        localStorage.setItem('ph_fav_snapshots', JSON.stringify(favoriteSnapshots));
+        localStorage.setItem('ph_fav_updates', JSON.stringify(favoriteUpdates));
+        updateFavUpdateBadge();
+    }
     localStorage.setItem('ph_favs', JSON.stringify(favorites));
     filterData();
+}
+
+// YENİ: Bir eklentinin "değişip değişmediğini" anlamak için kullanılan basit anlık görüntü.
+function snapshotForItem(item) {
+    return JSON.stringify({
+        desc: item.desc || '', code: item.code || '', status: item.status || '',
+        sourceUrl: item.sourceUrl || '', dateAdded: item.dateAdded || ''
+    });
+}
+
+// YENİ: Tüm kategorileri arka planda yükleyip favorilerin verisini kontrol eder,
+// önceki anlık görüntüden farklıysa 🔔 rozetini günceller.
+async function checkFavoriteUpdates() {
+    if (!favorites.length) return;
+    try {
+        await ensureAllCategoriesLoaded();
+    } catch (e) { return; }
+    const all = Object.keys(DATA_SOURCES).flatMap(k => cachedData[k] || []);
+    let changed = false;
+    favorites.forEach(key => {
+        const item = all.find(p => pluginKey(p) === key);
+        if (!item) return;
+        const snap = snapshotForItem(item);
+        const prev = favoriteSnapshots[key];
+        if (prev !== undefined && prev !== snap) {
+            favoriteUpdates[key] = true;
+            changed = true;
+        }
+        favoriteSnapshots[key] = snap;
+    });
+    localStorage.setItem('ph_fav_snapshots', JSON.stringify(favoriteSnapshots));
+    if (changed) localStorage.setItem('ph_fav_updates', JSON.stringify(favoriteUpdates));
+    updateFavUpdateBadge();
+}
+
+function updateFavUpdateBadge() {
+    const badge = document.getElementById('favUpdateBadge');
+    if (!badge) return;
+    const count = Object.values(favoriteUpdates).filter(Boolean).length;
+    if (count > 0) {
+        badge.textContent = count > 9 ? '9+' : String(count);
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+function dismissFavoriteUpdate(key) {
+    if (favoriteUpdates[key]) {
+        delete favoriteUpdates[key];
+        localStorage.setItem('ph_fav_updates', JSON.stringify(favoriteUpdates));
+        updateFavUpdateBadge();
+        filterData();
+    }
 }
 
 function computeNewestDate() {
@@ -1283,6 +1401,7 @@ function openModalItem(item, catOverride) {
     const modalCat = catOverride || currentMainCategory;
     const key = pluginKey(item);
     const isMovie = (modalCat === 'atmos' || modalCat === 'imax');
+    dismissFavoriteUpdate(key);
 
     document.getElementById('modal-title').textContent = item.name;
     document.getElementById('modal-tags').innerHTML = '';
@@ -1370,6 +1489,9 @@ function openModalItem(item, catOverride) {
         if (wuplayGuide) wuplayGuide.classList.toggle('hidden', isAPK || !isWuplayCompatible); 
         if (downloaderGuide) downloaderGuide.classList.toggle('hidden', !code);
         if (cloudstreamGuide) cloudstreamGuide.classList.toggle('hidden', !hasCloudstream);
+
+        // YENİ: Kullanıcının menüden seçtiği platformun kılavuzu (görünürse) otomatik açılır.
+        applyPlatformGuidePreference();
 
         const savedRating = userRatings[key] || 0;
         currentRatingDisplay = savedRating; updateStarsUI(savedRating);
@@ -1626,6 +1748,50 @@ function closeAboutModal() {
 }
 function closeAboutModalOnBackdrop(e) { if (e.target.id === 'about-modal-overlay') closeAboutModal(); }
 
+// YENİ: Platform (Stremio/Nuvio/CloudStream/...) seçici modalı
+function openPlatformModal() {
+    updateMenuPlatformLabel();
+    document.getElementById('platform-modal-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    lockBodyScroll(); setTimeout(() => document.getElementById('platform-modal-box').classList.remove('translate-y-full'), 10);
+}
+function closePlatformModal() {
+    document.getElementById('platform-modal-box').classList.add('translate-y-full');
+    setTimeout(() => { document.getElementById('platform-modal-overlay').classList.add('opacity-0', 'pointer-events-none'); unlockBodyScroll(); }, 300);
+}
+function closePlatformModalOnBackdrop(e) { if (e.target.id === 'platform-modal-overlay') closePlatformModal(); }
+
+function choosePlatform(id) {
+    platformPref = id;
+    localStorage.setItem('ph_platform_pref', id);
+    updateMenuPlatformLabel();
+    showToast(`Platform kaydedildi: ${PLATFORM_LABELS[id] || id}`);
+    closePlatformModal();
+    if (currentModalItem) applyPlatformGuidePreference();
+}
+
+function updateMenuPlatformLabel() {
+    const el = document.getElementById('menuPlatformValue');
+    if (el) el.textContent = platformPref ? `${PLATFORM_LABELS[platformPref]} ✏️` : 'Seçilmedi — dokun, seç';
+    document.querySelectorAll('.platform-choice-btn').forEach(b => {
+        const active = b.dataset.platform === platformPref;
+        b.classList.toggle('ring-2', active);
+        b.classList.toggle('ring-indigo-500', active);
+        b.classList.toggle('bg-indigo-600/20', active);
+    });
+}
+
+// YENİ: Eklenti detay modalında, o an görünür kılavuzlardan kullanıcının tercih ettiği
+// platforma ait olanı otomatik açar ve görünüme kaydırır.
+function applyPlatformGuidePreference() {
+    if (!platformPref) return;
+    const guideId = PLATFORM_GUIDE_IDS[platformPref];
+    const guideEl = guideId && document.getElementById(guideId);
+    if (guideEl && !guideEl.classList.contains('hidden')) {
+        guideEl.setAttribute('open', '');
+        setTimeout(() => guideEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 250);
+    }
+}
+
 function openFeedbackModal() {
     document.getElementById('feedback-textarea').value = '';
     document.getElementById('feedback-char-count').textContent = '0/500';
@@ -1672,7 +1838,7 @@ async function submitFeedback() {
 
 async function confirmClearData() {
     if (!await showConfirmModal('Favori, not, puan ve senkron kodunuz bu cihazdan silinecek. Emin misiniz?')) return;
-    ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_genre_filter','ph_sort'].forEach(k => localStorage.removeItem(k));
+    ['ph_favs','ph_ratings','ph_notes','ph_reported','ph_sync_code','ph_view_mode','ph_debrid_filter','ph_platform_filter','ph_genre_filter','ph_sort','ph_fav_snapshots','ph_fav_updates'].forEach(k => localStorage.removeItem(k));
     showToast('🗑️ Veriler temizlendi.');
     setTimeout(() => location.reload(), 800);
 }

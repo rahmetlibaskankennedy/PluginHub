@@ -191,6 +191,22 @@
       "Stremio"
     ],
     "type": "4K",
+    "name": "Nuvio",
+    "desc": "https://nuviostreams.hayd.uk/",
+    "installGuide": "nuvio",
+    "debrid": "free",
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+    "dateAdded": "2026-07-20"
+  },
+  {
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
+    "type": "4K",
     "name": "Jackettio",
     "desc": "https://jackettio.elfhosted.com/configure",
     "installGuide": "nuvio",
