@@ -6,13 +6,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0b0a1f">
-    <title>StreamRehber — Streaming Media Portal</title>
+    <meta name="theme-color" content="#070b16">
+    <title>StreamRehber — Keşfet, Kaydet, Düzenle</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
     <script>
         const REPORT_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev';
         const NOTES_ENDPOINT = 'https://pluginhub.sait-yldrm.workers.dev/notes';
@@ -20,99 +18,108 @@
 
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="stream-body">
+
+<svg class="ui-symbols" aria-hidden="true" focusable="false">
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 3 1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3ZM19 16l.7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.2 4.2"/></symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.8 8.1c0 5.4-8.8 10.2-8.8 10.2S3.2 13.5 3.2 8.1A4.6 4.6 0 0 1 12 6.3a4.6 4.6 0 0 1 8.8 1.8Z"/></symbol>
+    <symbol id="icon-sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></symbol>
+    <symbol id="icon-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.7 8.3-2.1 5.3-5.3 2.1 2.1-5.3 5.3-2.1Z"/></symbol>
+    <symbol id="icon-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 10h4M17 10h4M3 14h4M17 14h4"/></symbol>
+    <symbol id="icon-tv" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="m8 3 4 3 4-3M8 21h8"/></symbol>
+    <symbol id="icon-mobile" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"/><path d="M8 6H5v1a4 4 0 0 0 3 3.9M16 6h3v1a4 4 0 0 1-3 3.9M12 13v4M8.5 21h7M9 17h6"/></symbol>
+    <symbol id="icon-volume" viewBox="0 0 24 24"><path d="M5 10v4h3l4 3V7L8 10H5Z"/><path d="M15 9.5a4 4 0 0 1 0 5M18 7a7.5 7.5 0 0 1 0 10"/></symbol>
+    <symbol id="icon-maximize" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></symbol>
+    <symbol id="icon-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.7-4.4L3 9"/><path d="M3 4v5h5M4 13a8 8 0 0 0 14.7 4.4L21 15"/><path d="M21 20v-5h-5"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.7 8.7 0 0 1-3.2-.6L4 20l1.5-4A7.3 7.3 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6.5 7l.7 13h9.6l.7-13M10 11v5M14 11v5"/></symbol>
+</svg>
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<!-- Header -->
-<header class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-        <img src="https://raw.githubusercontent.com/rahmetlibaskankennedy/PluginHub/main/assets/logos/logo.png" alt="PluginHub logo" class="h-10 w-auto max-w-[220px] object-contain" />
-    </div>
-    <div class="flex gap-2 md:gap-3 items-center text-xs font-semibold text-slate-400">
-        <button onclick="toggleSearchModal()" id="headerSearchBtn" aria-label="Ara" class="min-h-[40px] min-w-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition flex items-center justify-center">🔍</button>
-        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="min-h-[40px] bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-3 md:px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition">♡ <span class="hidden sm:inline">Favoriler</span></button>
+<header class="app-header">
+    <button class="brand-lockup" type="button" onclick="goHome()" aria-label="Ana sayfaya dön">
+        <span class="brand-mark"><svg class="ui-icon"><use href="#icon-spark"/></svg></span>
+        <span class="brand-copy"><strong>StreamRehber</strong><small>Keşfet · Kaydet · Düzenle</small></span>
+    </button>
+    <div class="header-actions">
+        <button onclick="toggleSearchModal()" id="headerSearchBtn" aria-label="Ara" class="header-icon-button"><svg class="ui-icon"><use href="#icon-search"/></svg></button>
+        <button onclick="toggleFavFilter()" id="favBtn" aria-label="Sadece favorileri göster" class="header-favorite-button"><svg class="ui-icon"><use href="#icon-heart"/></svg><span>Favoriler</span></button>
     </div>
 </header>
 
-<main class="max-w-7xl mx-auto px-6 py-4">
-    
-   <!-- ANA KATEGORİLER -->
-    <div class="flex gap-1.5 sm:gap-3 overflow-x-auto pb-4 sm:pb-6 mb-2" id="mainCategoryTabs">
-        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30" onclick="switchMainCategory('eklentiler', this)">🧩 Eklentiler</button>
-        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('tvapk', this)">📺 TV APK</button>
-        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('mobilapk', this)">📱 Telefon</button>
-        <button class="flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5" onclick="switchMainCategory('sporapk', this)">⚽ Spor</button>
+<main class="app-main">
+    <div class="main-category-tabs" id="mainCategoryTabs" aria-label="Ana kategoriler">
+        <button class="main-category-tab is-active" onclick="switchMainCategory('eklentiler', this)"><svg class="ui-icon"><use href="#icon-spark"/></svg><span>Eklentiler</span></button>
+        <button class="main-category-tab" onclick="switchMainCategory('tvapk', this)"><svg class="ui-icon"><use href="#icon-tv"/></svg><span>TV</span></button>
+        <button class="main-category-tab" onclick="switchMainCategory('mobilapk', this)"><svg class="ui-icon"><use href="#icon-mobile"/></svg><span>Mobil</span></button>
+        <button class="main-category-tab" onclick="switchMainCategory('sporapk', this)"><svg class="ui-icon"><use href="#icon-trophy"/></svg><span>Spor</span></button>
     </div>
 
-    <!-- STATS HERO (tüm kategorilerde görünür) -->
-    <div class="hero-media-box p-6 md:p-8 mb-6 transition-all" id="heroSection">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="max-w-xl w-full text-center md:text-left">
-                <span class="text-[10px] font-black uppercase tracking-widest text-pink-500 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full mb-3 inline-block" id="heroEyebrow">🧩 Eklenti Ekosistemi</span>
-                <h1 class="text-2xl md:text-4xl font-black text-white mb-2 break-words">Tüm <span class="bg-gradient-to-r from-pink-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">İçerikler</span> Tek Yerde</h1>
-                <p class="text-xs md:text-sm text-slate-400 leading-relaxed" id="heroDesc">Öne çıkan bilgiler yükleniyor...</p>
-            </div>
-            <div class="flex gap-6 md:gap-10 justify-center shrink-0">
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-black text-white" id="statTotal">—</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" id="statTotalLabel">İçerik</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-black text-white" id="statNew">—</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Bu Hafta Yeni</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl md:text-3xl font-black text-white" id="statExtra">—</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" id="statExtraLabel">Uygulama</div>
-                </div>
-            </div>
+    <section class="hero-media-box" id="heroSection" aria-labelledby="heroTitle">
+        <div class="hero-kicker"><span class="live-dot" aria-hidden="true"></span><span id="heroEyebrow">Eklenti ve uygulama ekosistemi</span></div>
+        <h1 id="heroTitle">İzlemek istediğini daha hızlı bul.</h1>
+        <p id="heroDesc">Öne çıkan bilgiler yükleniyor...</p>
+        <div class="hero-stats" aria-label="Katalog özeti">
+            <div><strong id="statTotal">—</strong><span id="statTotalLabel">İçerik</span></div>
+            <div><strong id="statNew">—</strong><span>Bu hafta yeni</span></div>
+            <div><strong id="statExtra">—</strong><span id="statExtraLabel">Uygulama</span></div>
         </div>
-    </div>
+    </section>
 
-    <!-- ALT KATEGORİ SEKMELERİ -->
-    <div class="flex gap-2 overflow-x-auto pb-4 mb-4" id="categoryTabs"></div>
+    <section class="discovery-section" aria-labelledby="categoryTitle">
+        <div class="section-heading"><div><span>Hızlı keşfet</span><h2 id="categoryTitle">Kategoriler</h2></div></div>
+        <div id="categoryTabs" class="category-tabs"></div>
+    </section>
 
-    <!-- ARAMA + GÖRÜNÜM DEĞİŞTİRİCİ + FİLTRELE -->
-    <div class="flex gap-3 mb-6 bg-indigo-950/20 p-4 rounded-2xl border border-white/5">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 İçerik, film veya uygulama ara..." class="flex-1 min-w-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-xs text-white p-3.5 rounded-xl outline-none">
-        
-        <button onclick="toggleViewMode()" id="viewToggleBtn" class="shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-slate-300 hover:text-white px-3 py-3 rounded-xl flex items-center justify-center transition" aria-label="Görünümü Değiştir">
-            <svg id="viewIconGrid" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <svg id="viewIconList" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-        </button>
-
-        <button onclick="openFilterModal()" id="filterOpenBtn" class="relative shrink-0 min-h-[44px] bg-indigo-950/80 border border-slate-800 text-white text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-1.5 transition" aria-label="Filtrele ve sırala">
-            <span>⚙️</span><span class="hidden sm:inline">Filtrele</span>
-            <span id="filterBadge" class="hidden absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center">0</span>
-        </button>
-    </div>
-
-    <div class="flex justify-between items-center text-xs text-slate-400 mb-4">
-        <span id="resultCount">Yükleniyor...</span>
-    </div>
-
-    <!-- KARTLAR AKIŞI -->
-    <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <section class="results-section" aria-labelledby="resultTitle">
+        <div class="discovery-toolbar">
+            <label class="search-field" for="searchInput">
+                <svg class="ui-icon"><use href="#icon-search"/></svg>
+                <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="Başlık veya kategori ara..." autocomplete="off">
+            </label>
+            <button onclick="toggleViewMode()" id="viewToggleBtn" class="toolbar-icon-button" aria-label="Görünümü değiştir">
+                <svg id="viewIconGrid" class="ui-icon" fill="none"><use href="#icon-grid"/></svg>
+                <svg id="viewIconList" class="ui-icon hidden" fill="none"><use href="#icon-list"/></svg>
+            </button>
+            <button onclick="openFilterModal()" id="filterOpenBtn" class="toolbar-filter-button" aria-label="Filtrele ve sırala">
+                <svg class="ui-icon"><use href="#icon-sliders"/></svg><span>Filtrele</span>
+                <span id="filterBadge" class="hidden">0</span>
+            </button>
+        </div>
+        <div class="results-heading"><div><span>Seçilmiş içerikler</span><h2 id="resultTitle">Bugün senin için</h2></div><span id="resultCount">Yükleniyor...</span></div>
+        <div id="resultsGrid" class="results-grid"></div>
+    </section>
 </main>
 
-<!-- MOBİL DOCK NAVIGATION -->
-<div class="stream-dock">
-    <div class="dock-indicator" id="dockIndicator"></div>
-    <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Başa Dön">🏠</button>
-    
-    <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/dolby-atmos.png" alt="Dolby Atmos" class="dock-logo" style="height: 25px;">
+<!-- HIZLI ALT MENÜ -->
+<nav class="stream-dock" aria-label="Hızlı menü">
+    <div class="dock-indicator" id="dockIndicator" aria-hidden="true"></div>
+    <button class="dock-btn active" id="dock-home" onclick="goHome()" aria-label="Keşfet">
+        <svg class="ui-icon"><use href="#icon-compass"/></svg><span>Keşfet</span>
     </button>
-      
-    <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX Filmler">
-        <img src="https://rahmetlibaskankennedy.github.io/PluginHub/assets/logos/imax-enhanced.png" alt="IMAX Enhanced" class="dock-logo" style="height: 20px;">
+    <button class="dock-btn" id="dock-atmos" onclick="switchMainCategory('atmos')" aria-label="Dolby Atmos filmleri">
+        <svg class="ui-icon"><use href="#icon-volume"/></svg><span>Atmos</span>
     </button>
-
-    <button class="dock-btn text-2xl" id="dock-dice" aria-label="Rastgele Film (basılı tut: türe göre)">🎲</button>
-    
-    <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">☰</button>
-</div>
+    <button class="dock-btn" id="dock-imax" onclick="switchMainCategory('imax')" aria-label="IMAX filmleri">
+        <svg class="ui-icon"><use href="#icon-maximize"/></svg><span>IMAX</span>
+    </button>
+    <button class="dock-btn" id="dock-dice" aria-label="Rastgele film">
+        <svg class="ui-icon"><use href="#icon-dice"/></svg><span>Rastgele</span>
+    </button>
+    <button class="dock-btn" id="dock-menu" aria-label="Menü" onclick="openMenuModal()">
+        <svg class="ui-icon"><use href="#icon-menu"/></svg><span>Menü</span>
+    </button>
+</nav>
 
 <!-- MENÜ MODALI -->
 <div id="menu-modal-overlay" onclick="closeMenuModal(event)" class="fixed inset-0 bg-[#05040f]/90 backdrop-blur-xl z-[2000] flex items-end md:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
@@ -123,35 +130,35 @@
         </div>
         <div class="flex flex-col gap-3">
             <button onclick="closeMenuModal(); setTimeout(openSyncModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-                <span class="text-2xl">🔄</span>
+                <span class="menu-action-icon"><svg class="ui-icon"><use href="#icon-refresh"/></svg></span>
                 <div>
                     <div class="text-sm font-bold text-white">Senkronizasyon</div>
                     <div class="text-xs text-slate-400">Kişisel verilerini eşitle</div>
                 </div>
             </button>
             <button onclick="exportFavorites()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-                <span class="text-2xl">📋</span>
+                <span class="menu-action-icon"><svg class="ui-icon"><use href="#icon-copy"/></svg></span>
                 <div>
                     <div class="text-sm font-bold text-white">Favorileri Kopyala</div>
                     <div class="text-xs text-slate-400">Favori linklerini panoya yapıştır</div>
                 </div>
             </button>
             <button onclick="closeMenuModal(); setTimeout(openAboutModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-    <span class="text-2xl">ℹ️</span>
+    <span class="menu-action-icon"><svg class="ui-icon"><use href="#icon-info"/></svg></span>
     <div>
         <div class="text-sm font-bold text-white">Hakkında</div>
         <div class="text-xs text-slate-400">Site hakkında bilgi ve wiki</div>
     </div>
 </button>
 <button onclick="closeMenuModal(); setTimeout(openFeedbackModal, 300)" class="flex items-center gap-4 bg-[#1a173d] hover:bg-[#252159] p-4 rounded-xl transition text-left border border-white/5">
-    <span class="text-2xl">💬</span>
+    <span class="menu-action-icon"><svg class="ui-icon"><use href="#icon-message"/></svg></span>
     <div>
         <div class="text-sm font-bold text-white">Geri Bildirim Gönder</div>
         <div class="text-xs text-slate-400">Öneri veya sorun bildir</div>
     </div>
 </button>
 <button onclick="closeMenuModal(); confirmClearData()" class="flex items-center gap-4 bg-[#1a173d] hover:bg-rose-900/30 p-4 rounded-xl transition text-left border border-white/5">
-    <span class="text-2xl">🗑️</span>
+    <span class="menu-action-icon is-danger"><svg class="ui-icon"><use href="#icon-trash"/></svg></span>
     <div>
         <div class="text-sm font-bold text-white">Verilerimi Temizle</div>
         <div class="text-xs text-slate-400">Favori, not ve puanları sil</div>
@@ -639,12 +646,12 @@ const debouncedFilter = debounce(filterData, 180);
 function onSearchInput() { debouncedFilter(); }
 
 async function switchMainCategory(key, btnEl) {
-    document.querySelectorAll('#mainCategoryTabs button').forEach(b => {
-        b.className = "flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-[#1a173d] text-slate-400 hover:text-white border border-white/5";
+    document.querySelectorAll('#mainCategoryTabs button').forEach(button => {
+        button.classList.remove('is-active');
     });
     
     if (btnEl && btnEl.parentElement && btnEl.parentElement.id === 'mainCategoryTabs') {
-        btnEl.className = "flex-1 sm:flex-none px-2 py-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-sm transition-all whitespace-nowrap bg-pink-600 text-white shadow-lg shadow-pink-600/30";
+        btnEl.classList.add('is-active');
     }
 
     if (['eklentiler', 'tvapk', 'mobilapk', 'sporapk'].includes(key)) {
@@ -783,12 +790,12 @@ function updateStatsBar(key) {
     document.getElementById('statNew').textContent = newCount;
 
     const eyebrowMap = {
-        eklentiler: '🧩 Eklenti ve Uygulama Ekosistemi',
-        tvapk: '📺 TV Uygulamaları',
-        mobilapk: '📱 Telefon Uygulamaları',
-        sporapk: '⚽ Spor Uygulamaları',
-        atmos: '🎬 Dolby Atmos Filmler',
-        imax: '🎞️ IMAX Filmler'
+        eklentiler: 'Eklenti ve uygulama ekosistemi',
+        tvapk: 'TV uygulamaları',
+        mobilapk: 'Mobil uygulamalar',
+        sporapk: 'Spor uygulamaları',
+        atmos: 'Dolby Atmos filmleri',
+        imax: 'IMAX filmleri'
     };
     document.getElementById('heroEyebrow').textContent = eyebrowMap[key] || eyebrowMap.eklentiler;
 
@@ -926,7 +933,7 @@ function goHome() {
 function toggleFavFilter() {
     showFavsOnly = !showFavsOnly;
     const favBtn = document.getElementById('favBtn');
-    favBtn.style.background = showFavsOnly ? 'var(--accent-pink)' : '';
+    favBtn.style.background = showFavsOnly ? 'linear-gradient(135deg, var(--sr-indigo), var(--sr-violet))' : '';
     favBtn.style.color = showFavsOnly ? '#fff' : '';
     filterData();
 }
@@ -1168,6 +1175,82 @@ return `
     </div>
         `;
     }
+}
+
+/* StreamRehber 2.0 kart sistemi: aynı veri ve etkileşimler, daha görsel bir sunum. */
+function streamIcon(name) {
+    return `<svg class="ui-icon" aria-hidden="true"><use href="#icon-${name}"/></svg>`;
+}
+
+function streamCoverTone(item) {
+    const value = [...String(item.name || '')].reduce((total, char) => total + char.charCodeAt(0), 0);
+    return `cover-tone-${value % 4}`;
+}
+
+function streamCardMedia(item, cat, isMovie) {
+    const icon = isMovie ? 'film' : cat === 'tvapk' ? 'tv' : cat === 'mobilapk' ? 'mobile' : cat === 'sporapk' ? 'trophy' : 'spark';
+    const label = isMovie && item.rank
+        ? `<span class="card-rank">#${escapeHtml(item.rank)}</span>`
+        : `<span class="card-kind">${escapeHtml(item.type || (cat === 'eklentiler' ? 'Kaynak' : 'Uygulama'))}</span>`;
+    return `<div class="card-media ${streamCoverTone(item)}">
+        ${label}
+        <span class="card-media-icon">${streamIcon(icon)}</span>
+        <span class="card-media-glow"></span>
+    </div>`;
+}
+
+function streamCardChips(item, cat) {
+    const values = [];
+    if (item.genre) values.push(item.genre);
+    if (Array.isArray(item.platform) && item.platform.length) values.push(item.platform[0]);
+    if (!item.genre && Array.isArray(item.app) && item.app.length) values.push(item.app[0]);
+    if (cat === 'eklentiler' && item.debrid) {
+        const debridLabels = { required: 'Debrid', optional: 'Opsiyonel', paid: 'Ücretli', free: 'Ücretsiz' };
+        values.push(debridLabels[item.debrid] || item.debrid);
+    }
+    return values.slice(0, 2).map(value => `<span class="card-chip">${escapeHtml(value)}</span>`).join('');
+}
+
+function buildCardHTML(item, catOverride) {
+    const cat = catOverride || currentMainCategory;
+    const itemKey = pluginKey(item);
+    const isFav = favorites.includes(itemKey);
+    const isMovie = (cat === 'atmos' || cat === 'imax');
+    const description = isMovie
+        ? `${item.year || '—'} · ${item.genre || 'Film'}`
+        : (descWithoutUrl(item.desc || '') || item.desc || 'Koleksiyon bilgisi yakında güncellenecek.');
+    const status = item.status === 'dead' ? 'Kontrol gerekli' : (isRecentlyAdded(item.dateAdded) ? 'Yeni' : 'Doğrulandı');
+    const statusClass = status === 'Kontrol gerekli' ? 'is-warning' : (status === 'Yeni' ? 'is-new' : 'is-verified');
+    const copyAction = isMovie
+        ? `<button class="fragman-badge card-action" data-key="${escapeHtml(itemKey)}" type="button">${streamIcon('film')}<span>Fragman</span></button>`
+        : `<button class="copy-btn card-action" data-key="${escapeHtml(itemKey)}" type="button">${streamIcon('copy')}<span>Kopyala</span></button>`;
+    const compareAction = !isMovie
+        ? `<button class="compare-btn comparison-action${compareList.includes(itemKey) ? ' is-selected' : ''}" data-key="${escapeHtml(itemKey)}" type="button">Karşılaştır</button>`
+        : '';
+    const codeMarkup = !isMovie && item.code
+        ? `<span class="card-code">Kod: <strong>${escapeHtml(item.code)}</strong></span>`
+        : '';
+    const ageMarkup = item.ageRestricted ? '<span class="age-badge">18+</span>' : '';
+
+    return `
+        <div class="card-visual-wrap">${streamCardMedia(item, cat, isMovie)}</div>
+        <div class="card-content">
+            <div class="card-topline">
+                <span class="status-pill ${statusClass}">${status === 'Doğrulandı' ? streamIcon('spark') : ''}${status}</span>
+                <button class="fav-btn card-favorite${isFav ? ' is-saved' : ''}" data-key="${escapeHtml(itemKey)}" type="button" aria-label="${isFav ? 'Favorilerden çıkar' : 'Favorilere ekle'}">${streamIcon('heart')}</button>
+            </div>
+            <h3 title="${escapeHtml(item.name)}">${escapeHtml(item.name)} ${ageMarkup}</h3>
+            <p>${escapeHtml(description)}</p>
+            <div class="card-chips">${streamCardChips(item, cat)}</div>
+            ${codeMarkup}
+            <div class="card-footer">
+                ${copyAction}
+                <div class="card-footer-actions">
+                    ${compareAction}
+                    <span class="card-chevron">${streamIcon('chevron')}</span>
+                </div>
+            </div>
+        </div>`;
 }
 
 function renderCards(data) {
