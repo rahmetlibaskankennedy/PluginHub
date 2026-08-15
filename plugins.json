@@ -796,24 +796,6 @@
       "Nuvio",
       "Stremio"
     ],
-    "type": "Dublaj",
-    "name": "TCLTurko",
-    "status": "dead",
-    "desc": "https://tclbot-1.onrender.com/manifest.json",
-    "installGuide": "nuvio",
-    "debrid": "free",
-    "platform": [
-      "tv",
-      "mobile",
-      "web"
-    ],
-    "dateAdded": "2026-07-20"
-  },
-  {
-    "app": [
-      "Nuvio",
-      "Stremio"
-    ],
     "type": "4K",
     "name": "Nexus",
     "desc": "https://nexuszen.vercel.app/manifest.json",
