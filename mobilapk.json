@@ -13,7 +13,7 @@
     "type": "Stream",
     "name": "Nuvio",
     "desc": "Stremio alternatifi en iyi stream uygulamalarından.",
-    "sourceUrl": "https://github.com/NuvioMedia/NuvioMobile/releases/tag/0.3.1",
+    "sourceUrl": "https://github.com/NuvioMedia/NuvioMobile/releases",
     "status": "ok",
     "platform": ["mobile"]
   },
