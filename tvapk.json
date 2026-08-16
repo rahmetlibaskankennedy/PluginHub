@@ -21,7 +21,7 @@
     "app": ["Android TV", "webOS"],
     "type": "Stream",
     "name": "Nuvio",
-    "desc": "Stremio benzeri, daha hafif ve hızlı bir alternatif. Özellikle TV box cihazlarında yüksek performans sergiler. Kurulum: https://github.com/tapframe/NuvioTV/releases",
+    "desc": "Stremio benzeri, daha hafif ve hızlı bir alternatif. Özellikle TV box cihazlarında yüksek performans sergiler. Kurulum: https://github.com/NuvioMedia/NuvioTV/releases",
     "code": "9231168",
     "status": "ok",
     "platform": ["tv"]
@@ -31,7 +31,7 @@
     "type": "YouTube İstemcisi",
     "name": "SmartTube",
     "desc": "Reklamsız, SponsorBlock destekli açık kaynaklı YouTube istemcisi. 4K/8K, HDR, 60fps desteği. Google hesabı gerekmez. Kurulum: https://github.com/yuliskov/SmartTube",
-    "code": "79040",
+    "code": "79015",
     "status": "ok",
     "platform": ["tv"]
   },
@@ -138,7 +138,7 @@
     "app": ["Android TV"],
     "type": "Film/Dizi/Canlı TV",
     "name": "CinePlus",
-    "desc": "BeeTV'nin en güncel klonu/halefi. V1.0.3 sürümüyle daha stabil çalışıyor.",
+    "desc": "BeeTV'nin en güncel klonu/halefi. V1.0.5 sürümüyle daha stabil çalışıyor.",
     "code": "2098541",
     "status": "ok",
     "platform": ["tv"],
@@ -208,7 +208,7 @@
     "type": "Stream",
     "name": "Fusion",
     "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonlu ve Trakt destekli. Tam verim için Infuse medya oynatıcı ile kullanımı önerilir.",
-    "sourceUrl": "https://apps.apple.com/tr/app/fusion-media-center/id6759285919?l=tr&platform=tv",
+    "sourceUrl": "https://apps.apple.com/us/app/fusion-media-center/id6759285919",
     "status": "ok",
     "platform": ["tv"]
   },
@@ -216,9 +216,9 @@
     "app": ["Android TV"],
     "type": "Kompakt Medya Portalı",
     "name": "PlayTorrio",
-    "desc": "Film, YT müzik, kitap, manga ve IPTV'yi birleştiren proje. Ayarlar ve debrid özellikleri şu an stabil olmasa da gömülü YouTube müzik çaları sorunsuz çalışır.",
+    "desc": "Film, dizi, oyun, müzik, kitap, manga ve IPTV'yi birleştiren açık kaynaklı proje. Jellyfin entegrasyonu, Jackett/Prowlarr desteği ve tam Stremio eklenti uyumluluğu ile gelişmiş durumda.",
     "sourceUrl": "https://playtorrio.xyz/",
-    "status": "warn",
+    "status": "ok",
     "platform": ["tv"]
   },
   {
@@ -226,7 +226,7 @@
     "type": "Kompakt Medya Portalı",
     "name": "Debrify",
     "desc": "Debrid hesabınızı, torrent arama motorunuzu ve Stremio eklentilerinizi tek bir uygulamada birleştiren, yerel bir oynatıcıya ve düzgün bir Android TV deneyimine sahip bir medya yöneticisi/oynatıcısıdır.",
-    "sourceUrl": "https://github.com/varunsalian/debrify/releases/download/v0.7.0-beta.1/debrify-v0.7.0-beta.1.apk",
+    "sourceUrl": "https://github.com/varunsalian/debrify/releases",
     "status": "ok",
     "platform": ["tv"]
   }
