@@ -17,7 +17,7 @@
     "status": "ok",
     "platform": ["mobile"]
   },
-    {
+  {
     "app": ["iOS"],
     "type": "Stream",
     "name": "Stremio (Sideload IPA)",
@@ -26,7 +26,7 @@
     "status": "warn",
     "platform": ["mobile"]
   },
-    {
+  {
     "app": ["iOS"],
     "type": "Stream",
     "name": "Nuvio",
@@ -49,7 +49,7 @@
     "type": "Stream",
     "name": "Fusion",
     "desc": "Apple ekosistemi için Stremio/Nuvio alternatifi. iCloud senkronizasyonlu ve Trakt destekli. Tam verim için Infuse medya oynatıcı ile kullanımı önerilir.",
-    "sourceUrl": "https://apps.apple.com/tr/app/fusion-media-center/id6759285919?l=tr&platform=tv",
+    "sourceUrl": "https://apps.apple.com/us/app/fusion-media-center/id6759285919",
     "status": "ok",
     "platform": ["mobile"]
   },
