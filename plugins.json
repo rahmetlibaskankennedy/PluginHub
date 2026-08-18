@@ -1153,6 +1153,7 @@
     ],
     "type": "Repo",
     "name": "!Kraptor",
+    "status": "dead",
     "desc": "https://raw.githubusercontent.com/Kraptor123/cs-kraptor/refs/heads/master/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
@@ -1168,6 +1169,7 @@
     ],
     "type": "Repo",
     "name": "!Cskarma",
+    "status": "dead",
     "desc": "https://raw.githubusercontent.com/Kraptor123/cs-Karma/refs/heads/master/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
@@ -1213,6 +1215,7 @@
     ],
     "type": "Repo",
     "name": "!AyzenCS3",
+    "status": "dead",
     "desc": "https://raw.githubusercontent.com/ByAyzen/AyzenCS3/refs/heads/builds/repo.json",
     "installGuide": "cloudstream",
     "debrid": "free",
@@ -1334,5 +1337,20 @@
       "web"
     ],
     "dateAdded": "2026-07-30"
+  },
+   {
+    "app": [
+      "CloudStream"
+    ],
+    "type": "Repo",
+    "name": "PltStream",
+    "desc": "https://raw.githubusercontent.com/pltmustafa/plt-stream/refs/heads/master/repo.json",
+    "installGuide": "cloudstream",
+    "debrid": "free",
+    "platform": [
+      "tv",
+      "mobile"
+    ],
+     "dateAdded": "2026-08-18"
   }
 ]
