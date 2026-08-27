@@ -1352,5 +1352,21 @@
       "mobile"
     ],
      "dateAdded": "2026-08-18"
+  },
+  {
+    "app": [
+      "Nuvio",
+      "Stremio"
+    ],
+    "type": "4K",
+    "name": "FrostNodes",
+    "desc": "https://t.me/+6_aKXTVWKOg2Yjdk",
+    "installGuide": "nuvio",
+    "debrid": "required",
+    "platform": [
+      "tv",
+      "mobile",
+      "web"
+    ],
   }
 ]
