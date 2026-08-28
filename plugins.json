@@ -336,22 +336,6 @@
       "Stremio"
     ],
     "type": "4K",
-    "name": "NebulaStreams",
-    "desc": "https://nebulastreams.onrender.com/manifest.json",
-    "installGuide": "nuvio",
-    "debrid": "free",
-    "platform": [
-      "tv",
-      "mobile"
-    ],
-    "dateAdded": "2026-07-20"
-  },
-  {
-    "app": [
-      "Nuvio",
-      "Stremio"
-    ],
-    "type": "4K",
     "name": "Meteor",
     "desc": "https://meteorfortheweebs.midnightignite.me/configure",
     "installGuide": "nuvio",
