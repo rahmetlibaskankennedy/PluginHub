@@ -1100,23 +1100,6 @@
   },
   {
     "app": [
-      "Nuvio",
-      "Stremio"
-    ],
-    "type": "4K",
-    "name": "Magnetio",
-    "desc": "https://magnetio.peterdsp.dev/configure",
-    "installGuide": "nuvio",
-    "debrid": "free",
-    "platform": [
-      "tv",
-      "mobile",
-      "web"
-    ],
-    "dateAdded": "2026-07-20"
-  },
-  {
-    "app": [
       "CloudStream"
     ],
     "type": "Repo",
