@@ -489,7 +489,13 @@
 <script>
 // SPA Veri Altyapısı
 const DATA_SOURCES = {
-    'eklentiler': 'plugins.json',
+    // NOT (2026-09-06): eklentiler artık statik plugins.json'dan değil,
+    // Cloudflare Worker + KV'den okunuyor — admin panelinden yapılan
+    // ekleme/düzenleme/silme anında burada da görünür, git commit ve
+    // GitHub Pages build beklemek gerekmez. Diğer JSON dosyaları
+    // (tvapk, mobilapk, sporapk, atmos, imax) şimdilik statik kalmaya
+    // devam ediyor, sadece eklentiler taşındı.
+    'eklentiler': 'https://pluginhub.sait-yldrm.workers.dev/plugins',
     'tvapk': 'tvapk.json',
     'mobilapk': 'mobilapk.json',
     'sporapk': 'sporapk.json',
