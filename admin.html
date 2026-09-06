@@ -12,7 +12,8 @@
   <div class="login-gate" id="loginGate">
     <div class="login-card">
       <h1>PluginHub Admin</h1>
-      <p>Devam etmek için yönetici parolasını gir.</p>
+      <p>Firebase yönetici hesabınla giriş yap.</p>
+      <input type="email" id="loginEmail" placeholder="E-posta" autocomplete="username">
       <input type="password" id="loginPassword" placeholder="Parola" autocomplete="current-password">
       <button class="btn" id="loginBtn" type="button">Giriş Yap</button>
       <div class="login-error" id="loginError" style="display:none;"></div>
@@ -22,7 +23,10 @@
   <!-- ================= ANA PANEL ================= -->
   <div class="admin-app" id="adminApp" style="display:none;">
     <header class="admin-header">
-      <h1>Yönetim Paneli</h1>
+      <div>
+        <h1>Yönetim Paneli</h1>
+        <div class="admin-user" id="adminUserLabel"></div>
+      </div>
       <button class="btn secondary" id="signOutBtn" type="button">Çıkış</button>
     </header>
 
@@ -59,6 +63,7 @@
               <option value="free">free</option>
               <option value="optional">optional</option>
               <option value="required">required</option>
+              <option value="paid">paid</option>
             </select>
           </div>
         </div>
@@ -90,13 +95,15 @@
           <div class="field"><label>TARİH</label><input type="date" id="fDateAdded2"></div>
         </div>
         <div class="field-row" id="codeSourceRow" style="display:none;">
-          <div class="field"><label>KOD (opsiyonel)</label><input type="text" id="fCode" placeholder="Örn. ABC123"></div>
+          <div class="field"><label>KOD (opsiyonel)</label><input type="text" id="fCode" placeholder="Örn. 71893"></div>
           <div class="field"><label>İNDİRME LİNKİ (opsiyonel)</label><input type="text" id="fSourceUrl" placeholder="https://…"></div>
         </div>
         <div class="field-row">
           <div class="field"><label>DURUM</label>
             <select id="fStatus">
-              <option value="">Aktif</option>
+              <option value="">Aktif (durum alanı yok)</option>
+              <option value="ok">Aktif / OK</option>
+              <option value="warn">Uyarı</option>
               <option value="dead">Çalışmıyor</option>
             </select>
           </div>
@@ -104,7 +111,7 @@
         </div>
         <div class="modal-actions">
           <button type="button" class="btn secondary" id="deleteItemBtn" style="display:none;">Sil</button>
-          <button type="submit" class="btn">Kaydet</button>
+          <button type="submit" class="btn" id="saveItemBtn">Kaydet</button>
         </div>
       </form>
     </div>
@@ -112,6 +119,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="admin.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
 </html>
