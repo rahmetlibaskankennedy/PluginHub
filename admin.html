@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PluginHub — Eklenti Yönetimi</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ================= GİRİŞ EKRANI ================= -->
+  <div class="login-gate" id="loginGate">
+    <div class="login-card">
+      <h1>PluginHub Admin</h1>
+      <p>Devam etmek için yönetici parolasını gir.</p>
+      <input type="password" id="loginPassword" placeholder="Parola" autocomplete="current-password">
+      <button class="btn" id="loginBtn" type="button">Giriş Yap</button>
+      <div class="login-error" id="loginError" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ================= ANA PANEL ================= -->
+  <div class="admin-app" id="adminApp" style="display:none;">
+    <header class="admin-header">
+      <h1>Eklenti Yönetimi</h1>
+      <div class="header-actions">
+        <input type="text" id="searchInput" class="search-input" placeholder="İsimde ara…">
+        <button class="btn" id="newPluginBtn" type="button">+ Yeni Eklenti</button>
+        <button class="btn secondary" id="signOutBtn" type="button">Çıkış</button>
+      </div>
+    </header>
+
+    <div id="listSub" class="list-sub"></div>
+    <div id="content"><div class="empty-state">Yükleniyor…</div></div>
+  </div>
+
+  <!-- ================= EKLE/DÜZENLE MODAL ================= -->
+  <div class="modal-overlay" id="pluginModalOverlay">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <strong id="modalTitle">Yeni Eklenti</strong>
+        <button type="button" id="modalCloseBtn" aria-label="Kapat">×</button>
+      </div>
+      <form id="pluginForm">
+        <div class="field"><label>BAŞLIK</label><input type="text" id="fName" required></div>
+        <div class="field"><label>URL / AÇIKLAMA</label><input type="text" id="fDesc" required placeholder="https://…"></div>
+        <div class="field-row">
+          <div class="field"><label>TÜR</label><input type="text" id="fType" list="typeOptions" required></div>
+          <div class="field"><label>DEBRID</label>
+            <select id="fDebrid">
+              <option value="free">free</option>
+              <option value="optional">optional</option>
+              <option value="required">required</option>
+            </select>
+          </div>
+        </div>
+        <datalist id="typeOptions">
+          <option value="4K"><option value="Altyazı"><option value="Canlı">
+          <option value="Debrid"><option value="Dublaj"><option value="Film">
+          <option value="Katalog"><option value="Plugin"><option value="Repo"><option value="Spor">
+        </datalist>
+        <div class="field">
+          <label>UYGULAMA</label>
+          <div class="checkbox-row">
+            <label><input type="checkbox" name="app" value="Nuvio"> Nuvio</label>
+            <label><input type="checkbox" name="app" value="Stremio"> Stremio</label>
+            <label><input type="checkbox" name="app" value="CloudStream"> CloudStream</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>PLATFORM</label>
+          <div class="checkbox-row">
+            <label><input type="checkbox" name="platform" value="tv"> TV</label>
+            <label><input type="checkbox" name="platform" value="mobile"> Mobil</label>
+            <label><input type="checkbox" name="platform" value="web"> Web</label>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>KURULUM REHBERİ</label>
+            <select id="fInstallGuide">
+              <option value="nuvio">nuvio</option>
+              <option value="stremio">stremio</option>
+              <option value="cloudstream">cloudstream</option>
+              <option value="web">web</option>
+            </select>
+          </div>
+          <div class="field"><label>TARİH</label><input type="date" id="fDateAdded"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>DURUM</label>
+            <select id="fStatus">
+              <option value="">Aktif</option>
+              <option value="dead">Çalışmıyor</option>
+            </select>
+          </div>
+          <div class="field checkbox-field"><label><input type="checkbox" id="fAgeRestricted"> 18+ İçerik</label></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" id="deletePluginBtn" style="display:none;">Sil</button>
+          <button type="submit" class="btn">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
