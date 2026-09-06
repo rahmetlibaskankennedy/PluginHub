@@ -13,6 +13,7 @@ const TAB_CONFIG = {
     saveUrl: () => `${WORKER_BASE}/admin/plugins`,
     deleteUrl: (id) => `${WORKER_BASE}/admin/plugins?id=${encodeURIComponent(id)}`,
     typeOptions: ['4K', 'Altyazı', 'Canlı', 'Debrid', 'Dublaj', 'Film', 'Katalog', 'Plugin', 'Repo', 'Spor'],
+    appOptions: ['Nuvio', 'Stremio', 'CloudStream'],
     hasInstallGuide: true, hasCode: false
   },
   tv: {
@@ -21,6 +22,7 @@ const TAB_CONFIG = {
     saveUrl: () => `${WORKER_BASE}/admin/apps`,
     deleteUrl: (id) => `${WORKER_BASE}/admin/apps?category=tv&id=${encodeURIComponent(id)}`,
     typeOptions: ['Stream', 'YouTube İstemcisi', 'Film/Dizi', 'Film/Dizi/Canlı TV', 'Kompakt Medya Portalı'],
+    appOptions: ['Android TV', 'Apple TV', 'Tizen', 'webOS', 'FireOS'],
     hasInstallGuide: false, hasCode: true
   },
   mobile: {
@@ -29,6 +31,7 @@ const TAB_CONFIG = {
     saveUrl: () => `${WORKER_BASE}/admin/apps`,
     deleteUrl: (id) => `${WORKER_BASE}/admin/apps?category=mobile&id=${encodeURIComponent(id)}`,
     typeOptions: ['Stream', 'Film/Dizi/Canlı TV', 'Film/Dizi', 'Müzik Uygulaması'],
+    appOptions: ['Android', 'iOS'],
     hasInstallGuide: false, hasCode: true
   },
   sport: {
@@ -37,6 +40,7 @@ const TAB_CONFIG = {
     saveUrl: () => `${WORKER_BASE}/admin/apps`,
     deleteUrl: (id) => `${WORKER_BASE}/admin/apps?category=sport&id=${encodeURIComponent(id)}`,
     typeOptions: ['Canlı'],
+    appOptions: ['Android TV', 'Android', 'iOS', 'Apple TV'],
     hasInstallGuide: false, hasCode: true
   }
 };
@@ -185,6 +189,14 @@ function applyTabFieldVisibility() {
   document.getElementById('ageField').style.display = activeTab === 'plugins' ? '' : 'none';
   const typeList = document.getElementById('typeOptions');
   typeList.innerHTML = cfg.typeOptions.map(t => `<option value="${escapeHtml(t)}">`).join('');
+  // NOT (düzeltme): "UYGULAMA" seçenekleri sekmeye göre TAMAMEN farklı —
+  // eklentilerde Nuvio/Stremio/CloudStream (hangi ana uygulamaya eklendiği),
+  // TV/Mobil/Spor'da ise Android/iOS/Tizen gibi gerçek cihaz platformları.
+  // Bunlar eskiden hep aynı 3 sabit kutuydu; TV/Mobil/Spor'da veriyle hiç
+  // eşleşmediği için hiçbiri işaretlenemiyor, kaydedince "app" alanı
+  // sessizce boşalıyordu (örn. "Android TV" kayboluyordu).
+  const appRow = document.getElementById('appCheckboxRow');
+  appRow.innerHTML = cfg.appOptions.map(a => `<label><input type="checkbox" name="app" value="${escapeHtml(a)}"> ${escapeHtml(a)}</label>`).join('');
 }
 
 function openModal(id = null) {
