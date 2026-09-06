@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>PluginHub → Firestore Migration</title>
+</head>
+<body>
+
+<h2>PluginHub Firestore Aktarımı</h2>
+
+<input id="email" type="email" placeholder="Admin e-posta">
+<br><br>
+
+<input id="password" type="password" placeholder="Admin şifre">
+<br><br>
+
+<button id="migrateBtn">Aktarımı Başlat</button>
+
+<pre id="log"></pre>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc
+}
+from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword
+}
+from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDKu0Xx3xYx_QrKX-h5nNJqr19JcxFu_Nw",
+  authDomain: "streamrehber.firebaseapp.com",
+  projectId: "streamrehber",
+  storageBucket: "streamrehber.firebasestorage.app",
+  messagingSenderId: "234978095149",
+  appId: "1:234978095149:web:04ee7a89e584d91ff4c8a4"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const log = document.getElementById("log");
+
+function writeLog(text) {
+  log.textContent += text + "\n";
+}
+
+
+const sources = {
+  plugins:
+    "https://pluginhub.sait-yldrm.workers.dev/plugins",
+
+  tv:
+    "https://pluginhub.sait-yldrm.workers.dev/apps?category=tv",
+
+  mobile:
+    "https://pluginhub.sait-yldrm.workers.dev/apps?category=mobile",
+
+  sport:
+    "https://pluginhub.sait-yldrm.workers.dev/apps?category=sport"
+};
+
+
+document.getElementById("migrateBtn").onclick = async () => {
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  try {
+
+    writeLog("Firebase'e giriş yapılıyor...");
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    writeLog("✓ Admin girişi başarılı");
+
+
+    for (const [catalog, url] of Object.entries(sources)) {
+
+      writeLog("");
+      writeLog(`${catalog} indiriliyor...`);
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(
+          `${catalog}: HTTP ${response.status}`
+        );
+      }
+
+      const items = await response.json();
+
+      writeLog(
+        `${catalog}: ${items.length} kayıt bulundu`
+      );
+
+      await setDoc(
+        doc(db, "catalogs", catalog),
+        {
+          items,
+          updatedAt: new Date().toISOString()
+        }
+      );
+
+      writeLog(
+        `✓ ${catalog} Firestore'a kaydedildi`
+      );
+    }
+
+
+    writeLog("");
+    writeLog("=================================");
+    writeLog("✓ TÜM AKTARIM TAMAMLANDI");
+    writeLog("=================================");
+
+  } catch (error) {
+
+    console.error(error);
+
+    writeLog("");
+    writeLog("HATA:");
+    writeLog(error.message);
+  }
+
+};
+
+</script>
+
+</body>
+</html>
