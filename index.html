@@ -11,6 +11,25 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Katalog verileri artık Firestore'dan okunuyor.
+        // Bu config istemci tarafında bulunabilir; erişim güvenliği Firestore Rules ile sağlanır.
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyDKu0Xx3xYx_QrKX-h5nNJqr19JcxFu_Nw",
+            authDomain: "streamrehber.firebaseapp.com",
+            projectId: "streamrehber",
+            storageBucket: "streamrehber.firebasestorage.app",
+            messagingSenderId: "234978095149",
+            appId: "1:234978095149:web:04ee7a89e584d91ff4c8a4"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        window.pluginHubDb = firebase.firestore();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <script>
@@ -488,20 +507,72 @@
 
 <script>
 // SPA Veri Altyapısı
+// Eklenti / TV / Telefon / Spor katalogları Firestore'dan okunur.
+// Atmos ve IMAX mevcut statik JSON dosyalarında kalır.
+const FIRESTORE_CATALOGS = {
+    'eklentiler': 'plugins',
+    'tvapk': 'tv',
+    'mobilapk': 'mobile',
+    'sporapk': 'sport'
+};
+
 const DATA_SOURCES = {
-    // NOT (2026-09-06): eklentiler artık statik plugins.json'dan değil,
-    // Cloudflare Worker + KV'den okunuyor — admin panelinden yapılan
-    // ekleme/düzenleme/silme anında burada da görünür, git commit ve
-    // GitHub Pages build beklemek gerekmez. Diğer JSON dosyaları
-    // (tvapk, mobilapk, sporapk, atmos, imax) şimdilik statik kalmaya
-    // devam ediyor, sadece eklentiler taşındı.
-    'eklentiler': 'https://pluginhub.sait-yldrm.workers.dev/plugins',
-    'tvapk': 'https://pluginhub.sait-yldrm.workers.dev/apps?category=tv',
-    'mobilapk': 'https://pluginhub.sait-yldrm.workers.dev/apps?category=mobile',
-    'sporapk': 'https://pluginhub.sait-yldrm.workers.dev/apps?category=sport',
     'atmos': 'atmos.json',
     'imax': 'imax.json'
 };
+
+const ALL_CATEGORY_KEYS = [
+    'eklentiler',
+    'tvapk',
+    'mobilapk',
+    'sporapk',
+    'atmos',
+    'imax'
+];
+
+async function fetchCategoryData(key) {
+    // Firestore katalogları
+    if (FIRESTORE_CATALOGS[key]) {
+        if (!window.pluginHubDb) {
+            throw new Error('Firestore başlatılamadı');
+        }
+
+        const docId = FIRESTORE_CATALOGS[key];
+        const snapshot = await window.pluginHubDb
+            .collection('catalogs')
+            .doc(docId)
+            .get();
+
+        if (!snapshot.exists) {
+            throw new Error(`Firestore belgesi bulunamadı: catalogs/${docId}`);
+        }
+
+        const payload = snapshot.data() || {};
+        if (!Array.isArray(payload.items)) {
+            throw new Error(`Geçersiz Firestore verisi: catalogs/${docId}.items bir dizi olmalı`);
+        }
+
+        return payload.items;
+    }
+
+    // Statik film katalogları
+    const source = DATA_SOURCES[key];
+    if (!source) {
+        throw new Error(`Bilinmeyen kategori: ${key}`);
+    }
+
+    const res = await fetch(source, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} - ${source} yüklenemedi`);
+    return await res.json();
+}
+
+function categorySourceLabel(key) {
+    if (FIRESTORE_CATALOGS[key]) {
+        return `Firestore: catalogs/${FIRESTORE_CATALOGS[key]}`;
+    }
+    return DATA_SOURCES[key] || key;
+}
+
 const tmdbGenres = {28:"Aksiyon",12:"Macera",16:"Animasyon",35:"Komedi",80:"Suç",99:"Belgesel",18:"Dram",10751:"Aile",14:"Fantastik",36:"Tarih",27:"Korku",10402:"Müzik",9648:"Gizem",10749:"Romantik",878:"Bilim Kurgu",10770:"TV Filmi",53:"Gerilim",10752:"Savaş",37:"Vahşi Batı"};
 let currentDiceGenre = null;
 const cachedData = {};
@@ -735,11 +806,11 @@ async function loadCategoryData(key) {
         postLoadSetup();
         return;
     }
+
     renderSkeletons();
+
     try {
-        const res = await fetch(DATA_SOURCES[key]);
-        if (!res.ok) throw new Error(`HTTP ${res.status} - Dosya bulunamadı`);
-        const data = await res.json();
+        const data = await fetchCategoryData(key);
         data.forEach(it => it._cat = key);
         cachedData[key] = data;
         plugins = data;
@@ -750,24 +821,26 @@ async function loadCategoryData(key) {
         document.getElementById('resultsGrid').innerHTML = `
             <div class="col-span-full text-center py-10">
                 <div class="text-rose-500 font-bold mb-2">Veri Yüklenemedi</div>
-                <div class="text-xs text-slate-400 break-all bg-black/20 p-3 rounded-lg inline-block border border-white/5">${err.message}</div>
-                <div class="text-xs text-slate-500 mt-4">Lütfen "${DATA_SOURCES[key]}" dosyasının sunucuda tam bu isimle var olduğundan emin olun (Büyük/küçük harf duyarlıdır). Ayrıca JSON sözdizimini (syntax) kontrol edin.</div>
+                <div class="text-xs text-slate-400 break-all bg-black/20 p-3 rounded-lg inline-block border border-white/5">${escapeHtml(err.message || String(err))}</div>
+                <div class="text-xs text-slate-500 mt-4">Kaynak: ${escapeHtml(categorySourceLabel(key))}</div>
             </div>`;
     }
 }
 
 async function ensureAllCategoriesLoaded() {
-    const keys = Object.keys(DATA_SOURCES);
+    const keys = ALL_CATEGORY_KEYS;
+
     await Promise.all(keys.map(async k => {
         if (cachedData[k]) return;
         try {
-            const res = await fetch(DATA_SOURCES[k]);
-            if (!res.ok) return;
-            const data = await res.json();
+            const data = await fetchCategoryData(k);
             data.forEach(it => it._cat = k);
             cachedData[k] = data;
-        } catch (e) { console.warn('Kategori yüklenemedi (genel arama):', k, e); }
+        } catch (e) {
+            console.warn('Kategori yüklenemedi (genel arama):', k, e);
+        }
     }));
+
     const all = keys.flatMap(k => cachedData[k] || []);
     globalFuseIndex = new Fuse(all, {
         keys: ['name'],
@@ -777,23 +850,23 @@ async function ensureAllCategoriesLoaded() {
     });
 }
 
-// YENİ: Zar → Katalog Köprüsü için sadece gerçek film verisi taşıyan
-// kategoriler (atmos, imax) üzerinde ayrı bir index kurulur. Eklenti/APK
-// listeleri (plugins/tvapk/mobilapk/sporapk) film adlarıyla eşleşmeyeceği
-// için buraya dahil edilmez.
+// Zar → Katalog Köprüsü için yalnız gerçek film verisi taşıyan
+// atmos ve imax statik JSON katalogları yüklenir.
 async function ensureMovieCatalogLoaded() {
     if (movieCatalogFuseIndex) return;
     const movieKeys = ['atmos', 'imax'];
+
     await Promise.all(movieKeys.map(async k => {
         if (cachedData[k]) return;
         try {
-            const res = await fetch(DATA_SOURCES[k]);
-            if (!res.ok) return;
-            const data = await res.json();
+            const data = await fetchCategoryData(k);
             data.forEach(it => it._cat = k);
             cachedData[k] = data;
-        } catch (e) { console.warn('Film kataloğu yüklenemedi:', k, e); }
+        } catch (e) {
+            console.warn('Film kataloğu yüklenemedi:', k, e);
+        }
     }));
+
     const movies = movieKeys.flatMap(k => cachedData[k] || []);
     movieCatalogFuseIndex = new Fuse(movies, {
         keys: ['name'],
@@ -1292,7 +1365,7 @@ async function checkFavoriteUpdates() {
     try {
         await ensureAllCategoriesLoaded();
     } catch (e) { return; }
-    const all = Object.keys(DATA_SOURCES).flatMap(k => cachedData[k] || []);
+    const all = ALL_CATEGORY_KEYS.flatMap(k => cachedData[k] || []);
     let changed = false;
     favorites.forEach(key => {
         const item = all.find(p => pluginKey(p) === key);
