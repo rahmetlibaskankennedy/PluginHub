@@ -72,6 +72,7 @@ const TAB_CONFIG = {
 const LAST_EMAIL_KEY = 'pluginhub_admin_email';
 let activeTab = 'plugins';
 let currentItems = [];
+let currentCategories = [];
 let editingId = null;
 let booted = false;
 
@@ -119,6 +120,7 @@ function enterApp(user) {
 function leaveApp() {
   booted = false;
   currentItems = [];
+  currentCategories = [];
   editingId = null;
   document.getElementById('adminApp').style.display = 'none';
   document.getElementById('loginGate').style.display = 'flex';
@@ -186,6 +188,7 @@ document.querySelectorAll('#tabs .tab').forEach(btn => {
     activeTab = btn.dataset.tab;
     document.querySelectorAll('#tabs .tab').forEach(b => b.classList.toggle('active', b === btn));
     document.getElementById('searchInput').value = '';
+    closeCategoryModal();
     loadItems();
   });
 });
@@ -201,10 +204,36 @@ function normalizeItems(raw) {
   return Array.isArray(raw) ? raw : [];
 }
 
+function normalizeCategories(raw, items = []) {
+  const source = Array.isArray(raw) ? raw : [];
+  const seen = new Set();
+  const out = [];
+
+  const add = (value) => {
+    const name = String(value ?? '').trim();
+    if (!name) return;
+    const key = name.toLocaleLowerCase('tr-TR');
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(name);
+  };
+
+  source.forEach(add);
+  // Eski verilerde categories alanı olmayabilir. Tür değerlerini kaybetmemek
+  // için kayıtların type alanlarını listenin sonuna otomatik ekliyoruz.
+  items.forEach(item => add(item?.type));
+  return out;
+}
+
 async function readCatalog(tab = activeTab) {
   const snap = await getDoc(catalogRef(tab));
   if (!snap.exists()) throw new Error(`catalogs/${TAB_CONFIG[tab].docId} belgesi bulunamadı.`);
-  return normalizeItems(snap.data()?.items);
+  const data = snap.data() || {};
+  const items = normalizeItems(data.items);
+  return {
+    items,
+    categories: normalizeCategories(data.categories, items)
+  };
 }
 
 async function mutateCatalog(tab, mutator) {
@@ -213,11 +242,14 @@ async function mutateCatalog(tab, mutator) {
     const snap = await tx.get(ref);
     if (!snap.exists()) throw new Error(`catalogs/${TAB_CONFIG[tab].docId} belgesi bulunamadı.`);
 
-    const items = normalizeItems(snap.data()?.items).map(item => ({ ...item }));
-    const result = mutator(items);
+    const data = snap.data() || {};
+    const items = normalizeItems(data.items).map(item => ({ ...item }));
+    const categories = normalizeCategories(data.categories, items);
+    const result = mutator(items, categories);
 
     tx.set(ref, {
       items,
+      categories,
       updatedAt: serverTimestamp()
     }, { merge: true });
 
@@ -234,7 +266,9 @@ async function loadItems() {
   document.getElementById('listSub').textContent = '';
 
   try {
-    currentItems = await readCatalog(activeTab);
+    const data = await readCatalog(activeTab);
+    currentItems = data.items;
+    currentCategories = data.categories;
     renderList();
   } catch (err) {
     content.innerHTML = `<div class="empty-state">Yüklenemedi: ${escapeHtml(friendlyFirestoreError(err))}</div>`;
@@ -284,6 +318,208 @@ function renderList() {
 document.getElementById('searchInput').addEventListener('input', renderList);
 
 // ---------------------------------------------------------------------
+// Alt kategori yönetimi
+// ---------------------------------------------------------------------
+function categoryNameKey(value) {
+  return String(value ?? '').trim().toLocaleLowerCase('tr-TR');
+}
+
+function categoryUsageCount(name) {
+  const key = categoryNameKey(name);
+  return currentItems.filter(item => categoryNameKey(item.type) === key).length;
+}
+
+function closeCategoryModal() {
+  document.getElementById('categoryModalOverlay').classList.remove('open');
+  document.getElementById('newCategoryName').value = '';
+}
+
+function openCategoryModal() {
+  document.getElementById('categoryModalSubtext').textContent = TAB_CONFIG[activeTab].label;
+  renderCategoryManager();
+  document.getElementById('categoryModalOverlay').classList.add('open');
+}
+
+function renderCategoryManager() {
+  const list = document.getElementById('categoryList');
+  if (!currentCategories.length) {
+    list.innerHTML = '<div class="category-empty">Henüz alt kategori yok. Yukarıdan yeni bir kategori ekleyebilirsin.</div>';
+    return;
+  }
+
+  list.innerHTML = currentCategories.map((name, index) => {
+    const count = categoryUsageCount(name);
+    return `
+      <div class="category-row" data-category-index="${index}">
+        <div class="category-name-wrap">
+          <input class="category-name-input" type="text" maxlength="50" value="${escapeHtml(name)}" data-category-name>
+          <span class="category-count">${count} kayıt</span>
+        </div>
+        <div class="category-order-actions">
+          <button type="button" class="icon-btn" data-category-up title="Yukarı taşı" ${index === 0 ? 'disabled' : ''}>↑</button>
+          <button type="button" class="icon-btn" data-category-down title="Aşağı taşı" ${index === currentCategories.length - 1 ? 'disabled' : ''}>↓</button>
+        </div>
+        <div class="category-main-actions">
+          <button type="button" class="icon-btn save" data-category-save title="Adı kaydet">✓</button>
+          <button type="button" class="icon-btn delete" data-category-delete title="Kategoriyi sil">×</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function refreshAfterCategoryChange() {
+  const data = await readCatalog(activeTab);
+  currentItems = data.items;
+  currentCategories = data.categories;
+  renderList();
+  renderCategoryManager();
+}
+
+async function addCategory() {
+  if (!auth.currentUser) return;
+  const input = document.getElementById('newCategoryName');
+  const name = input.value.trim();
+  if (!name) {
+    showToast('Kategori adı gerekli.', true);
+    input.focus();
+    return;
+  }
+  if (currentCategories.some(c => categoryNameKey(c) === categoryNameKey(name))) {
+    showToast('Bu kategori zaten var.', true);
+    return;
+  }
+
+  const tabAtStart = activeTab;
+  const btn = document.getElementById('addCategoryBtn');
+  btn.disabled = true;
+  try {
+    await mutateCatalog(tabAtStart, (items, categories) => {
+      if (categories.some(c => categoryNameKey(c) === categoryNameKey(name))) {
+        throw new Error('Bu kategori zaten var.');
+      }
+      categories.push(name);
+    });
+    input.value = '';
+    await refreshAfterCategoryChange();
+    showToast('Alt kategori eklendi.');
+  } catch (err) {
+    showToast('Kategori eklenemedi: ' + friendlyFirestoreError(err), true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function renameCategory(index, nextName) {
+  const oldName = currentCategories[index];
+  nextName = String(nextName ?? '').trim();
+  if (!oldName) return;
+  if (!nextName) {
+    showToast('Kategori adı boş olamaz.', true);
+    renderCategoryManager();
+    return;
+  }
+  if (categoryNameKey(oldName) === categoryNameKey(nextName)) {
+    // Büyük/küçük harf veya biçim değişikliğini yine de kaydet.
+  } else if (currentCategories.some((c, i) => i !== index && categoryNameKey(c) === categoryNameKey(nextName))) {
+    showToast('Bu isimde başka bir kategori zaten var.', true);
+    renderCategoryManager();
+    return;
+  }
+
+  try {
+    await mutateCatalog(activeTab, (items, categories) => {
+      const realIndex = categories.findIndex(c => categoryNameKey(c) === categoryNameKey(oldName));
+      if (realIndex === -1) throw new Error('Kategori bulunamadı.');
+      if (categories.some((c, i) => i !== realIndex && categoryNameKey(c) === categoryNameKey(nextName))) {
+        throw new Error('Bu isimde başka bir kategori zaten var.');
+      }
+      categories[realIndex] = nextName;
+      items.forEach(item => {
+        if (categoryNameKey(item.type) === categoryNameKey(oldName)) item.type = nextName;
+      });
+    });
+    await refreshAfterCategoryChange();
+    showToast('Kategori adı güncellendi.');
+  } catch (err) {
+    showToast('Kategori güncellenemedi: ' + friendlyFirestoreError(err), true);
+  }
+}
+
+async function moveCategory(index, direction) {
+  const target = index + direction;
+  if (target < 0 || target >= currentCategories.length) return;
+  const name = currentCategories[index];
+  try {
+    await mutateCatalog(activeTab, (items, categories) => {
+      const realIndex = categories.findIndex(c => categoryNameKey(c) === categoryNameKey(name));
+      if (realIndex === -1) throw new Error('Kategori bulunamadı.');
+      const realTarget = realIndex + direction;
+      if (realTarget < 0 || realTarget >= categories.length) return;
+      [categories[realIndex], categories[realTarget]] = [categories[realTarget], categories[realIndex]];
+    });
+    await refreshAfterCategoryChange();
+  } catch (err) {
+    showToast('Sıra değiştirilemedi: ' + friendlyFirestoreError(err), true);
+  }
+}
+
+async function deleteCategory(index) {
+  const name = currentCategories[index];
+  if (!name) return;
+  const count = categoryUsageCount(name);
+  const message = count > 0
+    ? `“${name}” kategorisinde ${count} kayıt var. Kategoriyi silersen bu kayıtların Tür alanı boşaltılacak. Devam edilsin mi?`
+    : `“${name}” kategorisi silinsin mi?`;
+  if (!confirm(message)) return;
+
+  try {
+    await mutateCatalog(activeTab, (items, categories) => {
+      const realIndex = categories.findIndex(c => categoryNameKey(c) === categoryNameKey(name));
+      if (realIndex === -1) throw new Error('Kategori bulunamadı.');
+      categories.splice(realIndex, 1);
+      items.forEach(item => {
+        if (categoryNameKey(item.type) === categoryNameKey(name)) item.type = '';
+      });
+    });
+    await refreshAfterCategoryChange();
+    showToast('Kategori silindi.');
+  } catch (err) {
+    showToast('Kategori silinemedi: ' + friendlyFirestoreError(err), true);
+  }
+}
+
+document.getElementById('manageCategoriesBtn').addEventListener('click', openCategoryModal);
+document.getElementById('categoryModalCloseBtn').addEventListener('click', closeCategoryModal);
+document.getElementById('categoryModalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'categoryModalOverlay') closeCategoryModal();
+});
+document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
+document.getElementById('newCategoryName').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') addCategory();
+});
+document.getElementById('categoryList').addEventListener('click', (e) => {
+  const row = e.target.closest('[data-category-index]');
+  if (!row) return;
+  const index = Number(row.dataset.categoryIndex);
+  if (!Number.isInteger(index)) return;
+
+  if (e.target.closest('[data-category-up]')) return void moveCategory(index, -1);
+  if (e.target.closest('[data-category-down]')) return void moveCategory(index, 1);
+  if (e.target.closest('[data-category-save]')) {
+    const input = row.querySelector('[data-category-name]');
+    return void renameCategory(index, input?.value);
+  }
+  if (e.target.closest('[data-category-delete]')) return void deleteCategory(index);
+});
+document.getElementById('categoryList').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || !e.target.matches('[data-category-name]')) return;
+  const row = e.target.closest('[data-category-index]');
+  if (!row) return;
+  e.preventDefault();
+  renameCategory(Number(row.dataset.categoryIndex), e.target.value);
+});
+
+// ---------------------------------------------------------------------
 // Ekle/Düzenle modal
 // ---------------------------------------------------------------------
 function todayISO() {
@@ -299,7 +535,11 @@ function applyTabFieldVisibility() {
   document.getElementById('codeSourceRow').style.display = cfg.hasCode ? '' : 'none';
   document.getElementById('ageField').style.display = activeTab === 'plugins' ? '' : 'none';
 
-  document.getElementById('typeOptions').innerHTML = cfg.typeOptions
+  const typeOptions = [...currentCategories];
+  cfg.typeOptions.forEach(t => {
+    if (!typeOptions.some(x => x.toLocaleLowerCase('tr-TR') === t.toLocaleLowerCase('tr-TR'))) typeOptions.push(t);
+  });
+  document.getElementById('typeOptions').innerHTML = typeOptions
     .map(t => `<option value="${escapeHtml(t)}">`)
     .join('');
 
@@ -436,7 +676,11 @@ document.getElementById('itemForm').addEventListener('submit', async (e) => {
   saveBtn.textContent = 'Kaydediliyor…';
 
   try {
-    await mutateCatalog(tabAtStart, (items) => {
+    await mutateCatalog(tabAtStart, (items, categories) => {
+      if (payload.type && !categories.some(c => c.toLocaleLowerCase('tr-TR') === payload.type.toLocaleLowerCase('tr-TR'))) {
+        categories.push(payload.type);
+      }
+
       if (editIdAtStart) {
         const idx = items.findIndex(x => x.id === editIdAtStart);
         if (idx === -1) throw new Error('Düzenlenecek kayıt bulunamadı. Listeyi yenile.');

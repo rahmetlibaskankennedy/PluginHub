@@ -39,6 +39,7 @@
 
     <div class="toolbar">
       <input type="text" id="searchInput" class="search-input" placeholder="İsimde ara…">
+      <button class="btn secondary" id="manageCategoriesBtn" type="button">☷ Alt Kategoriler</button>
       <button class="btn" id="newItemBtn" type="button">+ Yeni Ekle</button>
     </div>
 
@@ -114,6 +115,30 @@
           <button type="submit" class="btn" id="saveItemBtn">Kaydet</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ================= ALT KATEGORİ YÖNETİMİ ================= -->
+  <div class="modal-overlay" id="categoryModalOverlay">
+    <div class="modal-sheet category-sheet">
+      <div class="modal-head">
+        <div>
+          <strong>Alt Kategori Yönetimi</strong>
+          <div class="modal-subtext" id="categoryModalSubtext"></div>
+        </div>
+        <button type="button" id="categoryModalCloseBtn" aria-label="Kapat">×</button>
+      </div>
+
+      <div class="category-add-row">
+        <input type="text" id="newCategoryName" maxlength="50" placeholder="Yeni alt kategori adı…">
+        <button type="button" class="btn" id="addCategoryBtn">+ Ekle</button>
+      </div>
+
+      <div class="category-help">
+        Buradaki sıra ana sayfadaki alt kategori sekmelerinin sırasıdır. Kategori adını değiştirirsen o kategorideki kayıtların <b>Tür</b> alanı da otomatik güncellenir.
+      </div>
+
+      <div id="categoryList" class="category-list"></div>
     </div>
   </div>
 

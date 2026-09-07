@@ -530,6 +530,10 @@ const ALL_CATEGORY_KEYS = [
     'imax'
 ];
 
+// Firestore belgelerindeki admin tarafından yönetilen alt kategori sırası.
+// categories alanı yoksa site kayıtların type değerlerinden eski davranışla üretmeye devam eder.
+const catalogCategoryOrder = {};
+
 async function fetchCategoryData(key) {
     // Firestore katalogları
     if (FIRESTORE_CATALOGS[key]) {
@@ -551,6 +555,10 @@ async function fetchCategoryData(key) {
         if (!Array.isArray(payload.items)) {
             throw new Error(`Geçersiz Firestore verisi: catalogs/${docId}.items bir dizi olmalı`);
         }
+
+        catalogCategoryOrder[key] = Array.isArray(payload.categories)
+            ? payload.categories.map(x => String(x || '').trim()).filter(Boolean)
+            : [];
 
         return payload.items;
     }
@@ -1410,7 +1418,21 @@ function computeNewestDate() {
 }
 
 function buildTabs() {
-    const types = ['Tümü', ...new Set(plugins.map(p => p.type).filter(Boolean))];
+    const configured = Array.isArray(catalogCategoryOrder[currentMainCategory])
+        ? catalogCategoryOrder[currentMainCategory]
+        : [];
+    const discovered = plugins.map(p => String(p.type || '').trim()).filter(Boolean);
+    const seen = new Set();
+    const orderedTypes = [];
+
+    [...configured, ...discovered].forEach(type => {
+        const key = type.toLocaleLowerCase('tr-TR');
+        if (seen.has(key)) return;
+        seen.add(key);
+        orderedTypes.push(type);
+    });
+
+    const types = ['Tümü', ...orderedTypes];
     const container = document.getElementById('categoryTabs');
     container.innerHTML = types.map((t, i) => `<button class="pill-tab ${i === 0 ? 'active' : ''}" data-type="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
 }
